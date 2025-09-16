@@ -2,9 +2,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
+import { FormConnectionModal } from '@/components/whatsapp/form-connection-modal';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type WhatsAppConnection } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { IconBrandWhatsapp, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +15,11 @@ interface WhatsAppIndexProps {
     maxConnections: number;
     currentConnections: number;
     canCreateMore: boolean;
+    modalType?: 'create' | 'edit';
+    editConnection?: WhatsAppConnection;
 }
 
-export default function WhatsAppIndex({ connections, maxConnections, currentConnections, canCreateMore }: WhatsAppIndexProps) {
+export default function WhatsAppIndex({ connections, maxConnections, currentConnections, canCreateMore, modalType, editConnection }: WhatsAppIndexProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -39,6 +42,20 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
             });
         }
     };
+
+    const handleCreateClick = () => {
+        router.visit('/whatsapp/create');
+    };
+
+    const handleEditClick = (connectionId: number) => {
+        router.visit(`/whatsapp/${connectionId}/edit`);
+    };
+
+    const handleCloseModal = () => {
+        router.visit('/whatsapp');
+    };
+
+    const isModalOpen = modalType === 'create' || modalType === 'edit';
 
     const columns: ColumnDef<WhatsAppConnection>[] = [
         {
@@ -92,11 +109,13 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                 const connection = row.original;
                 return (
                     <div className="flex gap-2">
-                        <Link href={`/whatsapp/${connection.id}/edit`}>
-                            <Button variant="outline" size="sm">
-                                <IconEdit className="h-4 w-4" />
-                            </Button>
-                        </Link>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditClick(connection.id)}
+                        >
+                            <IconEdit className="h-4 w-4" />
+                        </Button>
                         <Button
                             variant="outline"
                             size="sm"
@@ -127,12 +146,13 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                     </div>
 
                     {canCreateMore && (
-                        <Link href="/whatsapp/create">
-                            <Button className="flex items-center gap-2">
-                                <IconPlus className="h-4 w-4" />
-                                {t('whatsapp.newConnection')}
-                            </Button>
-                        </Link>
+                        <Button
+                            className="flex items-center gap-2"
+                            onClick={handleCreateClick}
+                        >
+                            <IconPlus className="h-4 w-4" />
+                            {t('whatsapp.newConnection')}
+                        </Button>
                     )}
 
                     {!canCreateMore && (
@@ -161,12 +181,10 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                                     {t('whatsapp.createFirstConnection')}
                                 </p>
                                 {canCreateMore && (
-                                    <Link href="/whatsapp/create">
-                                        <Button>
-                                            <IconPlus className="h-4 w-4 mr-2" />
-                                            {t('whatsapp.createConnection')}
-                                        </Button>
-                                    </Link>
+                                    <Button onClick={handleCreateClick}>
+                                        <IconPlus className="h-4 w-4 mr-2" />
+                                        {t('whatsapp.createConnection')}
+                                    </Button>
                                 )}
                             </div>
                         ) : (
@@ -180,6 +198,13 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Modal de Formulário */}
+            <FormConnectionModal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                connection={modalType === 'edit' ? editConnection : undefined}
+            />
         </AppLayout>
     );
 }

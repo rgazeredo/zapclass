@@ -44,7 +44,17 @@ class WhatsAppConnectionController extends Controller
                 ->with('error', 'You have reached the maximum number of WhatsApp connections for your plan.');
         }
 
-        return Inertia::render('WhatsApp/Create');
+        $connections = WhatsAppConnection::where('tenant_id', $tenant->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('WhatsApp/Index', [
+            'connections' => $connections,
+            'maxConnections' => $maxConnections,
+            'currentConnections' => $currentConnections,
+            'canCreateMore' => $currentConnections < $maxConnections,
+            'modalType' => 'create',
+        ]);
     }
 
     /**
@@ -105,8 +115,21 @@ class WhatsAppConnectionController extends Controller
             abort(403);
         }
 
-        return Inertia::render('WhatsApp/Edit', [
-            'connection' => $whatsapp,
+        $tenant = Auth::user()->tenant;
+        $connections = WhatsAppConnection::where('tenant_id', $tenant->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $maxConnections = $tenant->whatsapp_connections;
+        $currentConnections = $connections->count();
+
+        return Inertia::render('WhatsApp/Index', [
+            'connections' => $connections,
+            'maxConnections' => $maxConnections,
+            'currentConnections' => $currentConnections,
+            'canCreateMore' => $currentConnections < $maxConnections,
+            'modalType' => 'edit',
+            'editConnection' => $whatsapp,
         ]);
     }
 
