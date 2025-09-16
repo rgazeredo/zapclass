@@ -2,6 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PricingController;
+
+// API routes for pricing
+Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
+
+// Development route to create sample products
+Route::post('/api/pricing/create-sample-products', [PricingController::class, 'createSampleProducts'])
+    ->name('api.pricing.create-sample-products');
 
 Route::get('/', function () {
     return Inertia::render('Landing/Index');
