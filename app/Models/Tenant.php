@@ -20,7 +20,7 @@ class Tenant extends Model
         'document',
         'address',
         'settings',
-        'plan_metadata',
+        'whatsapp_connections',
         'is_active',
         'stripe_id',
         'pm_type',
@@ -31,7 +31,7 @@ class Tenant extends Model
     protected $casts = [
         'settings' => 'array',
         'address' => 'array',
-        'plan_metadata' => 'array',
+        'whatsapp_connections' => 'integer',
         'is_active' => 'boolean',
         'trial_ends_at' => 'datetime',
     ];
@@ -113,5 +113,20 @@ class Tenant extends Model
     public function isAtUserLimit(): bool
     {
         return $this->users()->count() >= $this->getUserLimit();
+    }
+
+    public function whatsappConnections(): HasMany
+    {
+        return $this->hasMany(WhatsAppConnection::class);
+    }
+
+    public function canCreateWhatsAppConnection(): bool
+    {
+        return $this->whatsappConnections()->count() < $this->whatsapp_connections;
+    }
+
+    public function getRemainingWhatsAppConnections(): int
+    {
+        return max(0, $this->whatsapp_connections - $this->whatsappConnections()->count());
     }
 }

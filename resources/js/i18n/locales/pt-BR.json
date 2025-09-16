@@ -181,5 +181,33 @@
         "backupScheduled": "Backup agendado para hoje às 23:00",
         "systemRunningNormally": "Sistema funcionando normalmente",
         "updateAvailable": "Atualização disponível v2.1.0"
+    },
+    "whatsapp": {
+        "title": "WhatsApp",
+        "connections": "Conexões",
+        "myConnections": "Minhas Conexões",
+        "newConnection": "Nova Conexão",
+        "createConnection": "Criar Conexão",
+        "editConnection": "Editar Conexão",
+        "connectionName": "Nome da Conexão",
+        "systemName": "Nome do Sistema",
+        "adminField1": "Campo Admin 1",
+        "adminField2": "Campo Admin 2",
+        "phone": "Telefone",
+        "status": "Status",
+        "actions": "Ações",
+        "edit": "Editar",
+        "delete": "Excluir",
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "maxConnectionsReached": "Limite de conexões atingido",
+        "connectionsUsed": "Conexões utilizadas",
+        "connectionsAvailable": "Conexões disponíveis",
+        "connectionCreated": "Conexão criada com sucesso",
+        "connectionUpdated": "Conexão atualizada com sucesso",
+        "connectionDeleted": "Conexão excluída com sucesso",
+        "confirmDelete": "Tem certeza que deseja excluir esta conexão?",
+        "noConnections": "Nenhuma conexão encontrada",
+        "createFirstConnection": "Crie sua primeira conexão WhatsApp"
     }
 }

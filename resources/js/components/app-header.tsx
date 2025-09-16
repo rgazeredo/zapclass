@@ -13,6 +13,7 @@ import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid, Menu, Search } from 'lucide-react';
+import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
@@ -34,6 +35,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             title: t('dashboard.title'),
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: t('whatsapp.title'),
+            href: '/whatsapp',
+            icon: IconBrandWhatsapp,
         },
     ];
     return (

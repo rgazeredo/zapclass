@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\Auth\RegisterWithPlanController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\WhatsAppConnectionController;
 
 // API routes for pricing
 Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
@@ -69,6 +70,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // WhatsApp connections routes
+    Route::resource('whatsapp', WhatsAppConnectionController::class);
 
     Route::patch('settings/theme', function () {
         request()->validate([

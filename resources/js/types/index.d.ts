@@ -40,3 +40,16 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface WhatsAppConnection {
+    id: number;
+    tenant_id: number;
+    name: string;
+    system_name: string;
+    admin_field_1?: string | null;
+    admin_field_2?: string | null;
+    phone?: string | null;
+    status?: string | null;
+    created_at: string;
+    updated_at: string;
+}
