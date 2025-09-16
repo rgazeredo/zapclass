@@ -1,0 +1,110 @@
+{
+    "meta": {
+        "title": "ZapClass - Transforme Seu Negócio com API WhatsApp"
+    },
+    "navigation": {
+        "features": "Recursos",
+        "pricing": "Preços",
+        "contact": "Contato",
+        "login": "Entrar",
+        "language": "PT"
+    },
+    "hero": {
+        "badge": "Novo curso",
+        "title": "Transforme Seu Negócio com API WhatsApp",
+        "description": "Conecte, automatize e faça seu negócio crescer com nossa poderosa plataforma de API WhatsApp. Inclui cursos exclusivos para maximizar seus resultados.",
+        "startFreeDemo": "Começar Demo Grátis",
+        "viewPricing": "Ver Preços",
+        "noSetupRequired": "Sem configuração necessária",
+        "support247": "Suporte 24/7",
+        "interactiveDemo": "Demo Interativo",
+        "testPlatformFree": "Teste nossa plataforma gratuitamente"
+    },
+    "stats": {
+        "title": "Confiado por Milhares",
+        "description": "Junte-se às empresas que já estão transformando seus negócios",
+        "customersServed": "Clientes Atendidos",
+        "messagesSent": "Mensagens Enviadas",
+        "satisfaction": "Satisfação",
+        "uptime": "Uptime"
+    },
+    "features": {
+        "title": "Tudo que Você Precisa para Ter Sucesso",
+        "description": "Desde integração WhatsApp até cursos exclusivos, fornecemos todas as ferramentas que seu negócio precisa para crescer.",
+        "whatsappApi": {
+            "title": "Integração API WhatsApp",
+            "description": "Conecte múltiplas contas WhatsApp e automatize mensagens com uma API poderosa e confiável."
+        },
+        "completeApi": {
+            "title": "API Completa",
+            "description": "Acesso total à nossa API com webhooks, monitoramento em tempo real e documentação completa."
+        },
+        "exclusiveCourses": {
+            "title": "Cursos Exclusivos",
+            "description": "Aprenda a maximizar seus resultados com nossa biblioteca de cursos exclusivos sobre marketing e vendas."
+        },
+        "enterpriseSecurity": {
+            "title": "Segurança Empresarial",
+            "description": "Seus dados são protegidos com os mais altos padrões de segurança utilizados por grandes corporações."
+        },
+        "highPerformance": {
+            "title": "Alta Performance",
+            "description": "99.9% de uptime garantido com infraestrutura proprietária para suportar grandes volumes."
+        },
+        "specializedSupport": {
+            "title": "Suporte Especializado",
+            "description": "Nossa equipe de especialistas está pronta para ajudar você a alcançar os melhores resultados."
+        }
+    },
+    "pricing": {
+        "title": "Escolha Seu Plano",
+        "description": "Preços transparentes que crescem com seu negócio. Todos os planos incluem nossa biblioteca de cursos.",
+        "loadingPlans": "Carregando planos...",
+        "errorLoading": "Erro ao carregar planos:",
+        "showingDefaultPlans": "Mostrando planos padrão",
+        "mostPopular": "Mais Popular",
+        "month": "mês",
+        "year": "ano",
+        "choosePlan": "Escolher Plano",
+        "customPlanQuestion": "Precisa de um plano personalizado para seu negócio?",
+        "talkToSales": "Fale com Vendas"
+    },
+    "contact": {
+        "title": "Pronto para Começar?",
+        "description": "Agende uma demonstração ou entre em contato com nossa equipe para descobrir como a ZapClass pode transformar seu negócio.",
+        "scheduleDemo": "Agendar Demo",
+        "fullName": "Nome Completo",
+        "fullNamePlaceholder": "Seu nome completo",
+        "email": "Email",
+        "emailPlaceholder": "seu@email.com",
+        "company": "Empresa",
+        "companyPlaceholder": "Nome da empresa",
+        "phone": "Telefone",
+        "phonePlaceholder": "(11) 99999-9999",
+        "scheduleDemoButton": "Agendar Demo",
+        "getInTouch": "Entre em Contato",
+        "quickResponse": {
+            "title": "Resposta Rápida",
+            "description": "Respondemos todas as consultas em até 24 horas"
+        },
+        "specializedSupport": {
+            "title": "Suporte Especializado",
+            "description": "Segunda a sexta, das 9h às 18h"
+        },
+        "personalizedDemo": {
+            "title": "Demo Personalizada",
+            "description": "Sessões de demonstração personalizadas às necessidades do seu negócio"
+        }
+    },
+    "footer": {
+        "description": "Transforme seu negócio com a plataforma mais completa de API WhatsApp e cursos educacionais do mercado.",
+        "quickLinks": "Links Rápidos",
+        "features": "Recursos",
+        "pricing": "Preços",
+        "contact": "Contato",
+        "legal": "Legal",
+        "privacyPolicy": "Política de Privacidade",
+        "termsOfService": "Termos de Serviço",
+        "copyright": "© 2024 ZapClass. Todos os direitos reservados."
+    }
+}

@@ -8,6 +8,7 @@ use App\Http\Controllers\SubscriptionController;
 
 // API routes for pricing
 Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
+Route::get('/api/pricing/plan/{stripe_price_id}', [PricingController::class, 'getPlan'])->name('api.pricing.plan');
 
 // Development route to create sample products
 Route::post('/api/pricing/create-sample-products', [PricingController::class, 'createSampleProducts'])

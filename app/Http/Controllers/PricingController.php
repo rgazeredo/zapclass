@@ -48,6 +48,14 @@ class PricingController extends Controller
                 // Determinar o tipo de plano baseado no nome ou metadata
                 $planType = $this->determinePlanType($product->name, $product->metadata ?? []);
 
+                $features = [];
+
+                if (!empty($product->marketing_features)) {
+                    foreach ($product->marketing_features as $feature) {
+                        $features[] = $feature->name;
+                    }
+                }
+
                 $plans[] = [
                     'id' => $price->id,
                     'product_id' => $product->id,
@@ -58,7 +66,7 @@ class PricingController extends Controller
                     'interval' => $price->recurring->interval ?? 'month',
                     'interval_count' => $price->recurring->interval_count ?? 1,
                     'type' => $planType,
-                    'features' => $this->getPlanFeatures($planType, $product->metadata ?? []),
+                    'features' => $features,
                     'popular' => $planType === 'professional', // Marcar profissional como popular
                     'stripe_price_id' => $price->id,
                     'metadata' => $product->metadata ?? []
@@ -66,15 +74,80 @@ class PricingController extends Controller
             }
 
             // Ordenar planos por preço
-            usort($plans, function($a, $b) {
+            usort($plans, function ($a, $b) {
                 return $a['price'] <=> $b['price'];
             });
 
             return response()->json($plans);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Erro ao buscar planos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a single plan by stripe_price_id
+     */
+    public function getPlan($stripe_price_id)
+    {
+        try {
+            // Buscar o preço no Stripe
+            $price = Price::retrieve($stripe_price_id);
+
+            if (!$price->active) {
+                return response()->json([
+                    'error' => 'Plano não está ativo'
+                ], 404);
+            }
+
+            // Buscar o produto separadamente se não foi expandido
+            $product = null;
+            if (is_string($price->product)) {
+                $product = Product::retrieve($price->product);
+            } else {
+                $product = $price->product;
+            }
+
+            if (!$product->active) {
+                return response()->json([
+                    'error' => 'Produto não está ativo'
+                ], 404);
+            }
+
+            // Determinar tipo de plano
+            $planType = $this->determinePlanType($product->name, $product->metadata ?? []);
+
+            // Montar features
+            $features = [];
+            if (!empty($product->marketing_features)) {
+                foreach ($product->marketing_features as $feature) {
+                    $features[] = $feature->name;
+                }
+            }
+
+            // Montar dados do plano
+            $planData = [
+                'id' => $planType,
+                'name' => $product->name,
+                'description' => $product->description ?? '',
+                'price' => $price->unit_amount / 100,
+                'currency' => strtoupper($price->currency),
+                'interval' => $price->recurring->interval ?? 'month',
+                'features' => $features,
+                'popular' => $planType === 'professional',
+                'stripe_price_id' => $price->id,
+                'metadata' => $product->metadata ?? []
+            ];
+
+            return response()->json($planData);
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            return response()->json([
+                'error' => 'Plano não encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro ao buscar plano: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -103,50 +176,6 @@ class PricingController extends Controller
         }
 
         return 'basic'; // Default
-    }
-
-    /**
-     * Obter features do plano baseado no tipo
-     */
-    private function getPlanFeatures($type, $metadata)
-    {
-        // Se as features estão definidas no metadata do Stripe
-        if (isset($metadata['features'])) {
-            return json_decode($metadata['features'], true);
-        }
-
-        // Features padrão baseadas no tipo
-        switch ($type) {
-            case 'basic':
-                return [
-                    '1 Conexão WhatsApp',
-                    '1.000 mensagens/mês',
-                    'Dashboard básico',
-                    'Suporte por email'
-                ];
-
-            case 'professional':
-                return [
-                    '3 Conexões WhatsApp',
-                    '5.000 mensagens/mês',
-                    'Dashboard avançado',
-                    'API acesso completo',
-                    'Suporte prioritário'
-                ];
-
-            case 'enterprise':
-                return [
-                    'Conexões ilimitadas',
-                    '25.000 mensagens/mês',
-                    'Dashboard empresarial',
-                    'API completa + Webhooks',
-                    'Cursos exclusivos',
-                    'Suporte 24/7'
-                ];
-
-            default:
-                return [];
-        }
     }
 
     /**
@@ -212,7 +241,6 @@ class PricingController extends Controller
                 'message' => 'Produtos criados com sucesso',
                 'products' => $createdProducts
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Erro ao criar produtos: ' . $e->getMessage()

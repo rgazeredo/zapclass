@@ -65,9 +65,28 @@ class SubscriptionController extends Controller
                 return redirect()->route('home')->with('error', 'Conta não encontrada');
             }
 
-            // Ativar tenant
+            // Ativar tenant e criar/atualizar subscription
             $tenant->update([
                 'is_active' => true,
+            ]);
+
+            // Criar ou atualizar o registro da subscription na tabela subscriptions
+            \App\Models\Subscription::updateOrCreate(
+                ['stripe_id' => $subscription->id],
+                [
+                    'tenant_id' => $tenant->id,
+                    'type' => 'default',
+                    'stripe_id' => $subscription->id,
+                    'stripe_status' => $subscription->status,
+                    'stripe_price' => $subscription->items->data[0]->price->id ?? null,
+                    'quantity' => $subscription->items->data[0]->quantity ?? 1,
+                    'trial_ends_at' => $subscription->trial_end ? \Carbon\Carbon::createFromTimestamp($subscription->trial_end) : null,
+                    'ends_at' => null, // Subscription is active, no end date
+                ]
+            );
+
+            // Manter informações adicionais no settings para compatibilidade
+            $tenant->update([
                 'settings' => array_merge($tenant->settings ?? [], [
                     'subscription' => [
                         'stripe_subscription_id' => $subscription->id,
@@ -80,9 +99,25 @@ class SubscriptionController extends Controller
             // Fazer login automático do usuário
             Auth::login($user);
 
-            // Preparar dados do tenant com features
+            // Buscar features reais do plano no Stripe
+            $planFeatures = [];
+            if (isset($tenant->plan_metadata['stripe_price_id'])) {
+                try {
+                    $pricingController = new PricingController();
+                    $planResponse = $pricingController->getPlan($tenant->plan_metadata['stripe_price_id']);
+                    $planData = $planResponse->getData(true);
+
+                    if (!isset($planData['error']) && isset($planData['features'])) {
+                        $planFeatures = $planData['features'];
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Erro ao buscar features do plano: ' . $e->getMessage());
+                }
+            }
+
+            // Preparar dados do tenant com features do plano real ou fallback
             $tenantData = $tenant->only(['name', 'plan_metadata']);
-            $tenantData['plan_metadata']['features'] = $tenant->settings['features'] ?? [
+            $tenantData['plan_metadata']['features'] = !empty($planFeatures) ? $planFeatures : [
                 'Conexão WhatsApp',
                 'Dashboard completo',
                 'Mensagens ilimitadas',
