@@ -95,10 +95,42 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
             header: t('whatsapp.status'),
             cell: ({ row }) => {
                 const status = row.getValue("status") as string;
-                return status ? (
-                    <Badge variant="default">{status}</Badge>
-                ) : (
-                    <Badge variant="secondary">-</Badge>
+                if (!status) {
+                    return <Badge variant="secondary">-</Badge>;
+                }
+
+                const getStatusTranslation = (status: string) => {
+                    const translations: Record<string, string> = {
+                        'creating': t('whatsapp.statusCreating'),
+                        'created': t('whatsapp.statusCreated'),
+                        'connecting': t('whatsapp.statusConnecting'),
+                        'connected': t('whatsapp.statusConnected'),
+                        'disconnected': t('whatsapp.statusDisconnected'),
+                        'error': t('whatsapp.statusError'),
+                    };
+                    return translations[status] || status;
+                };
+
+                const getStatusVariant = (status: string) => {
+                    switch (status) {
+                        case 'connected':
+                            return 'default'; // Verde
+                        case 'creating':
+                        case 'connecting':
+                            return 'secondary'; // Azul/Cinza
+                        case 'error':
+                            return 'destructive'; // Vermelho
+                        case 'disconnected':
+                            return 'outline'; // Borda
+                        default:
+                            return 'secondary';
+                    }
+                };
+
+                return (
+                    <Badge variant={getStatusVariant(status) as any}>
+                        {getStatusTranslation(status)}
+                    </Badge>
                 );
             },
         },

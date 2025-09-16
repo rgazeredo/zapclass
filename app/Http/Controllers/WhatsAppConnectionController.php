@@ -3,12 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\WhatsAppConnection;
+use App\Services\UazApiService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class WhatsAppConnectionController extends Controller
 {
+    protected $uazApiService;
+
+    public function __construct(UazApiService $uazApiService)
+    {
+        $this->uazApiService = $uazApiService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -78,16 +88,57 @@ class WhatsAppConnectionController extends Controller
             'admin_field_2' => 'nullable|string|max:255',
         ]);
 
-        WhatsAppConnection::create([
-            'tenant_id' => $tenant->id,
-            'name' => $request->name,
-            'system_name' => $request->system_name,
-            'admin_field_1' => $request->admin_field_1,
-            'admin_field_2' => $request->admin_field_2,
-        ]);
+        DB::beginTransaction();
 
-        return redirect()->route('whatsapp.index')
-            ->with('success', 'WhatsApp connection created successfully.');
+        try {
+            // Criar conexão no banco de dados
+            $connection = WhatsAppConnection::create([
+                'tenant_id' => $tenant->id,
+                'name' => $request->name,
+                'system_name' => $request->system_name,
+                'admin_field_1' => $request->admin_field_1,
+                'admin_field_2' => $request->admin_field_2,
+                'status' => 'creating',
+            ]);
+
+            // Criar instância na API UAZ
+            $instanceName = $connection->instance_name;
+            $apiResponse = $this->uazApiService->createInstance($instanceName, [
+                'name' => $connection->name,
+                'admin_field_1' => $connection->admin_field_1,
+                'admin_field_2' => $connection->admin_field_2,
+            ]);
+
+            // Atualizar conexão com dados da API
+            $connection->update([
+                'status' => 'created',
+                'phone' => $apiResponse['phone'] ?? null,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('whatsapp.index')
+                ->with('success', 'WhatsApp connection created successfully.');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            // Se houve erro, tentar deletar a instância criada na API (se existir)
+            if (isset($instanceName)) {
+                try {
+                    $this->uazApiService->deleteInstance($instanceName);
+                } catch (Exception $deleteException) {
+                    // Log do erro de delete, mas não falhar por isso
+                    \Log::warning('Failed to cleanup UAZ instance after error', [
+                        'instance' => $instanceName,
+                        'error' => $deleteException->getMessage()
+                    ]);
+                }
+            }
+
+            return redirect()->route('whatsapp.index')
+                ->with('error', 'Failed to create WhatsApp connection: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -171,9 +222,36 @@ class WhatsAppConnectionController extends Controller
             abort(403);
         }
 
-        $whatsapp->delete();
+        $instanceName = $whatsapp->instance_name;
 
-        return redirect()->route('whatsapp.index')
-            ->with('success', 'WhatsApp connection deleted successfully.');
+        DB::beginTransaction();
+
+        try {
+            // Deletar instância na API UAZ primeiro
+            $this->uazApiService->deleteInstance($instanceName);
+
+            // Deletar conexão do banco de dados
+            $whatsapp->delete();
+
+            DB::commit();
+
+            return redirect()->route('whatsapp.index')
+                ->with('success', 'WhatsApp connection deleted successfully.');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            // Se falhou ao deletar na API, ainda assim deletar do banco
+            // pois a instância pode não existir mais na API
+            \Log::warning('Failed to delete UAZ instance, deleting from database anyway', [
+                'instance' => $instanceName,
+                'error' => $e->getMessage()
+            ]);
+
+            $whatsapp->delete();
+
+            return redirect()->route('whatsapp.index')
+                ->with('warning', 'WhatsApp connection deleted, but there was an issue with the external API.');
+        }
     }
 }

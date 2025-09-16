@@ -208,6 +208,15 @@
         "connectionDeleted": "Conexão excluída com sucesso",
         "confirmDelete": "Tem certeza que deseja excluir esta conexão?",
         "noConnections": "Nenhuma conexão encontrada",
-        "createFirstConnection": "Crie sua primeira conexão WhatsApp"
+        "createFirstConnection": "Crie sua primeira conexão WhatsApp",
+        "statusCreating": "Criando",
+        "statusCreated": "Criada",
+        "statusConnecting": "Conectando",
+        "statusConnected": "Conectada",
+        "statusDisconnected": "Desconectada",
+        "statusError": "Erro",
+        "instanceCreated": "Instância criada na API UAZ",
+        "instanceDeleted": "Instância removida da API UAZ",
+        "apiError": "Erro na API externa"
     }
 }

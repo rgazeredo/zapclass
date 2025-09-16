@@ -6,6 +6,7 @@ use App\Http\Controllers\PricingController;
 use App\Http\Controllers\Auth\RegisterWithPlanController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppConnectionController;
+use App\Http\Controllers\WhatsAppWebhookController;
 
 // API routes for pricing
 Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
@@ -14,6 +15,10 @@ Route::get('/api/pricing/plan/{stripe_price_id}', [PricingController::class, 'ge
 // Development route to create sample products
 Route::post('/api/pricing/create-sample-products', [PricingController::class, 'createSampleProducts'])
     ->name('api.pricing.create-sample-products');
+
+// WhatsApp Webhook route (public, no auth needed)
+Route::post('/api/whatsapp/webhook', [WhatsAppWebhookController::class, 'handle'])
+    ->name('whatsapp.webhook');
 
 Route::get('/', function () {
     return Inertia::render('Landing/Index');
