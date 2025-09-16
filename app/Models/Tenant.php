@@ -16,7 +16,11 @@ class Tenant extends Model
         'name',
         'slug',
         'domain',
+        'phone',
+        'document',
+        'address',
         'settings',
+        'plan_metadata',
         'is_active',
         'stripe_id',
         'pm_type',
@@ -26,6 +30,8 @@ class Tenant extends Model
 
     protected $casts = [
         'settings' => 'array',
+        'address' => 'array',
+        'plan_metadata' => 'array',
         'is_active' => 'boolean',
         'trial_ends_at' => 'datetime',
     ];

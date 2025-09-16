@@ -356,8 +356,7 @@ export default function LandingPage() {
                                         }`}
                                         variant={plan.type === 'basic' ? 'outline' : 'default'}
                                         onClick={() => {
-                                            // TODO: Implementar redirecionamento para checkout do Stripe
-                                            console.log('Selecionado plano:', plan.stripe_price_id);
+                                            window.location.href = `/register-with-plan?plan=${plan.stripe_price_id}`;
                                         }}
                                     >
                                         Escolher Plano

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PricingController;
+use App\Http\Controllers\Auth\RegisterWithPlanController;
+use App\Http\Controllers\SubscriptionController;
 
 // API routes for pricing
 Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
@@ -14,6 +16,28 @@ Route::post('/api/pricing/create-sample-products', [PricingController::class, 'c
 Route::get('/', function () {
     return Inertia::render('Landing/Index');
 })->name('home');
+
+// Test route
+Route::get('/test-route', function() {
+    return 'Test route works!';
+});
+
+// Registration with plan routes
+Route::get('/register-with-plan', [RegisterWithPlanController::class, 'create'])
+    ->name('register.with.plan');
+
+Route::post('/register-with-plan', [RegisterWithPlanController::class, 'store'])
+    ->name('register.with.plan.store');
+
+// Subscription routes
+Route::get('/subscription/success', [SubscriptionController::class, 'success'])
+    ->name('subscription.success');
+
+Route::get('/subscription/cancel/{tenant?}', [SubscriptionController::class, 'cancel'])
+    ->name('subscription.cancel');
+
+Route::post('/subscription/retry/{tenant}', [SubscriptionController::class, 'retry'])
+    ->name('subscription.retry');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
