@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: zapclass-app
+        container_name: zapclass-app
+        restart: unless-stopped
+        volumes:
+            - .:/var/www
+        depends_on:
+            - postgres
+        networks:
+            - zapclass-net
+
+    nginx:
+        image: nginx:stable
+        container_name: zapclass-nginx
+        restart: unless-stopped
+        ports:
+            - "80:80"
+        volumes:
+            - .:/var/www
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - app
+        networks:
+            - zapclass-net
+
+    postgres:
+        image: postgres:15
+        container_name: zapclass-postgres
+        restart: unless-stopped
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: zapclass
+            POSTGRES_USER: zapclass
+            POSTGRES_PASSWORD: secret
+        networks:
+            - zapclass-net
+
+networks:
+    zapclass-net:
+
+volumes:
+    pgdata:
