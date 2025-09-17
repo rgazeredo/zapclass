@@ -131,7 +131,6 @@ class SubscriptionController extends Controller
                     'status' => $subscription->status,
                 ]
             ]);
-
         } catch (\Exception $e) {
             \Log::error('Erro ao processar sucesso da assinatura: ' . $e->getMessage());
 
@@ -196,7 +195,6 @@ class SubscriptionController extends Controller
             ]);
 
             return redirect($session->url);
-
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
         }

@@ -142,29 +142,33 @@ class UazApiService
     /**
      * Obter QR Code para conectar WhatsApp
      *
-     * @param string $instanceName
+     * @param string $instanceToken Token específico da instância
      * @return array
      * @throws Exception
      */
-    public function getQrCode(string $instanceName): array
+    public function getQrCode(string $instanceToken): array
     {
         try {
+            // Formato correto encontrado através de testes: objeto vazio (stdClass)
             $response = Http::withHeaders([
-                'admintoken' => self::TOKEN,
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->get(self::BASE_URL . '/instance/qr', [
-                'instance_name' => $instanceName
-            ]);
+            ])->post(self::BASE_URL . '/instance/connect', new \stdClass());
 
-            if (!$response->successful()) {
-                throw new Exception('Falha ao obter QR Code: ' . $response->body());
-            }
+            // if ($response->status() != 200) {
+            //     throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
+            // }
+
+            // if (!$response->successful()) {
+            //     throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
+            // }
 
             return $response->json();
         } catch (Exception $e) {
             Log::error('UAZ API QR Exception', [
                 'message' => $e->getMessage(),
-                'instance_name' => $instanceName
+                'instance_token' => $instanceToken
             ]);
 
             throw $e;

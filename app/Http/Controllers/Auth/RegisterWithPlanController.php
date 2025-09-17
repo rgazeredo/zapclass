@@ -63,6 +63,14 @@ class RegisterWithPlanController extends Controller
                 $product = $price->product;
             }
 
+            $features = [];
+
+            if (!empty($product->marketing_features)) {
+                foreach ($product->marketing_features as $feature) {
+                    $features[] = $feature->name;
+                }
+            }
+
             $planData = [
                 'id' => $price->id,
                 'product_id' => $product->id,
@@ -71,7 +79,7 @@ class RegisterWithPlanController extends Controller
                 'price' => $price->unit_amount / 100,
                 'currency' => strtoupper($price->currency),
                 'interval' => $price->recurring->interval ?? 'month',
-                'features' => $this->getSimplePlanFeatures($product->name),
+                'features' => $features,
                 'metadata' => $product->metadata ?? []
             ];
 
@@ -228,7 +236,6 @@ class RegisterWithPlanController extends Controller
             return response()->json([
                 'checkout_url' => $checkoutSession->url
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 

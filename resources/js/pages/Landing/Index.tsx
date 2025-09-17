@@ -166,7 +166,7 @@ export default function LandingPage() {
                                 <h1 className="mb-6 text-5xl leading-tight font-bold text-gray-900">{t('hero.title')}</h1>
                                 <p className="mb-8 text-xl leading-relaxed text-gray-600">{t('hero.description')}</p>
                                 <div className="mb-8 flex flex-col gap-4 sm:flex-row">
-                                    <Button size="lg" className="bg-gray-900 hover:bg-gray-800" onClick={() => scrollToSection('contact')}>
+                                    <Button size="lg" className="bg-gray-900 hover:bg-gray-800" onClick={() => scrollToSection('pricing')}>
                                         {t('pricing.title')}
                                     </Button>
                                 </div>

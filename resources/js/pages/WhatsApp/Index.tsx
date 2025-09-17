@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { FormConnectionModal } from '@/components/whatsapp/form-connection-modal';
+import { QRCodeDisplayModal } from '@/components/whatsapp/qrcode-display-modal';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type WhatsAppConnection } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { IconBrandWhatsapp, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconEdit, IconPlus, IconTrash, IconQrcode } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 interface WhatsAppIndexProps {
     connections: WhatsAppConnection[];
@@ -21,6 +23,12 @@ interface WhatsAppIndexProps {
 
 export default function WhatsAppIndex({ connections, maxConnections, currentConnections, canCreateMore, modalType, editConnection }: WhatsAppIndexProps) {
     const { t } = useTranslation();
+
+    // Estados dos modais de QR Code
+    const [qrDisplayModalOpen, setQrDisplayModalOpen] = useState(false);
+    const [selectedConnectionId, setSelectedConnectionId] = useState<number | null>(null);
+    const [qrCodeData, setQrCodeData] = useState<any>(null);
+    const [isGeneratingQR, setIsGeneratingQR] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -53,6 +61,34 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
 
     const handleCloseModal = () => {
         router.visit('/whatsapp');
+    };
+
+    const handleQRCode = async (connectionId: number) => {
+        setIsGeneratingQR(true);
+        setSelectedConnectionId(connectionId);
+
+        try {
+            const response = await fetch(`/whatsapp/${connectionId}/qrcode`);
+            const data = await response.json();
+
+            if (data.success) {
+                setQrCodeData(data.qrcode);
+                setQrDisplayModalOpen(true);
+            } else {
+                alert(data.message || 'Erro ao gerar QR code');
+            }
+        } catch (error) {
+            console.error('Erro ao gerar QR code:', error);
+            alert('Erro ao gerar QR code');
+        } finally {
+            setIsGeneratingQR(false);
+        }
+    };
+
+    const handleCloseQRDisplayModal = () => {
+        setQrDisplayModalOpen(false);
+        setQrCodeData(null);
+        setSelectedConnectionId(null);
     };
 
     const isModalOpen = modalType === 'create' || modalType === 'edit';
@@ -151,6 +187,15 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                         <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleQRCode(connection.id)}
+                            disabled={isGeneratingQR && selectedConnectionId === connection.id}
+                            title={t('whatsapp.generateQRCode')}
+                        >
+                            <IconQrcode className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleDelete(connection.id)}
                         >
                             <IconTrash className="h-4 w-4 text-red-600" />
@@ -236,6 +281,13 @@ export default function WhatsAppIndex({ connections, maxConnections, currentConn
                 open={isModalOpen}
                 onClose={handleCloseModal}
                 connection={modalType === 'edit' ? editConnection : undefined}
+            />
+
+            {/* Modal para exibir QR Code */}
+            <QRCodeDisplayModal
+                open={qrDisplayModalOpen}
+                onClose={handleCloseQRDisplayModal}
+                qrCodeData={qrCodeData}
             />
         </AppLayout>
     );

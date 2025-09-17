@@ -32,12 +32,8 @@ export default function PlanSummary({ plan }: PlanSummaryProps) {
             </div>
 
             <div className="mb-6">
-                <div className="text-3xl font-bold text-gray-900">
-                    {formatPrice(plan.price, plan.currency)}
-                </div>
-                <div className="text-sm text-gray-600">
-                    por {plan.interval === 'month' ? 'mês' : 'ano'}
-                </div>
+                <div className="text-3xl font-bold text-gray-900">{formatPrice(plan.price, plan.currency)}</div>
+                <div className="text-sm text-gray-600">por {plan.interval === 'month' ? 'mês' : 'ano'}</div>
             </div>
 
             <div>
@@ -45,7 +41,7 @@ export default function PlanSummary({ plan }: PlanSummaryProps) {
                 <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start">
-                            <IconCheck className="mr-2 mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
+                            <IconCheck className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
                             <span className="text-sm text-gray-700">{feature}</span>
                         </li>
                     ))}
@@ -54,8 +50,7 @@ export default function PlanSummary({ plan }: PlanSummaryProps) {
 
             <div className="mt-6 rounded-md bg-blue-50 p-3">
                 <p className="text-xs text-blue-800">
-                    <strong>Garantia:</strong> Você pode cancelar sua assinatura a qualquer momento.
-                    Sem taxas de cancelamento.
+                    <strong>Garantia:</strong> Você pode cancelar sua assinatura a qualquer momento. Sem taxas de cancelamento.
                 </p>
             </div>
         </div>

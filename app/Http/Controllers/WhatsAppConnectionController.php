@@ -113,6 +113,7 @@ class WhatsAppConnectionController extends Controller
             $connection->update([
                 'status' => 'created',
                 'phone' => $apiResponse['phone'] ?? null,
+                'token' => $apiResponse['token'] ?? null,
             ]);
 
             DB::commit();
@@ -210,6 +211,40 @@ class WhatsAppConnectionController extends Controller
 
         return redirect()->route('whatsapp.index')
             ->with('success', 'WhatsApp connection updated successfully.');
+    }
+
+    /**
+     * Generate QR code for WhatsApp connection
+     */
+    public function qrcode(Request $request, WhatsAppConnection $whatsapp)
+    {
+        // Verificar se a conexão pertence ao tenant do usuário
+        if ($whatsapp->tenant_id !== auth()->user()->tenant_id) {
+            abort(403);
+        }
+
+        // Verificar se a conexão tem token
+        if (!$whatsapp->token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token da instância não encontrado. A conexão precisa ser recriada.'
+            ], 400);
+        }
+
+        try {
+            $qrData = $this->uazApiService->getQrCode($whatsapp->token);
+
+            return response()->json([
+                'success' => true,
+                'qrcode' => $qrData
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate QR code: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

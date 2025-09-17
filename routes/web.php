@@ -78,6 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // WhatsApp connections routes
     Route::resource('whatsapp', WhatsAppConnectionController::class);
+    Route::get('whatsapp/{whatsapp}/qrcode', [WhatsAppConnectionController::class, 'qrcode'])
+        ->name('whatsapp.qrcode');
 
     Route::patch('settings/theme', function () {
         request()->validate([

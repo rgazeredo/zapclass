@@ -50,6 +50,7 @@ export interface WhatsAppConnection {
     admin_field_2?: string | null;
     phone?: string | null;
     status?: string | null;
+    token?: string | null;
     created_at: string;
     updated_at: string;
 }
