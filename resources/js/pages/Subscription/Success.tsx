@@ -4,14 +4,9 @@ import { IconArrowRight, IconCheck } from '@tabler/icons-react';
 interface SuccessProps {
     tenant: {
         name: string;
-        plan_metadata?: {
-            plan_name: string;
-            description: string;
-            price: number;
-            currency: string;
-            interval: string;
-            features?: string[];
-        };
+        plan_name: string;
+        description: string;
+        features?: string[];
     };
     subscription: {
         id: string;
@@ -44,10 +39,10 @@ export default function Success({ tenant, subscription }: SuccessProps) {
                             </p>
                         </div>
 
-                        {tenant.plan_metadata && (
+                        {tenant && (
                             <div className="mb-4">
-                                <h3 className="mb-2 font-medium text-gray-900">Plano Ativo: {tenant.plan_metadata.plan_name}</h3>
-                                <p className="mb-3 text-sm text-gray-600">{tenant.plan_metadata.description}</p>
+                                <h3 className="mb-2 font-medium text-gray-900">Plano Ativo: {tenant.plan_name}</h3>
+                                <p className="mb-3 text-sm text-gray-600">{tenant.description}</p>
 
                                 <div className="rounded-md bg-gray-50 p-3">
                                     <p className="mb-2 text-xs text-gray-700">
@@ -55,12 +50,7 @@ export default function Success({ tenant, subscription }: SuccessProps) {
                                     </p>
                                     <ul className="space-y-1 text-xs text-gray-600">
                                         {(
-                                            tenant.plan_metadata?.features || [
-                                                'Conexão WhatsApp',
-                                                'Dashboard completo',
-                                                'Mensagens ilimitadas',
-                                                'Suporte técnico',
-                                            ]
+                                            tenant.features || ['Conexão WhatsApp', 'Dashboard completo', 'Mensagens ilimitadas', 'Suporte técnico']
                                         ).map((feature, index) => (
                                             <li key={index} className="flex items-start">
                                                 <IconCheck className="mt-0.5 mr-1 h-3 w-3 flex-shrink-0 text-green-500" />

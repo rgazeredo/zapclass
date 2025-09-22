@@ -82,7 +82,7 @@ export default function LandingPage() {
                                     {t('navigation.contact')}
                                 </a>
                                 <LanguageSwitcher />
-                                <a href="#" className="text-gray-600 hover:text-gray-900">
+                                <a href="/login" className="text-gray-600 hover:text-gray-900">
                                     {t('navigation.login')}
                                 </a>
                                 <Button
@@ -137,7 +137,7 @@ export default function LandingPage() {
                                         {t('navigation.contact')}
                                     </a>
                                     <LanguageSwitcher />
-                                    <a href="#" className="text-gray-600 hover:text-gray-900">
+                                    <a href="/login" className="text-gray-600 hover:text-gray-900">
                                         {t('navigation.login')}
                                     </a>
                                     <Button

@@ -13,50 +13,154 @@ class UazApiService
     private const TOKEN = 'X6qJRwJZ9UGQcvIcw5bvFrojp52YCtabXZBg2P4hajIJq97a30';
 
     /**
-     * Criar uma nova instância na API UAZ
+     * Criar uma nova instância
      *
-     * @param string $instanceName Nome da instância
      * @param array $options Opções adicionais para a instância
      * @return array
      * @throws Exception
      */
-    public function createInstance(string $instanceName, array $options = []): array
+    public function createInstance(array $options = []): array
     {
         try {
+            Log::error('API Error: createInstance', [
+                'name' => $options['name'],
+                'systemName' => $options['system_name'],
+                'adminField01' => $options['admin_field_1'] ?? null,
+                'adminField02' => $options['admin_field_2'] ?? null,
+                'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
+            ]);
+
             $response = Http::withHeaders([
                 'admintoken' => self::TOKEN,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post(self::BASE_URL . '/instance/init', [
-                'name' => $options['name'] ?? $instanceName,
-                'systemName' => $instanceName,
+                'name' => $options['name'],
+                'systemName' => $options['system_name'],
                 'adminField01' => $options['admin_field_1'] ?? null,
                 'adminField02' => $options['admin_field_2'] ?? null,
                 'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
             ]);
 
             if (!$response->successful()) {
-                Log::error('UAZ API Error', [
+                Log::error('API Error: createInstance', [
                     'status' => $response->status(),
-                    'body' => $response->body(),
-                    'instance_name' => $instanceName
+                    'body' => $response->body()
                 ]);
 
-                throw new Exception('Falha ao criar instância na API UAZ: ' . $response->body());
+                throw new Exception('Falha ao criar instância: ' . $response->body());
             }
 
             $data = $response->json();
 
-            Log::info('UAZ Instance Created', [
-                'instance_name' => $instanceName,
+            Log::info('Instance Created: createInstance', [
                 'response' => $data
             ]);
 
             return $data;
         } catch (Exception $e) {
-            Log::error('UAZ API Exception', [
-                'message' => $e->getMessage(),
-                'instance_name' => $instanceName
+            Log::error('API Exception: createInstance', [
+                'message' => $e->getMessage()
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Atualizar uma instância
+     *
+     * @param string $instanceName
+     * @return array
+     * @throws Exception
+     */
+    public function updateInstance(string $token, string $instanceName): array
+    {
+        try {
+            Log::error('API Error: updateInstance', [
+                'instanceName' => $instanceName
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/instance/updateInstanceName', [
+                'name' => $instanceName
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('API Error: updateInstance', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                throw new Exception('Falha ao atualizar instância: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Instance Updated: updateInstance', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Exception: updateInstance', [
+                'message' => $e->getMessage()
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Atualizar os campos admin_field_1 e admin_field_2 de uma instância
+     *
+     * @param string $instanceId
+     * @param string $adminField01
+     * @param string $adminField02
+     * @return array
+     * @throws Exception
+     */
+    public function updateAdminFields(string $instanceId, ?string $adminField01 = null, ?string $adminField02 = null): array
+    {
+        try {
+            Log::error('API: updateAdminFields', [
+                'instanceId' => $instanceId,
+                'adminField01' => $adminField01,
+                'adminField02' => $adminField02
+            ]);
+
+            $response = Http::withHeaders([
+                'admintoken' => self::TOKEN,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/instance/updateAdminFields', [
+                'id' => $instanceId,
+                'adminField01' => $adminField01,
+                'adminField02' => $adminField02
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('API Error: updateAdminFields', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                throw new Exception('Falha ao atualizar campos admin_field_1 e admin_field_2: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Instance Updated: updateAdminFields', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Exception: updateAdminFields', [
+                'message' => $e->getMessage()
             ]);
 
             throw $e;
@@ -66,29 +170,43 @@ class UazApiService
     /**
      * Obter status de uma instância
      *
-     * @param string $instanceName
+     * @param string $token
      * @return array
      * @throws Exception
      */
-    public function getInstanceStatus(string $instanceName): array
+    public function getInstanceStatus(string $token): array
     {
         try {
-            $response = Http::withHeaders([
-                'admintoken' => self::TOKEN,
-                'Accept' => 'application/json',
-            ])->get(self::BASE_URL . '/instance/status', [
-                'instance_name' => $instanceName
+
+            Log::error('API Error: getInstanceStatus', [
+                'token' => $token
             ]);
 
+            $response = Http::withHeaders([
+                'token' => $token,
+                'Accept' => 'application/json',
+            ])->get(self::BASE_URL . '/instance/status');
+
             if (!$response->successful()) {
+                Log::error('API Error: getInstanceStatus', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
                 throw new Exception('Falha ao obter status da instância: ' . $response->body());
             }
 
-            return $response->json();
+            $data = $response->json();
+
+            Log::info('Instance Status: getInstanceStatus', [
+                'response' => $data
+            ]);
+
+            return $data;
         } catch (Exception $e) {
-            Log::error('UAZ API Status Exception', [
+            Log::error('API Status Exception: getInstanceStatus', [
                 'message' => $e->getMessage(),
-                'instance_name' => $instanceName
+                'token' => $token
             ]);
 
             throw $e;
@@ -105,6 +223,11 @@ class UazApiService
     public function deleteInstance(string $instanceName): bool
     {
         try {
+
+            Log::error('API Error: deleteInstance', [
+                'instanceName' => $instanceName
+            ]);
+
             $response = Http::withHeaders([
                 'admintoken' => self::TOKEN,
                 'Accept' => 'application/json',
@@ -113,7 +236,7 @@ class UazApiService
             ]);
 
             if (!$response->successful()) {
-                Log::warning('UAZ API Delete Warning', [
+                Log::error('API Error: deleteInstance', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                     'instance_name' => $instanceName
@@ -123,19 +246,65 @@ class UazApiService
                 return false;
             }
 
-            Log::info('UAZ Instance Deleted', [
+            Log::info('API Instance Deleted: deleteInstance', [
                 'instance_name' => $instanceName
             ]);
 
             return true;
         } catch (Exception $e) {
-            Log::error('UAZ API Delete Exception', [
+            Log::error('API Delete Exception: deleteInstance', [
                 'message' => $e->getMessage(),
                 'instance_name' => $instanceName
             ]);
 
             // Não lançar exception para delete
             return false;
+        }
+    }
+
+    /**
+     * Desconectar uma instância do WhatsApp
+     *
+     * @param string $instanceToken Token específico da instância
+     * @return array
+     * @throws Exception
+     */
+    public function disconnectInstance(string $instanceToken): array
+    {
+        try {
+            Log::info('API: disconnectInstance', [
+                'instance_token' => $instanceToken
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/instance/disconnect', new \stdClass());
+
+            if (!$response->successful()) {
+                Log::error('API Error: disconnectInstance', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                throw new Exception('Falha ao desconectar instância: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Instance Disconnected', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Disconnect Exception', [
+                'message' => $e->getMessage(),
+                'instance_token' => $instanceToken
+            ]);
+
+            throw $e;
         }
     }
 
@@ -156,17 +325,20 @@ class UazApiService
                 'Accept' => 'application/json',
             ])->post(self::BASE_URL . '/instance/connect', new \stdClass());
 
-            // if ($response->status() != 200) {
-            //     throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
-            // }
+            $json = $response->json();
 
-            // if (!$response->successful()) {
-            //     throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
-            // }
+            Log::info('API QR Code', [
+                'instance' => $json['instance'],
+                'qrcode' => $json['instance']['qrcode'],
+            ]);
 
-            return $response->json();
+            if (empty($json) || empty($json['instance']['qrcode'])) {
+                throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
+            }
+
+            return $json;
         } catch (Exception $e) {
-            Log::error('UAZ API QR Exception', [
+            Log::error('API QR Exception', [
                 'message' => $e->getMessage(),
                 'instance_token' => $instanceToken
             ]);

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('admin_field_1')->nullable();
             $table->string('admin_field_2')->nullable();
             $table->string('phone')->nullable();
+            $table->string('token')->nullable();
+            $table->string('instance_id')->nullable();
             $table->string('status')->nullable();
             $table->timestamps();
         });

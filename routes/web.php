@@ -80,6 +80,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('whatsapp', WhatsAppConnectionController::class);
     Route::get('whatsapp/{whatsapp}/qrcode', [WhatsAppConnectionController::class, 'qrcode'])
         ->name('whatsapp.qrcode');
+    Route::post('whatsapp/{whatsapp}/disconnect', [WhatsAppConnectionController::class, 'disconnect'])
+        ->name('whatsapp.disconnect');
+    Route::get('whatsapp/{whatsapp}/status', [WhatsAppConnectionController::class, 'status'])
+        ->name('whatsapp.status');
+    Route::post('whatsapp/{whatsapp}/update-status', [WhatsAppConnectionController::class, 'updateStatus'])
+        ->name('whatsapp.update-status');
 
     Route::patch('settings/theme', function () {
         request()->validate([

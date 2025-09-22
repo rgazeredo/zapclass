@@ -18,6 +18,7 @@ class WhatsAppConnection extends Model
         'phone',
         'status',
         'token',
+        'instance_id',
     ];
 
     public function tenant(): BelongsTo

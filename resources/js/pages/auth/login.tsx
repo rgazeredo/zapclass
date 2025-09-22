@@ -27,7 +27,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login({ status, canResetPassword }: LoginProps) {
     const [showPassword, setShowPassword] = useState(false);
-    const { post, processing } = useForm();
+    const { data, setData, post, processing, errors } = useForm({
+        email: '',
+        password: '',
+        remember: false,
+    });
 
     const form = useHookForm({
         resolver: zodResolver(loginSchema),
@@ -38,8 +42,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         },
     });
 
-    const onSubmit = (data: any) => {
-        post('/login', data);
+    const onSubmit = (formData: LoginFormValues) => {
+        post('/login');
     };
 
     return (
@@ -68,9 +72,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                             autoFocus
                                             autoComplete="email"
                                             {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setData('email', e.target.value);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />
+                                    {errors.email && <div className="text-sm text-red-600">{errors.email}</div>}
                                 </FormItem>
                             )}
                         />
@@ -98,6 +107,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                 placeholder="Password"
                                                 autoComplete="current-password"
                                                 {...field}
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    setData('password', e.target.value);
+                                                }}
                                             />
                                             <Button
                                                 type="button"
@@ -115,6 +128,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         </div>
                                     </FormControl>
                                     <FormMessage />
+                                    {errors.password && <div className="text-sm text-red-600">{errors.password}</div>}
                                 </FormItem>
                             )}
                         />
@@ -127,7 +141,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
-                                            onCheckedChange={field.onChange}
+                                            onCheckedChange={(checked) => {
+                                                field.onChange(checked);
+                                                setData('remember', !!checked);
+                                            }}
                                         />
                                     </FormControl>
                                     <div className="space-y-1 leading-none">

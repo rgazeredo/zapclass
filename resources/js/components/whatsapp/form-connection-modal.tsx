@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { type WhatsAppConnection } from '@/types';
 import { router } from '@inertiajs/react';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface FormConnectionModalProps {
@@ -20,7 +20,6 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
 
     const [formData, setFormData] = useState({
         name: '',
-        system_name: '',
         admin_field_1: '',
         admin_field_2: '',
     });
@@ -31,7 +30,6 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
         if (connection) {
             setFormData({
                 name: connection.name,
-                system_name: connection.system_name,
                 admin_field_1: connection.admin_field_1 || '',
                 admin_field_2: connection.admin_field_2 || '',
             });
@@ -39,7 +37,6 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
             // Limpar form quando é criação
             setFormData({
                 name: '',
-                system_name: '',
                 admin_field_1: '',
                 admin_field_2: '',
             });
@@ -80,9 +77,9 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
     };
 
     const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     };
 
@@ -101,10 +98,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                         {isEditing ? t('whatsapp.editConnection') : t('whatsapp.createConnection')}
                     </DialogTitle>
                     <DialogDescription>
-                        {isEditing
-                            ? `Edite os dados da conexão ${connection.name}`
-                            : 'Preencha os dados para criar uma nova conexão WhatsApp'
-                        }
+                        {isEditing ? `Edite os dados da conexão ${connection.name}` : 'Preencha os dados para criar uma nova conexão WhatsApp'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -118,18 +112,6 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
                                 placeholder="Ex: WhatsApp Principal"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <Label htmlFor="system_name">{t('whatsapp.systemName')} *</Label>
-                            <Input
-                                id="system_name"
-                                type="text"
-                                value={formData.system_name}
-                                onChange={(e) => handleInputChange('system_name', e.target.value)}
-                                placeholder="Ex: whatsapp_main"
                                 required
                             />
                         </div>

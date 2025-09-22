@@ -6,9 +6,12 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Price;
+use Stripe\Product;
 use Stripe\Subscription;
 
 class SubscriptionController extends Controller
@@ -29,13 +32,15 @@ class SubscriptionController extends Controller
             return redirect()->route('home')->with('error', 'Sessão de pagamento não encontrada');
         }
 
+        Log::debug('SubscriptionController success', ['session_id' => $request->all()]);
+
         try {
             // Recuperar sessão do Stripe
             $session = Session::retrieve($sessionId, [
                 'expand' => ['subscription', 'customer']
             ]);
 
-            \Log::info('Session retrieved', ['session_id' => $sessionId, 'payment_status' => $session->payment_status ?? 'null']);
+            Log::info('Session retrieved', ['session_id' => $sessionId, 'payment_status' => $session->payment_status ?? 'null']);
 
             if (!$session || $session->payment_status !== 'paid') {
                 return redirect()->route('home')->with('error', 'Pagamento não confirmado');
@@ -44,7 +49,7 @@ class SubscriptionController extends Controller
             // Verificar se a subscription foi expandida e buscar separadamente se necessário
             $subscription = null;
             if (is_string($session->subscription)) {
-                \Log::info('Retrieving subscription separately', ['subscription_id' => $session->subscription]);
+                Log::info('Retrieving subscription separately', ['subscription_id' => $session->subscription]);
                 $subscription = Subscription::retrieve($session->subscription);
             } else {
                 $subscription = $session->subscription;
@@ -67,7 +72,7 @@ class SubscriptionController extends Controller
 
             // Ativar tenant e criar/atualizar subscription
             $tenant->update([
-                'is_active' => true,
+                'is_active' => true
             ]);
 
             // Criar ou atualizar o registro da subscription na tabela subscriptions
@@ -99,30 +104,29 @@ class SubscriptionController extends Controller
             // Fazer login automático do usuário
             Auth::login($user);
 
-            // Buscar features reais do plano no Stripe
-            $planFeatures = [];
-            if (isset($tenant->plan_metadata['stripe_price_id'])) {
-                try {
-                    $pricingController = new PricingController();
-                    $planResponse = $pricingController->getPlan($tenant->plan_metadata['stripe_price_id']);
-                    $planData = $planResponse->getData(true);
+            $price = Price::retrieve($subscription->items->data[0]->price->id);
 
-                    if (!isset($planData['error']) && isset($planData['features'])) {
-                        $planFeatures = $planData['features'];
-                    }
-                } catch (\Exception $e) {
-                    \Log::warning('Erro ao buscar features do plano: ' . $e->getMessage());
+            $product = Product::retrieve($price->product);
+
+            // Atualizar número de conexões WhatsApp do tenant
+            $tenant->update([
+                'whatsapp_connections' => $product->metadata->whatsapp_connections
+            ]);
+
+            // Buscar features reais do plano no Stripe
+            $features = [];
+
+            if (!empty($product->marketing_features)) {
+                foreach ($product->marketing_features as $feature) {
+                    $features[] = $feature->name;
                 }
             }
 
             // Preparar dados do tenant com features do plano real ou fallback
-            $tenantData = $tenant->only(['name', 'plan_metadata']);
-            $tenantData['plan_metadata']['features'] = !empty($planFeatures) ? $planFeatures : [
-                'Conexão WhatsApp',
-                'Dashboard completo',
-                'Mensagens ilimitadas',
-                'Suporte técnico'
-            ];
+            $tenantData = $tenant->only(['name']);
+            $tenantData['plan_name'] = $product->name;
+            $tenantData['description'] = $product->description;
+            $tenantData['features'] = $features;
 
             return Inertia::render('Subscription/Success', [
                 'tenant' => $tenantData,
@@ -132,7 +136,7 @@ class SubscriptionController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erro ao processar sucesso da assinatura: ' . $e->getMessage());
+            Log::error('Erro ao processar sucesso da assinatura: ' . $e->getMessage());
 
             return redirect()->route('home')->with('error', 'Erro ao confirmar assinatura');
         }
