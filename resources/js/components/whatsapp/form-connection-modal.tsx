@@ -98,7 +98,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                         {isEditing ? t('whatsapp.editConnection') : t('whatsapp.createConnection')}
                     </DialogTitle>
                     <DialogDescription>
-                        {isEditing ? `Edite os dados da conexão ${connection.name}` : 'Preencha os dados para criar uma nova conexão WhatsApp'}
+                        {isEditing ? t('whatsapp.editConnectionDescription', { name: connection.name }) : t('whatsapp.createConnectionDescription')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -111,7 +111,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                placeholder="Ex: WhatsApp Principal"
+                                placeholder={t('whatsapp.connectionNamePlaceholder')}
                                 required
                             />
                         </div>
@@ -123,7 +123,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                                 type="text"
                                 value={formData.admin_field_1}
                                 onChange={(e) => handleInputChange('admin_field_1', e.target.value)}
-                                placeholder="Campo administrativo opcional"
+                                placeholder={t('whatsapp.adminFieldPlaceholder')}
                             />
                         </div>
 
@@ -134,14 +134,14 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                                 type="text"
                                 value={formData.admin_field_2}
                                 onChange={(e) => handleInputChange('admin_field_2', e.target.value)}
-                                placeholder="Campo administrativo opcional"
+                                placeholder={t('whatsapp.adminFieldPlaceholder')}
                             />
                         </div>
                     </div>
 
                     <div className="flex gap-2 pt-4">
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Salvando...' : t('whatsapp.save')}
+                            {isSubmitting ? t('whatsapp.saving') : t('whatsapp.save')}
                         </Button>
                         <Button type="button" variant="outline" onClick={onClose}>
                             {t('whatsapp.cancel')}

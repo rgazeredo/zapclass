@@ -346,7 +346,7 @@ export default function WhatsAppIndex({
                                 <IconQrcode className="h-4 w-4" />
                             )}
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleShowApiData(connection.id)} title="Dados da API">
+                        <Button variant="outline" size="sm" onClick={() => handleShowApiData(connection.id)} title={t('whatsapp.apiData')}>
                             <IconApi className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => handleDelete(connection.id)}>
