@@ -1,20 +1,23 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { IconBrandWhatsapp, IconLoader2 } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
 
 interface QRCodeDisplayModalProps {
     open: boolean;
     onClose: () => void;
-    qrCodeData: any;
+    qrCodeData: {
+        instance?: {
+            name?: string;
+            qrcode?: string;
+            status?: string;
+        };
+    };
     isPollingStatus?: boolean;
     connectionStatus?: string;
     onDisconnect?: () => void;
 }
 
 export function QRCodeDisplayModal({ open, onClose, qrCodeData, isPollingStatus, connectionStatus, onDisconnect }: QRCodeDisplayModalProps) {
-    const { t } = useTranslation();
-
     const handleOpenChange = (newOpen: boolean) => {
         if (!newOpen) {
             onClose();
@@ -48,11 +51,7 @@ export function QRCodeDisplayModal({ open, onClose, qrCodeData, isPollingStatus,
                                 <h3 className="mt-2 text-lg font-medium text-green-800">WhatsApp Conectado!</h3>
                                 <p className="text-sm text-green-600">Sua instância está ativa e pronta para uso</p>
                             </div>
-                            <Button
-                                variant="outline"
-                                onClick={onDisconnect}
-                                className="border-red-200 text-red-600 hover:bg-red-50"
-                            >
+                            <Button variant="outline" onClick={onDisconnect} className="border-red-200 text-red-600 hover:bg-red-50">
                                 Desconectar
                             </Button>
                         </div>
@@ -63,7 +62,9 @@ export function QRCodeDisplayModal({ open, onClose, qrCodeData, isPollingStatus,
                             ) : (
                                 <div className="rounded border bg-gray-100 p-8">
                                     <p className="text-gray-500">QR Code não disponível</p>
-                                    {qrCodeData?.instance?.status && <p className="mt-2 text-sm text-gray-400">Status: {qrCodeData.instance.status}</p>}
+                                    {qrCodeData?.instance?.status && (
+                                        <p className="mt-2 text-sm text-gray-400">Status: {qrCodeData.instance.status}</p>
+                                    )}
                                 </div>
                             )}
                         </>

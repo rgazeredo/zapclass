@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\RegisterWithPlanController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppConnectionController;
 use App\Http\Controllers\WhatsAppWebhookController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 // API routes for pricing
 Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
@@ -25,7 +27,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Test route
-Route::get('/test-route', function() {
+Route::get('/test-route', function () {
     return 'Test route works!';
 });
 
@@ -48,7 +50,7 @@ Route::post('/subscription/retry/{tenant}', [SubscriptionController::class, 'ret
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        $user = auth()->user();
+        $user = User::find(Auth::user()->id);
 
         // Se é admin, carregar dados globais
         if ($user->isAdmin()) {
@@ -92,7 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'theme' => 'required|in:light,dark,system',
         ]);
 
-        auth()->user()->update([
+        $user = User::find(Auth::user()->id);
+        $user->update([
             'theme' => request('theme'),
         ]);
 
@@ -100,5 +103,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('settings.theme');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

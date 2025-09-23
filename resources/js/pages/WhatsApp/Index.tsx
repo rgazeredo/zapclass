@@ -2,12 +2,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
+import { ApiDataModal } from '@/components/whatsapp/api-data-modal';
 import { FormConnectionModal } from '@/components/whatsapp/form-connection-modal';
 import { QRCodeDisplayModal } from '@/components/whatsapp/qrcode-display-modal';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type WhatsAppConnection } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode, IconTrash } from '@tabler/icons-react';
+import { IconApi, IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode, IconTrash } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,10 @@ export default function WhatsAppIndex({
     const [qrCodeData, setQrCodeData] = useState<string | null>(null);
     const [isGeneratingQR, setIsGeneratingQR] = useState(false);
     const [isPollingStatus, setIsPollingStatus] = useState(false);
+
+    // Estados do modal de dados da API
+    const [apiDataModalOpen, setApiDataModalOpen] = useState(false);
+    const [selectedConnection, setSelectedConnection] = useState<WhatsAppConnection | null>(null);
 
     // Ref para controlar o interval do polling
     const statusPollingRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,6 +77,19 @@ export default function WhatsAppIndex({
 
     const handleCloseModal = () => {
         router.visit('/whatsapp');
+    };
+
+    const handleShowApiData = (connectionId: number) => {
+        const connection = connections.find((c) => c.id === connectionId);
+        if (connection) {
+            setSelectedConnection(connection);
+            setApiDataModalOpen(true);
+        }
+    };
+
+    const handleCloseApiDataModal = () => {
+        setApiDataModalOpen(false);
+        setSelectedConnection(null);
     };
 
     const getInstanceStatus = async (connectionId: number) => {
@@ -328,6 +346,9 @@ export default function WhatsAppIndex({
                                 <IconQrcode className="h-4 w-4" />
                             )}
                         </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleShowApiData(connection.id)} title="Dados da API">
+                            <IconApi className="h-4 w-4" />
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => handleDelete(connection.id)}>
                             <IconTrash className="h-4 w-4 text-red-600" />
                         </Button>
@@ -402,11 +423,14 @@ export default function WhatsAppIndex({
             <QRCodeDisplayModal
                 open={qrDisplayModalOpen}
                 onClose={handleCloseQRDisplayModal}
-                qrCodeData={qrCodeData}
+                qrCodeData={{ instance: { qrcode: qrCodeData || undefined } }}
                 isPollingStatus={isPollingStatus}
                 connectionStatus={connections.find((c) => c.id === selectedConnectionId)?.status || undefined}
                 onDisconnect={handleDisconnect}
             />
+
+            {/* Modal para exibir dados da API */}
+            <ApiDataModal open={apiDataModalOpen} onClose={handleCloseApiDataModal} connection={selectedConnection} />
 
             {/* Overlay de Loading para geração de QR Code */}
             {isGeneratingQR && (

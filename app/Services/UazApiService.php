@@ -309,6 +309,57 @@ class UazApiService
     }
 
     /**
+     * Enviar mensagem de texto
+     *
+     * @param string $instanceToken Token específico da instância
+     * @param array $messageData Dados da mensagem (recipient, text)
+     * @return array
+     * @throws Exception
+     */
+    public function sendMessage(string $instanceToken, array $messageData): array
+    {
+        try {
+            Log::info('API: Enviando mensagem via UAZ', [
+                'instance_token' => substr($instanceToken, 0, 10) . '...',
+                'recipient' => $messageData['recipient']
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/send/text', [
+                'number' => $messageData['recipient'],
+                'text' => $messageData['text']
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('API Error: sendMessage', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                throw new Exception('Falha ao enviar mensagem: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Message Sent: sendMessage', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Send Message Exception', [
+                'message' => $e->getMessage(),
+                'instance_token' => substr($instanceToken, 0, 10) . '...'
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
      * Obter QR Code para conectar WhatsApp
      *
      * @param string $instanceToken Token específico da instância

@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "WebFetch(domain:docs.uazapi.com)"
+      "WebFetch(domain:docs.uazapi.com)",
+      "Bash(task-master list:*)",
+      "Bash(task-master set-status:*)",
+      "Bash(task-master show:*)",
+      "Bash(task-master:*)",
+      "Bash(php artisan make:migration:*)",
+      "Bash(docker-compose exec:*)"
     ],
     "deny": [],
     "ask": []
