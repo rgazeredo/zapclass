@@ -5,7 +5,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { LayoutGrid } from 'lucide-react';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconApi, IconMessage2, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from './app-logo';
 
@@ -22,6 +22,28 @@ export function AppSidebar() {
             title: t('whatsapp.title'),
             href: '/whatsapp',
             icon: IconBrandWhatsapp,
+        },
+        {
+            title: 'Documentação da API',
+            href: '/api-docs',
+            icon: IconApi,
+            items: [
+                {
+                    title: 'Enviar Mensagem',
+                    href: '/api-docs/send-message',
+                    icon: IconMessage2,
+                },
+                {
+                    title: 'Status da Mensagem',
+                    href: '/api-docs/message-status',
+                    icon: IconInfoCircle,
+                },
+                {
+                    title: 'Informações da Conexão',
+                    href: '/api-docs/connection-info',
+                    icon: IconApi,
+                },
+            ],
         },
     ];
 
