@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class WhatsAppConnection extends Model
@@ -40,8 +41,13 @@ class WhatsAppConnection extends Model
         return $this->belongsTo(Tenant::class);
     }
 
+    public function webhooks(): HasMany
+    {
+        return $this->hasMany(Webhook::class, 'whatsapp_connection_id');
+    }
+
     /**
-     * Get the full instance name for UAZ API
+     * Get the full instance name for API
      */
     public function getInstanceNameAttribute(): string
     {

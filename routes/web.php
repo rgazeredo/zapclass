@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterWithPlanController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppConnectionController;
 use App\Http\Controllers\WhatsAppWebhookController;
+use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\ApiDocumentationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -97,6 +98,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('whatsapp.status');
     Route::post('whatsapp/{whatsapp}/update-status', [WhatsAppConnectionController::class, 'updateStatus'])
         ->name('whatsapp.update-status');
+
+    // Webhook management routes
+    Route::get('whatsapp/{connection}/webhooks', [WebhookController::class, 'index'])
+        ->name('webhooks.index');
+    Route::post('whatsapp/{connection}/webhooks', [WebhookController::class, 'store'])
+        ->name('webhooks.store');
+    Route::put('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'update'])
+        ->name('webhooks.update');
+    Route::delete('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'destroy'])
+        ->name('webhooks.destroy');
 
     Route::patch('settings/theme', function () {
         request()->validate([

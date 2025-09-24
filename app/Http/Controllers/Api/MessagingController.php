@@ -33,7 +33,7 @@ class MessagingController extends Controller
             // Pegar conexão autenticada do middleware
             $connection = $request->attributes->get('api_connection');
 
-            // Validar se temos os dados necessários para chamar a API UAZ
+            // Validar se temos os dados necessários para chamar a API
             if (!$connection->token || !$connection->instance_id) {
                 return $this->errorResponse(
                     'Conexão não configurada adequadamente. Entre em contato com o suporte.',
@@ -41,7 +41,7 @@ class MessagingController extends Controller
                 );
             }
 
-            // Preparar dados para a API UAZ
+            // Preparar dados para a API
             $messageData = [
                 'recipient' => $request->phone_number,
                 'text' => $request->message,
@@ -50,18 +50,18 @@ class MessagingController extends Controller
             // Gerar ID único para rastreamento
             $messageId = 'msg_' . Str::random(20);
 
-            Log::info('API: Enviando mensagem via UAZ', [
+            Log::info('API: Enviando mensagem via', [
                 'message_id' => $messageId,
                 'connection_id' => $connection->id,
                 'recipient' => $request->phone_number,
                 'message_length' => strlen($request->message)
             ]);
 
-            // Chamar API UAZ
+            // Chamar API
             $response = $this->uazApiService->sendMessage($connection->token, $messageData);
 
             // Log da resposta
-            Log::info('API: Resposta da UAZ', [
+            Log::info('API: Resposta da', [
                 'message_id' => $messageId,
                 'connection_id' => $connection->id,
                 'uaz_response' => $response
@@ -76,7 +76,6 @@ class MessagingController extends Controller
                 'timestamp' => now()->toISOString(),
                 'connection_id' => $connection->client_instance_id,
             ], 'Mensagem enviada com sucesso');
-
         } catch (Exception $e) {
             Log::error('API: Erro ao enviar mensagem', [
                 'connection_id' => $connection?->id,
@@ -112,7 +111,6 @@ class MessagingController extends Controller
                 'timestamp' => now()->toISOString(),
                 'connection_id' => $connection->client_instance_id,
             ]);
-
         } catch (Exception $e) {
             Log::error('API: Erro ao consultar status da mensagem', [
                 'message_id' => $messageId,
@@ -143,7 +141,6 @@ class MessagingController extends Controller
                 'api_rate_limit' => $connection->api_rate_limit,
                 'api_last_used' => $connection->api_last_used_at?->toISOString(),
             ]);
-
         } catch (Exception $e) {
             Log::error('API: Erro ao obter informações da conexão', [
                 'error' => $e->getMessage()

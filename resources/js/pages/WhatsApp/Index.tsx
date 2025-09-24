@@ -5,10 +5,11 @@ import { DataTable } from '@/components/ui/data-table';
 import { ApiDataModal } from '@/components/whatsapp/api-data-modal';
 import { FormConnectionModal } from '@/components/whatsapp/form-connection-modal';
 import { QRCodeDisplayModal } from '@/components/whatsapp/qrcode-display-modal';
+import { WebhookManagementModal } from '@/components/whatsapp/webhook-management-modal';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type WhatsAppConnection } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { IconApi, IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode, IconTrash } from '@tabler/icons-react';
+import { IconApi, IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode, IconTrash, IconWebhook } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +43,10 @@ export default function WhatsAppIndex({
     // Estados do modal de dados da API
     const [apiDataModalOpen, setApiDataModalOpen] = useState(false);
     const [selectedConnection, setSelectedConnection] = useState<WhatsAppConnection | null>(null);
+
+    // Estados do modal de webhooks
+    const [webhookModalOpen, setWebhookModalOpen] = useState(false);
+    const [selectedWebhookConnection, setSelectedWebhookConnection] = useState<WhatsAppConnection | null>(null);
 
     // Ref para controlar o interval do polling
     const statusPollingRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,6 +95,19 @@ export default function WhatsAppIndex({
     const handleCloseApiDataModal = () => {
         setApiDataModalOpen(false);
         setSelectedConnection(null);
+    };
+
+    const handleShowWebhooks = (connectionId: number) => {
+        const connection = connections.find((c) => c.id === connectionId);
+        if (connection) {
+            setSelectedWebhookConnection(connection);
+            setWebhookModalOpen(true);
+        }
+    };
+
+    const handleCloseWebhookModal = () => {
+        setWebhookModalOpen(false);
+        setSelectedWebhookConnection(null);
     };
 
     const getInstanceStatus = async (connectionId: number) => {
@@ -349,6 +367,9 @@ export default function WhatsAppIndex({
                         <Button variant="outline" size="sm" onClick={() => handleShowApiData(connection.id)} title={t('whatsapp.apiData')}>
                             <IconApi className="h-4 w-4" />
                         </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleShowWebhooks(connection.id)} title={t('whatsapp.webhooks')}>
+                            <IconWebhook className="h-4 w-4" />
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => handleDelete(connection.id)}>
                             <IconTrash className="h-4 w-4 text-red-600" />
                         </Button>
@@ -431,6 +452,9 @@ export default function WhatsAppIndex({
 
             {/* Modal para exibir dados da API */}
             <ApiDataModal open={apiDataModalOpen} onClose={handleCloseApiDataModal} connection={selectedConnection} />
+
+            {/* Modal de Gestão de Webhooks */}
+            <WebhookManagementModal open={webhookModalOpen} onClose={handleCloseWebhookModal} connection={selectedWebhookConnection} />
 
             {/* Overlay de Loading para geração de QR Code */}
             {isGeneratingQR && (

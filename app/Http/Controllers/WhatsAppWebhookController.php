@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class WhatsAppWebhookController extends Controller
 {
     /**
-     * Handle webhook from UAZ API
+     * Handle webhook from API
      */
     public function handle(Request $request)
     {
@@ -37,7 +37,7 @@ class WhatsAppWebhookController extends Controller
             [$tenantSlug, $systemName] = $parts;
 
             // Encontrar a conexão
-            $connection = WhatsAppConnection::whereHas('tenant', function($query) use ($tenantSlug) {
+            $connection = WhatsAppConnection::whereHas('tenant', function ($query) use ($tenantSlug) {
                 $query->where('slug', $tenantSlug);
             })->where('system_name', $systemName)->first();
 
@@ -53,7 +53,6 @@ class WhatsAppWebhookController extends Controller
             $this->processEvent($connection, $event, $data);
 
             return response()->json(['status' => 'success']);
-
         } catch (\Exception $e) {
             Log::error('WhatsApp Webhook Error', [
                 'message' => $e->getMessage(),

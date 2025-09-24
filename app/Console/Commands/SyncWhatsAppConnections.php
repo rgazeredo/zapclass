@@ -20,7 +20,7 @@ class SyncWhatsAppConnections extends Command
      *
      * @var string
      */
-    protected $description = 'Sync WhatsApp connections status with UAZ API';
+    protected $description = 'Sync WhatsApp connections status with API';
 
     protected $uazApiService;
 
@@ -40,7 +40,7 @@ class SyncWhatsAppConnections extends Command
         $query = WhatsAppConnection::with('tenant');
 
         if ($tenantSlug = $this->option('tenant')) {
-            $query->whereHas('tenant', function($q) use ($tenantSlug) {
+            $query->whereHas('tenant', function ($q) use ($tenantSlug) {
                 $q->where('slug', $tenantSlug);
             });
             $this->info("Syncing connections for tenant: {$tenantSlug}");
@@ -71,7 +71,6 @@ class SyncWhatsAppConnections extends Command
                     $this->line("\n[{$connection->instance_name}] Status updated: {$currentStatus} -> {$newStatus}");
                     $synced++;
                 }
-
             } catch (\Exception $e) {
                 $this->error("\n[{$connection->instance_name}] Error: " . $e->getMessage());
                 $errors++;

@@ -319,7 +319,7 @@ class UazApiService
     public function sendMessage(string $instanceToken, array $messageData): array
     {
         try {
-            Log::info('API: Enviando mensagem via UAZ', [
+            Log::info('API: Enviando mensagem via', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'recipient' => $messageData['recipient']
             ]);
@@ -392,6 +392,207 @@ class UazApiService
             Log::error('API QR Exception', [
                 'message' => $e->getMessage(),
                 'instance_token' => $instanceToken
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Criar webhook na API
+     *
+     * @param string $instanceToken Token específico da instância
+     * @param string $instanceId ID da instância
+     * @param array $webhookData Dados do webhook
+     * @return array
+     * @throws Exception
+     */
+    public function createWebhook(string $instanceToken, string $instanceId, array $webhookData): array
+    {
+        try {
+            // Preparar dados conforme documentação API
+            $payload = [
+                'action' => 'add',
+                'url' => $webhookData['url']
+            ];
+
+            // Adicionar eventos se especificados (API espera array, não string)
+            if (isset($webhookData['events'])) {
+                $payload['events'] = is_string($webhookData['events'])
+                    ? explode(',', $webhookData['events'])
+                    : $webhookData['events'];
+            }
+
+            // TODO: Reativar quando API corrigir o excludeMessages
+            // Adicionar eventos de exclusão se especificados (API espera array, não string)
+            // if (isset($webhookData['excludeMessages'])) {
+            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+            //         ? explode(',', $webhookData['excludeMessages'])
+            //         : $webhookData['excludeMessages'];
+            // }
+
+            Log::info('API: Criando webhook via', [
+                'instance_token' => substr($instanceToken, 0, 10) . '...',
+                'instance_id' => $instanceId,
+                'payload' => $payload
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/webhook', $payload);
+
+            if (!$response->successful()) {
+                Log::error('API Error: createWebhook', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'payload' => $payload
+                ]);
+
+                throw new Exception('Falha ao criar webhook: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Webhook Created: createWebhook', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Create Webhook Exception', [
+                'message' => $e->getMessage(),
+                'instance_token' => substr($instanceToken, 0, 10) . '...'
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Deletar webhook da API
+     *
+     * @param string $instanceToken Token específico da instância
+     * @param string $instanceId ID da instância
+     * @param string $webhookUrl URL do webhook para remover
+     * @return array
+     * @throws Exception
+     */
+    public function deleteWebhook(string $instanceToken, string $instanceId, string $webhookUrl): array
+    {
+        try {
+            // Preparar dados conforme documentação API
+            $payload = [
+                'action' => 'remove',
+                'url' => $webhookUrl
+            ];
+
+            Log::info('API: Deletando webhook via', [
+                'instance_token' => substr($instanceToken, 0, 10) . '...',
+                'instance_id' => $instanceId,
+                'payload' => $payload
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/webhook', $payload);
+
+            if (!$response->successful()) {
+                Log::error('API Error: deleteWebhook', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'payload' => $payload
+                ]);
+
+                throw new Exception('Falha ao deletar webhook: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Webhook Deleted: deleteWebhook', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Delete Webhook Exception', [
+                'message' => $e->getMessage(),
+                'instance_token' => substr($instanceToken, 0, 10) . '...'
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Editar webhook na API
+     *
+     * @param string $instanceToken Token específico da instância
+     * @param string $instanceId ID da instância
+     * @param array $webhookData Dados do webhook
+     * @return array
+     * @throws Exception
+     */
+    public function updateWebhook(string $instanceToken, string $instanceId, array $webhookData): array
+    {
+        try {
+            // Preparar dados conforme documentação API
+            $payload = [
+                'action' => 'edit',
+                'url' => $webhookData['url']
+            ];
+
+            // Adicionar eventos se especificados (API espera array, não string)
+            if (isset($webhookData['events'])) {
+                $payload['events'] = is_string($webhookData['events'])
+                    ? explode(',', $webhookData['events'])
+                    : $webhookData['events'];
+            }
+
+            // TODO: Reativar quando API corrigir o excludeMessages
+            // Adicionar eventos de exclusão se especificados (API espera array, não string)
+            // if (isset($webhookData['excludeMessages'])) {
+            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+            //         ? explode(',', $webhookData['excludeMessages'])
+            //         : $webhookData['excludeMessages'];
+            // }
+
+            Log::info('API: Editando webhook via', [
+                'instance_token' => substr($instanceToken, 0, 10) . '...',
+                'instance_id' => $instanceId,
+                'payload' => $payload
+            ]);
+
+            $response = Http::withHeaders([
+                'token' => $instanceToken,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(self::BASE_URL . '/webhook', $payload);
+
+            if (!$response->successful()) {
+                Log::error('API Error: updateWebhook', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'payload' => $payload
+                ]);
+
+                throw new Exception('Falha ao editar webhook: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            Log::info('Webhook Updated: updateWebhook', [
+                'response' => $data
+            ]);
+
+            return $data;
+        } catch (Exception $e) {
+            Log::error('API Update Webhook Exception', [
+                'message' => $e->getMessage(),
+                'instance_token' => substr($instanceToken, 0, 10) . '...'
             ]);
 
             throw $e;

@@ -72,7 +72,6 @@ class WhatsAppConnectionController extends Controller
                     'phone' => $owner
                 ]);
             }
-
         } catch (Exception $e) {
             Log::error('Failed to check connection status on page load', [
                 'connection_id' => $connection->id,
@@ -174,7 +173,7 @@ class WhatsAppConnectionController extends Controller
                 'status' => 'creating',
             ]);
 
-            // Criar instância na API UAZ
+            // Criar instância na API
             $apiResponse = $this->uazApiService->createInstance([
                 'name' => $connection->name,
                 'system_name' => 'ZapClass',
@@ -204,7 +203,7 @@ class WhatsAppConnectionController extends Controller
                     $this->uazApiService->deleteInstance($instanceName);
                 } catch (Exception $deleteException) {
                     // Log do erro de delete, mas não falhar por isso
-                    Log::warning('Failed to cleanup UAZ instance after error', [
+                    Log::warning('Failed to cleanup instance after error', [
                         'instance' => $instanceName,
                         'error' => $deleteException->getMessage()
                     ]);
@@ -289,12 +288,12 @@ class WhatsAppConnectionController extends Controller
             ]);
 
             if ($whatsapp->name !== $request->name) {
-                // Atualiza o nome da instância na API UAZ
+                // Atualiza o nome da instância na API
                 $this->uazApiService->updateInstance($whatsapp->token, $request->name);
             }
 
             if ($whatsapp->admin_field_1 !== $request->admin_field_1 || $whatsapp->admin_field_2 !== $request->admin_field_2) {
-                // Atualiza os campos admin_field_1 e admin_field_2 na instância na API UAZ
+                // Atualiza os campos admin_field_1 e admin_field_2 na instância na API
                 $this->uazApiService->updateAdminFields($whatsapp->instance_id, $request->admin_field_1, $request->admin_field_2);
             }
 
@@ -339,7 +338,7 @@ class WhatsAppConnectionController extends Controller
         }
 
         try {
-            // Desconectar na API UAZ
+            // Desconectar na API
             $this->uazApiService->disconnectInstance($whatsapp->token);
 
             // Atualizar status no banco
@@ -409,7 +408,7 @@ class WhatsAppConnectionController extends Controller
     }
 
     /**
-     * Get instance status from UAZ API
+     * Get instance status from API
      */
     public function status(Request $request, WhatsAppConnection $whatsapp)
     {
@@ -513,7 +512,7 @@ class WhatsAppConnectionController extends Controller
         DB::beginTransaction();
 
         try {
-            // Deletar instância na API UAZ primeiro
+            // Deletar instância na API primeiro
             $this->uazApiService->deleteInstance($instanceName);
 
             // Deletar conexão do banco de dados
@@ -528,7 +527,7 @@ class WhatsAppConnectionController extends Controller
 
             // Se falhou ao deletar na API, ainda assim deletar do banco
             // pois a instância pode não existir mais na API
-            Log::warning('Failed to delete UAZ instance, deleting from database anyway', [
+            Log::warning('Failed to delete instance, deleting from database anyway', [
                 'instance' => $instanceName,
                 'error' => $e->getMessage()
             ]);
