@@ -66,7 +66,9 @@ export function QRCodeDisplayModal({ open, onClose, qrCodeData, isPollingStatus,
                                 <div className="rounded border bg-gray-100 p-8">
                                     <p className="text-gray-500">{t('whatsapp.qrCodeNotAvailable')}</p>
                                     {qrCodeData?.instance?.status && (
-                                        <p className="mt-2 text-sm text-gray-400">{t('whatsapp.status')}: {qrCodeData.instance.status}</p>
+                                        <p className="mt-2 text-sm text-gray-400">
+                                            {t('whatsapp.status')}: {qrCodeData.instance.status}
+                                        </p>
                                     )}
                                 </div>
                             )}
@@ -90,15 +92,9 @@ export function QRCodeDisplayModal({ open, onClose, qrCodeData, isPollingStatus,
                             <div className="space-y-2 text-sm text-gray-600">
                                 <p className="font-medium text-gray-800">{t('whatsapp.howToConnect')}:</p>
                                 <p>1. {t('whatsapp.step1OpenWhatsApp')}</p>
-                                <p>
-                                    2. {t('whatsapp.step2TapMenu')}
-                                </p>
-                                <p>
-                                    3. {t('whatsapp.step3TapLinkedDevices')}
-                                </p>
-                                <p>
-                                    4. {t('whatsapp.step4TapLinkDevice')}
-                                </p>
+                                <p>2. {t('whatsapp.step2TapMenu')}</p>
+                                <p>3. {t('whatsapp.step3TapLinkedDevices')}</p>
+                                <p>4. {t('whatsapp.step4TapLinkDevice')}</p>
                                 <p>5. {t('whatsapp.step5ScanQR')}</p>
                             </div>
                         </div>

@@ -36,7 +36,7 @@ export default function WhatsAppIndex({
     // Estados dos modais de QR Code
     const [qrDisplayModalOpen, setQrDisplayModalOpen] = useState(false);
     const [selectedConnectionId, setSelectedConnectionId] = useState<number | null>(null);
-    const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+    const [qrCodeData, setQrCodeData] = useState<{ instance?: { name?: string; qrcode?: string; status?: string } } | null>(null);
     const [isGeneratingQR, setIsGeneratingQR] = useState(false);
     const [isPollingStatus, setIsPollingStatus] = useState(false);
 
@@ -197,6 +197,8 @@ export default function WhatsAppIndex({
             const data = await response.json();
 
             if (data.success) {
+                console.log(data);
+
                 setQrCodeData(data.qrcode);
                 setQrDisplayModalOpen(true);
 
@@ -444,7 +446,7 @@ export default function WhatsAppIndex({
             <QRCodeDisplayModal
                 open={qrDisplayModalOpen}
                 onClose={handleCloseQRDisplayModal}
-                qrCodeData={{ instance: { qrcode: qrCodeData || undefined } }}
+                qrCodeData={qrCodeData ?? { instance: undefined }}
                 isPollingStatus={isPollingStatus}
                 connectionStatus={connections.find((c) => c.id === selectedConnectionId)?.status || undefined}
                 onDisconnect={handleDisconnect}
