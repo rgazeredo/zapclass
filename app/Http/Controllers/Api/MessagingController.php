@@ -12,6 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/**
+ * @tags Mensagens
+ */
+
 class MessagingController extends Controller
 {
     protected UazApiService $uazApiService;
@@ -22,10 +26,95 @@ class MessagingController extends Controller
     }
 
     /**
-     * Enviar mensagem de texto
+     * Enviar mensagem de texto via WhatsApp
      *
-     * @param SendTextMessageRequest $request
+     * Envia uma mensagem de texto personalizada para qualquer número brasileiro através
+     * da sua instância WhatsApp conectada. Suporta recursos avançados como agendamento,
+     * priorização, rastreamento customizado e resposta a mensagens específicas.
+     *
+     * Este endpoint processa mensagens instantaneamente ou com atraso configurável,
+     * oferecendo controle total sobre o envio e permitindo integração completa
+     * com sistemas de CRM, e-commerce e automação.
+     *
+     * @param SendTextMessageRequest $request Dados completos da mensagem
      * @return JsonResponse
+     *
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Mensagem enviada com sucesso",
+     *   "data": {
+     *     "message_id": "msg_zc_abc123def456ghi789",
+     *     "status": "sent",
+     *     "recipient": "5511987654321",
+     *     "text_message": "Olá! Bem-vindo à nossa plataforma ZapClass 🚀",
+     *     "connection_id": "zapclass_inst_001",
+     *     "trackingId": "order_2024_12345",
+     *     "delayMessage": 0,
+     *     "linkPreview": true,
+     *     "timestamp": "2024-01-15T10:30:45.000000Z"
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 400 {
+     *   "success": false,
+     *   "error": "validation_error",
+     *   "message": "Os dados fornecidos são inválidos",
+     *   "details": {
+     *     "recipient": [
+     *       "O número deve estar no formato: 55 + DDD + telefone (ex: 5511987654321)"
+     *     ],
+     *     "text_message": [
+     *       "O conteúdo da mensagem é obrigatório"
+     *     ]
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 401 {
+     *   "success": false,
+     *   "error": "authentication_error",
+     *   "message": "Token de autenticação ausente ou inválido",
+     *   "hint": "Inclua o cabeçalho: Authorization: Bearer SEU_TOKEN_API",
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 402 {
+     *   "success": false,
+     *   "error": "quota_exceeded",
+     *   "message": "Limite mensal de mensagens excedido",
+     *   "details": {
+     *     "current_usage": 1000,
+     *     "plan_limit": 1000,
+     *     "reset_date": "2024-02-01T00:00:00.000000Z"
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 422 {
+     *   "success": false,
+     *   "error": "business_logic_error",
+     *   "message": "Número de telefone bloqueado ou inválido para envio",
+     *   "details": {
+     *     "blocked_reason": "Usuário optou por não receber mensagens",
+     *     "blocked_since": "2024-01-10T15:20:30.000000Z"
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 500 {
+     *   "success": false,
+     *   "error": "service_error",
+     *   "message": "Instância WhatsApp temporariamente indisponível",
+     *   "details": {
+     *     "error_code": "INSTANCE_DISCONNECTED",
+     *     "retry_after": 60,
+     *     "estimated_recovery": "2024-01-15T10:35:00.000000Z"
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @authenticated
      */
     public function sendText(SendTextMessageRequest $request): JsonResponse
     {
@@ -43,8 +132,8 @@ class MessagingController extends Controller
 
             // Preparar dados para a API
             $messageData = [
-                'recipient' => $request->phone_number,
-                'text' => $request->message,
+                'recipient' => $request->recipient,
+                'text' => $request->text_message,
             ];
 
             // Gerar ID único para rastreamento
@@ -53,8 +142,8 @@ class MessagingController extends Controller
             Log::info('API: Enviando mensagem via', [
                 'message_id' => $messageId,
                 'connection_id' => $connection->id,
-                'recipient' => $request->phone_number,
-                'message_length' => strlen($request->message)
+                'recipient' => $request->recipient,
+                'message_length' => strlen($request->text_message)
             ]);
 
             // Chamar API
@@ -71,15 +160,18 @@ class MessagingController extends Controller
             return $this->successResponse([
                 'message_id' => $messageId,
                 'status' => 'sent',
-                'recipient' => $request->phone_number,
-                'message' => $request->message,
+                'recipient' => $request->recipient,
+                'text_message' => $request->text_message,
                 'timestamp' => now()->toISOString(),
                 'connection_id' => $connection->client_instance_id,
+                'trackingId' => $request->trackingId,
+                'delayMessage' => $request->delayMessage ?? 0,
+                'linkPreview' => $request->linkPreview ?? true,
             ], 'Mensagem enviada com sucesso');
         } catch (Exception $e) {
             Log::error('API: Erro ao enviar mensagem', [
                 'connection_id' => $connection?->id,
-                'recipient' => $request->phone_number,
+                'recipient' => $request->recipient,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -92,11 +184,42 @@ class MessagingController extends Controller
     }
 
     /**
-     * Obter status de uma mensagem
+     * Consultar status de uma mensagem enviada
      *
-     * @param Request $request
-     * @param string $messageId
+     * Retorna o status atual de uma mensagem específica identificada pelo message_id.
+     * Útil para rastrear se a mensagem foi entregue ao destinatário.
+     *
+     * @param Request $request Requisição HTTP
+     * @param string $messageId ID único da mensagem retornado no envio
      * @return JsonResponse
+     *
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Operação realizada com sucesso",
+     *   "data": {
+     *     "message_id": "msg_abc123def456ghi789",
+     *     "status": "delivered",
+     *     "timestamp": "2024-01-15T10:35:20.000000Z",
+     *     "connection_id": "zapclass_123"
+     *   },
+     *   "timestamp": "2024-01-15T10:35:20.000000Z"
+     * }
+     *
+     * @response 401 {
+     *   "success": false,
+     *   "error": "api_error",
+     *   "message": "Token de API inválido ou expirado",
+     *   "timestamp": "2024-01-15T10:35:20.000000Z"
+     * }
+     *
+     * @response 500 {
+     *   "success": false,
+     *   "error": "api_error",
+     *   "message": "Erro ao consultar status da mensagem",
+     *   "timestamp": "2024-01-15T10:35:20.000000Z"
+     * }
+     *
+     * @authenticated
      */
     public function getMessageStatus(Request $request, string $messageId): JsonResponse
     {
@@ -122,10 +245,44 @@ class MessagingController extends Controller
     }
 
     /**
-     * Obter informações da conexão
+     * Obter informações da conexão WhatsApp
      *
-     * @param Request $request
+     * Retorna detalhes sobre a conexão WhatsApp associada ao token de API,
+     * incluindo status, telefone conectado e informações de uso da API.
+     *
+     * @param Request $request Requisição HTTP
      * @return JsonResponse
+     *
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Operação realizada com sucesso",
+     *   "data": {
+     *     "connection_id": "zapclass_123",
+     *     "name": "Conexão Principal",
+     *     "status": "connected",
+     *     "phone": "5511999999999",
+     *     "api_usage_count": 42,
+     *     "api_rate_limit": 1000,
+     *     "api_last_used": "2024-01-15T10:25:30.000000Z"
+     *   },
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 401 {
+     *   "success": false,
+     *   "error": "api_error",
+     *   "message": "Token de API inválido ou expirado",
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @response 500 {
+     *   "success": false,
+     *   "error": "api_error",
+     *   "message": "Erro ao obter informações da conexão",
+     *   "timestamp": "2024-01-15T10:30:45.000000Z"
+     * }
+     *
+     * @authenticated
      */
     public function getConnectionInfo(Request $request): JsonResponse
     {
