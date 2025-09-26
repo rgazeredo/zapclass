@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { ApiDataModal } from '@/components/whatsapp/api-data-modal';
+import { DeleteConfirmationModal } from '@/components/whatsapp/delete-confirmation-modal';
 import { FormConnectionModal } from '@/components/whatsapp/form-connection-modal';
 import { QRCodeDisplayModal } from '@/components/whatsapp/qrcode-display-modal';
 import { WebhookManagementModal } from '@/components/whatsapp/webhook-management-modal';
@@ -48,6 +49,11 @@ export default function WhatsAppIndex({
     const [webhookModalOpen, setWebhookModalOpen] = useState(false);
     const [selectedWebhookConnection, setSelectedWebhookConnection] = useState<WhatsAppConnection | null>(null);
 
+    // Estados do modal de confirmação de exclusão
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [connectionToDelete, setConnectionToDelete] = useState<number | null>(null);
+    const [isDeletingConnection, setIsDeletingConnection] = useState(false);
+
     // Ref para controlar o interval do polling
     const statusPollingRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -63,13 +69,30 @@ export default function WhatsAppIndex({
     ];
 
     const handleDelete = (connectionId: number) => {
-        if (confirm(t('whatsapp.confirmDelete'))) {
-            router.delete(`/whatsapp/${connectionId}`, {
-                onSuccess: () => {
-                    // Redirect handled by controller
-                },
-            });
-        }
+        setConnectionToDelete(connectionId);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (!connectionToDelete) return;
+
+        setIsDeletingConnection(true);
+        router.delete(`/whatsapp/${connectionToDelete}`, {
+            onStart: () => setIsDeletingConnection(true),
+            onFinish: () => {
+                setIsDeletingConnection(false);
+                setDeleteModalOpen(false);
+                setConnectionToDelete(null);
+            },
+            onSuccess: () => {
+                // Redirect handled by controller
+            },
+        });
+    };
+
+    const cancelDelete = () => {
+        setDeleteModalOpen(false);
+        setConnectionToDelete(null);
     };
 
     const handleCreateClick = () => {
@@ -457,6 +480,18 @@ export default function WhatsAppIndex({
 
             {/* Modal de Gestão de Webhooks */}
             <WebhookManagementModal open={webhookModalOpen} onClose={handleCloseWebhookModal} connection={selectedWebhookConnection} />
+
+            {/* Modal de Confirmação de Exclusão */}
+            <DeleteConfirmationModal
+                open={deleteModalOpen}
+                onClose={cancelDelete}
+                onConfirm={confirmDelete}
+                title={t('whatsapp.confirmDelete')}
+                description={t('whatsapp.deleteWarning')}
+                confirmButtonText={t('whatsapp.delete')}
+                cancelButtonText={t('common.cancel')}
+                isLoading={isDeletingConnection}
+            />
 
             {/* Overlay de Loading para geração de QR Code */}
             {isGeneratingQR && (

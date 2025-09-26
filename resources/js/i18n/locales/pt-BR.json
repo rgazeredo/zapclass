@@ -187,7 +187,12 @@
         "noResults": "Nenhum resultado encontrado.",
         "rowsSelected": "{selected} de {total} linha(s) selecionada(s).",
         "previous": "Anterior",
-        "next": "Próximo"
+        "next": "Próximo",
+        "cancel": "Cancelar",
+        "delete": "Excluir",
+        "deleting": "Excluindo...",
+        "confirmDelete": "Confirmar Exclusão",
+        "deleteWarning": "Esta ação não pode ser desfeita. Todos os dados associados serão permanentemente removidos."
     },
     "whatsapp": {
         "title": "WhatsApp",
@@ -214,6 +219,7 @@
         "connectionUpdated": "Conexão atualizada com sucesso",
         "connectionDeleted": "Conexão excluída com sucesso",
         "confirmDelete": "Tem certeza que deseja excluir esta conexão?",
+        "deleteWarning": "Esta conexão será excluída. Esta ação não pode ser desfeita.",
         "noConnections": "Nenhuma conexão encontrada",
         "createFirstConnection": "Crie sua primeira conexão WhatsApp",
         "statusCreating": "Criando",

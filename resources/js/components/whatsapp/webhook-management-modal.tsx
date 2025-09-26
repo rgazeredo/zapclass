@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +36,7 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
     const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     // Form states
     const [formData, setFormData] = useState({
@@ -116,9 +118,10 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
 
     const handleAddWebhook = () => {
         setIsAddingWebhook(true);
+        setShowAdvanced(false);
         setFormData({
             url: '',
-            events: [],
+            events: availableEvents, // Select all events by default
             exclude_events: [],
             status: 'active',
         });
@@ -126,6 +129,12 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
 
     const handleEditWebhook = (webhook: Webhook) => {
         setEditingWebhook(webhook);
+
+        // If not all events are selected, show advanced mode automatically
+        const webhookEvents = webhook.events || [];
+        const hasAllEvents = availableEvents.every(event => webhookEvents.includes(event));
+        setShowAdvanced(!hasAllEvents);
+
         setFormData({
             url: webhook.url,
             events: webhook.events || [],
@@ -137,6 +146,7 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
     const handleCancelForm = () => {
         setIsAddingWebhook(false);
         setEditingWebhook(null);
+        setShowAdvanced(false);
         setFormData({
             url: '',
             events: [],
@@ -159,9 +169,12 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
         setError(null);
 
         try {
+            // If Advanced is not checked, send all events
+            const eventsToSend = showAdvanced ? formData.events : availableEvents;
+
             const webhookData = {
                 url: formData.url,
-                events: formData.events,
+                events: eventsToSend,
                 exclude_events: formData.exclude_events,
                 status: formData.status,
             };
@@ -358,28 +371,67 @@ export function WebhookManagementModal({ open, onClose, connection }: WebhookMan
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div>
-                                        <Label>Escutar eventos</Label>
-                                        <p className="mb-2 text-sm text-gray-500">Selecione os eventos que deseja escutar</p>
-                                        <div className="grid grid-cols-4 gap-2">
-                                            {availableEvents.map((event) => (
-                                                <div
-                                                    key={event}
-                                                    className={`cursor-pointer rounded border p-2 text-sm transition-colors ${
-                                                        formData.events.includes(event)
-                                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                            : 'border-gray-200 hover:border-gray-300'
-                                                    }`}
-                                                    onClick={() => toggleEventSelection(event, 'events')}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="font-medium">{event}</span>
-                                                        {formData.events.includes(event) && <IconCheck className="h-3 w-3 text-blue-600" />}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                    {/* Advanced Options Checkbox */}
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="advanced-options"
+                                            checked={showAdvanced}
+                                            onCheckedChange={(checked) => {
+                                                setShowAdvanced(!!checked);
+                                                // If unchecking advanced, select all events
+                                                if (!checked) {
+                                                    setFormData(prev => ({ ...prev, events: availableEvents }));
+                                                }
+                                            }}
+                                        />
+                                        <Label htmlFor="advanced-options" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                            Avançado
+                                        </Label>
+                                        <p className="text-sm text-gray-500">
+                                            Selecionar eventos específicos (por padrão, todos os eventos são escutados)
+                                        </p>
                                     </div>
+
+                                    {/* Events Section - Only show when Advanced is checked */}
+                                    {showAdvanced && (
+                                        <div>
+                                            <Label>Escutar eventos</Label>
+                                            <p className="mb-2 text-sm text-gray-500">Selecione os eventos que deseja escutar</p>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {availableEvents.map((event) => (
+                                                    <div
+                                                        key={event}
+                                                        className={`cursor-pointer rounded border p-2 text-sm transition-colors ${
+                                                            formData.events.includes(event)
+                                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                                : 'border-gray-200 hover:border-gray-300'
+                                                        }`}
+                                                        onClick={() => toggleEventSelection(event, 'events')}
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="font-medium">{event}</span>
+                                                            {formData.events.includes(event) && <IconCheck className="h-3 w-3 text-blue-600" />}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Show events summary when Advanced is not checked */}
+                                    {!showAdvanced && (
+                                        <div className="rounded-lg bg-blue-50 p-3">
+                                            <div className="flex items-center gap-2">
+                                                <IconCheck className="h-4 w-4 text-blue-600" />
+                                                <span className="text-sm font-medium text-blue-800">
+                                                    Todos os eventos serão escutados
+                                                </span>
+                                            </div>
+                                            <p className="mt-1 text-xs text-blue-600">
+                                                {availableEvents.join(', ')}
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {/* TODO: Reativar quando API corrigir o excludeMessages */}
                                     {/* <div>

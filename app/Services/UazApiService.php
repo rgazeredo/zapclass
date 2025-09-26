@@ -216,30 +216,28 @@ class UazApiService
     /**
      * Deletar uma instância
      *
-     * @param string $instanceName
+     * @param string $token
      * @return bool
      * @throws Exception
      */
-    public function deleteInstance(string $instanceName): bool
+    public function deleteInstance(string $token): bool
     {
         try {
 
             Log::error('API Error: deleteInstance', [
-                'instanceName' => $instanceName
+                'token' => $token
             ]);
 
             $response = Http::withHeaders([
-                'admintoken' => self::TOKEN,
+                'token' => $token,
                 'Accept' => 'application/json',
-            ])->delete(self::BASE_URL . '/instance/delete', [
-                'instance_name' => $instanceName
-            ]);
+            ])->delete(self::BASE_URL . '/instance');
 
             if (!$response->successful()) {
                 Log::error('API Error: deleteInstance', [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                    'instance_name' => $instanceName
+                    'token' => $token
                 ]);
 
                 // Não lançar exception para delete, pois pode já ter sido deletada
@@ -247,14 +245,14 @@ class UazApiService
             }
 
             Log::info('API Instance Deleted: deleteInstance', [
-                'instance_name' => $instanceName
+                'token' => $token
             ]);
 
             return true;
         } catch (Exception $e) {
             Log::error('API Delete Exception: deleteInstance', [
                 'message' => $e->getMessage(),
-                'instance_name' => $instanceName
+                'token' => $token
             ]);
 
             // Não lançar exception para delete

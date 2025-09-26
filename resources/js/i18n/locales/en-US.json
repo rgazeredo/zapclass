@@ -187,7 +187,12 @@
         "noResults": "No results found.",
         "rowsSelected": "{selected} of {total} row(s) selected.",
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "confirmDelete": "Confirm Deletion",
+        "deleteWarning": "This action cannot be undone. All associated data will be permanently removed."
     },
     "whatsapp": {
         "title": "WhatsApp",
@@ -214,6 +219,7 @@
         "connectionUpdated": "Connection updated successfully",
         "connectionDeleted": "Connection deleted successfully",
         "confirmDelete": "Are you sure you want to delete this connection?",
+        "deleteWarning": "This connection will be deleted. This action cannot be undone.",
         "noConnections": "No connections found",
         "createFirstConnection": "Create your first WhatsApp connection",
         "statusCreating": "Creating",

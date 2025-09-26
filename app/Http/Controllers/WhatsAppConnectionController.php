@@ -190,6 +190,8 @@ class WhatsAppConnectionController extends Controller
                 'instance_id' => $apiResponse['instance']['id'] ?? null,
             ]);
 
+            $connection->enableApi();
+
             DB::commit();
 
             return redirect()->route('whatsapp.index')
@@ -507,13 +509,11 @@ class WhatsAppConnectionController extends Controller
             abort(403);
         }
 
-        $instanceName = $whatsapp->instance_name;
-
         DB::beginTransaction();
 
         try {
             // Deletar instância na API primeiro
-            $this->uazApiService->deleteInstance($instanceName);
+            $this->uazApiService->deleteInstance($whatsapp->token);
 
             // Deletar conexão do banco de dados
             $whatsapp->delete();
@@ -528,7 +528,7 @@ class WhatsAppConnectionController extends Controller
             // Se falhou ao deletar na API, ainda assim deletar do banco
             // pois a instância pode não existir mais na API
             Log::warning('Failed to delete instance, deleting from database anyway', [
-                'instance' => $instanceName,
+                'token' => $whatsapp->token,
                 'error' => $e->getMessage()
             ]);
 
