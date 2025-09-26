@@ -8,7 +8,6 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppConnectionController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Http\Controllers\WebhookController;
-use App\Http\Controllers\ApiDocumentationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,13 +27,6 @@ Route::get('/', function () {
     return Inertia::render('Landing/Index');
 })->name('home');
 
-// API Documentation
-Route::prefix('api-docs')->name('api.docs.')->group(function () {
-    Route::get('/', [ApiDocumentationController::class, 'index'])->name('index');
-    Route::get('/send-message', [ApiDocumentationController::class, 'sendMessage'])->name('send-message');
-    Route::get('/message-status', [ApiDocumentationController::class, 'messageStatus'])->name('message-status');
-    Route::get('/connection-info', [ApiDocumentationController::class, 'connectionInfo'])->name('connection-info');
-});
 
 // Test route
 Route::get('/test-route', function () {
