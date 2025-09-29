@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\MessagingController;
+use App\Http\Controllers\Api\V1\MessagingController;
+use App\Http\Controllers\Api\V2\MessagingController as V2MessagingController;
 use App\Http\Middleware\ApiAuthentication;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +35,16 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::get('info', [MessagingController::class, 'getConnectionInfo'])
             ->name('api.connection.info');
     });
+});
 
+Route::prefix('v2')->middleware([ApiAuthentication::class])->group(function () {
+
+    // Rotas de mensagens
+    Route::prefix('messages')->group(function () {
+        // Enviar mensagem avançada V2
+        Route::post('send-advanced-message', [V2MessagingController::class, 'sendAdvancedMessage'])
+            ->name('api.messages.send-advanced-message');
+    });
 });
 
 // Rota de health check (sem autenticação)

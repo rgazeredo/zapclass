@@ -8,13 +8,15 @@
       "Bash(task-master show:*)",
       "Bash(task-master:*)",
       "Bash(php artisan make:migration:*)",
-      "Bash(docker-compose exec:*)"
+      "Bash(docker-compose exec:*)",
+      "WebFetch(domain:scramble.dedoc.co)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "task-master-ai"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

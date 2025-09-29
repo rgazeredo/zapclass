@@ -1,0 +1,350 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "ZapClass API Documentation",
+        "version": "1.0.0",
+        "description": "API oficial do ZapClass para integra\u00e7\u00e3o com WhatsApp."
+    },
+    "servers": [
+        {
+            "url": "http://localhost/api/v1"
+        }
+    ],
+    "paths": {
+        "/messages/send-text": {
+            "post": {
+                "operationId": "messages.send-text",
+                "description": "Envia uma mensagem de texto para um n\u00famero espec\u00edfico.",
+                "summary": "Mensagem de texto",
+                "tags": [
+                    "Mensagens",
+                    "Messaging"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendTextMessageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "500": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "api_error"
+                                                    ]
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Erro interno do servidor. Tente novamente em alguns instantes."
+                                                    ]
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "success",
+                                                "error",
+                                                "message",
+                                                "timestamp"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "description": "Error overview.",
+                                                    "example": "Conex\u00e3o n\u00e3o configurada adequadamente. Entre em contato com o suporte."
+                                                }
+                                            },
+                                            "required": [
+                                                "message"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Retornar resposta padronizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Mensagem enviada com sucesso"
+                                            ]
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message_id": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "sent"
+                                                    ]
+                                                },
+                                                "recipient": {
+                                                    "type": "string"
+                                                },
+                                                "text_message": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                },
+                                                "connection_id": {
+                                                    "type": "string"
+                                                },
+                                                "trackingId": {
+                                                    "type": "string"
+                                                },
+                                                "delayMessage": {
+                                                    "type": "string"
+                                                },
+                                                "linkPreview": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "message_id",
+                                                "status",
+                                                "recipient",
+                                                "text_message",
+                                                "timestamp",
+                                                "connection_id",
+                                                "trackingId",
+                                                "delayMessage",
+                                                "linkPreview"
+                                            ]
+                                        },
+                                        "timestamp": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "timestamp"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "example": "Token de autoriza\u00e7\u00e3o n\u00e3o fornecido"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/messages/status/{messageId}": {
+            "get": {
+                "operationId": "messages.status",
+                "description": "Retorna o status atual de uma mensagem espec\u00edfica identificada pelo message_id.\n\u00datil para rastrear se a mensagem foi entregue ao destinat\u00e1rio.",
+                "summary": "Consultar status de uma mensagem enviada",
+                "tags": [
+                    "Mensagens",
+                    "Messaging"
+                ],
+                "parameters": [
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID \u00fanico da mensagem retornado no envio",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/connection/info": {
+            "get": {
+                "operationId": "connection.info",
+                "description": "Retorna detalhes sobre a conex\u00e3o WhatsApp associada ao token de API,\nincluindo status, telefone conectado e informa\u00e7\u00f5es de uso da API.",
+                "summary": "Obter informa\u00e7\u00f5es da conex\u00e3o WhatsApp",
+                "tags": [
+                    "Mensagens",
+                    "Messaging"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SendTextMessageRequest": {
+                "type": "object",
+                "properties": {
+                    "recipient": {
+                        "type": "string",
+                        "description": "N\u00famero do destinat\u00e1rio no formato internacional brasileiro\nDeve incluir c\u00f3digo do pa\u00eds (55) + DDD + n\u00famero",
+                        "example": "5511987654321"
+                    },
+                    "text_message": {
+                        "type": "string",
+                        "description": "Conte\u00fado da mensagem de texto a ser enviada\nSuporta texto simples, emojis e caracteres especiais",
+                        "example": "Ol\u00e1! Bem-vindo \u00e0 nossa plataforma ZapClass \ud83d\ude80",
+                        "maxLength": 4096
+                    },
+                    "linkPreview": {
+                        "type": "boolean",
+                        "description": "Controla se links na mensagem devem exibir pr\u00e9via autom\u00e1tica\ntrue: exibe pr\u00e9via, false: apenas o link",
+                        "example": true
+                    },
+                    "delayMessage": {
+                        "type": "integer",
+                        "description": "Atraso em segundos antes do envio (agendamento)\n\u00datil para envios programados ou intervalos entre mensagens",
+                        "example": 0,
+                        "minimum": 0,
+                        "maximum": 3600
+                    },
+                    "mentionEveryone": {
+                        "type": "boolean",
+                        "description": "Mencionar todos os participantes do grupo (apenas para grupos)\ntrue: menciona @todos, false: mensagem normal",
+                        "example": false
+                    },
+                    "messageToReply": {
+                        "type": "string",
+                        "description": "ID da mensagem para responder (criar thread)\nCria uma resposta vinculada \u00e0 mensagem original",
+                        "example": "msg_abc123xyz789",
+                        "maxLength": 100
+                    },
+                    "trackingId": {
+                        "type": "string",
+                        "description": "Identificador personalizado para controle interno\n\u00datil para rastrear mensagens em seu sistema",
+                        "example": "order_2024_12345",
+                        "maxLength": 50
+                    },
+                    "mentioned": {
+                        "type": "array",
+                        "description": "Lista de contatos a serem mencionados na mensagem\nArray de n\u00fameros de telefone para mencionar especificamente",
+                        "example": [
+                            "5511999999999",
+                            "5511888888888"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "recipient",
+                    "text_message"
+                ],
+                "title": "SendTextMessageRequest"
+            }
+        },
+        "responses": {
+            "ValidationException": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Errors overview."
+                                },
+                                "errors": {
+                                    "type": "object",
+                                    "description": "A detailed description of each field that failed validation.",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "required": [
+                                "message",
+                                "errors"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

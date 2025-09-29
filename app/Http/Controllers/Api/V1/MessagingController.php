@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SendTextMessageRequest;
@@ -26,93 +26,15 @@ class MessagingController extends Controller
     }
 
     /**
-     * Enviar mensagem de texto via WhatsApp
+     * Mensagem de texto
      *
-     * Envia uma mensagem de texto personalizada para qualquer número brasileiro através
-     * da sua instância WhatsApp conectada. Suporta recursos avançados como agendamento,
-     * priorização, rastreamento customizado e resposta a mensagens específicas.
-     *
-     * Este endpoint processa mensagens instantaneamente ou com atraso configurável,
-     * oferecendo controle total sobre o envio e permitindo integração completa
-     * com sistemas de CRM, e-commerce e automação.
+     * Envia uma mensagem de texto para um número específico.
      *
      * @param SendTextMessageRequest $request Dados completos da mensagem
      * @return JsonResponse
      *
-     * @response 200 {
-     *   "success": true,
-     *   "message": "Mensagem enviada com sucesso",
-     *   "data": {
-     *     "message_id": "msg_zc_abc123def456ghi789",
-     *     "status": "sent",
-     *     "recipient": "5511987654321",
-     *     "text_message": "Olá! Bem-vindo à nossa plataforma ZapClass 🚀",
-     *     "connection_id": "zapclass_inst_001",
-     *     "trackingId": "order_2024_12345",
-     *     "delayMessage": 0,
-     *     "linkPreview": true,
-     *     "timestamp": "2024-01-15T10:30:45.000000Z"
-     *   },
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
-     *
-     * @response 400 {
-     *   "success": false,
-     *   "error": "validation_error",
-     *   "message": "Os dados fornecidos são inválidos",
-     *   "details": {
-     *     "recipient": [
-     *       "O número deve estar no formato: 55 + DDD + telefone (ex: 5511987654321)"
-     *     ],
-     *     "text_message": [
-     *       "O conteúdo da mensagem é obrigatório"
-     *     ]
-     *   },
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
-     *
-     * @response 401 {
-     *   "success": false,
-     *   "error": "authentication_error",
-     *   "message": "Token de autenticação ausente ou inválido",
-     *   "hint": "Inclua o cabeçalho: Authorization: Bearer SEU_TOKEN_API",
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
-     *
-     * @response 402 {
-     *   "success": false,
-     *   "error": "quota_exceeded",
-     *   "message": "Limite mensal de mensagens excedido",
-     *   "details": {
-     *     "current_usage": 1000,
-     *     "plan_limit": 1000,
-     *     "reset_date": "2024-02-01T00:00:00.000000Z"
-     *   },
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
-     *
-     * @response 422 {
-     *   "success": false,
-     *   "error": "business_logic_error",
-     *   "message": "Número de telefone bloqueado ou inválido para envio",
-     *   "details": {
-     *     "blocked_reason": "Usuário optou por não receber mensagens",
-     *     "blocked_since": "2024-01-10T15:20:30.000000Z"
-     *   },
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
-     *
-     * @response 500 {
-     *   "success": false,
-     *   "error": "service_error",
-     *   "message": "Instância WhatsApp temporariamente indisponível",
-     *   "details": {
-     *     "error_code": "INSTANCE_DISCONNECTED",
-     *     "retry_after": 60,
-     *     "estimated_recovery": "2024-01-15T10:35:00.000000Z"
-     *   },
-     *   "timestamp": "2024-01-15T10:30:45.000000Z"
-     * }
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Exception
      *
      * @authenticated
      */
@@ -122,12 +44,14 @@ class MessagingController extends Controller
             // Pegar conexão autenticada do middleware
             $connection = $request->attributes->get('api_connection');
 
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(401, 'Token de autorização não fornecido');
+            }
+
             // Validar se temos os dados necessários para chamar a API
             if (!$connection->token || !$connection->instance_id) {
-                return $this->errorResponse(
-                    'Conexão não configurada adequadamente. Entre em contato com o suporte.',
-                    500
-                );
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
             }
 
             // Preparar dados para a API

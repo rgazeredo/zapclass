@@ -11,16 +11,16 @@ use App\Http\Controllers\WebhookController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-// API routes for pricing
-Route::get('/api/pricing/plans', [PricingController::class, 'getPlans'])->name('api.pricing.plans');
-Route::get('/api/pricing/plan/{stripe_price_id}', [PricingController::class, 'getPlan'])->name('api.pricing.plan');
+// Internal routes for pricing (frontend use only)
+Route::get('/internal/pricing/plans', [PricingController::class, 'getPlans'])->name('internal.pricing.plans');
+Route::get('/internal/pricing/plan/{stripe_price_id}', [PricingController::class, 'getPlan'])->name('internal.pricing.plan');
 
 // Development route to create sample products
-Route::post('/api/pricing/create-sample-products', [PricingController::class, 'createSampleProducts'])
-    ->name('api.pricing.create-sample-products');
+Route::post('/internal/pricing/create-sample-products', [PricingController::class, 'createSampleProducts'])
+    ->name('internal.pricing.create-sample-products');
 
 // WhatsApp Webhook route (public, no auth needed)
-Route::post('/api/whatsapp/webhook', [WhatsAppWebhookController::class, 'handle'])
+Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'handle'])
     ->name('whatsapp.webhook');
 
 Route::get('/', function () {
