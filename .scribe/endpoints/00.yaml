@@ -1,0 +1,298 @@
+name: Endpoints
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/messages/send-text
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Mensagem de texto'
+      description: 'Envia uma mensagem de texto para um número específico.'
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer zt_your_api_token_here'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      recipient:
+        name: recipient
+        description: 'Must match the regex /^55[1-9][0-9]{9,10}$/.'
+        required: true
+        example: '553642559314'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      text_message:
+        name: text_message
+        description: 'Must not be greater than 4096 characters.'
+        required: true
+        example: k
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      linkPreview:
+        name: linkPreview
+        description: ''
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      delayMessage:
+        name: delayMessage
+        description: 'Must be at least 0. Must not be greater than 3600.'
+        required: false
+        example: 14
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mentionEveryone:
+        name: mentionEveryone
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mentioned:
+        name: mentioned
+        description: 'Must match the regex /^55[1-9][0-9]{9,10}$/.'
+        required: false
+        example:
+          - '553642559314'
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      messageToReply:
+        name: messageToReply
+        description: 'Must not be greater than 100 characters.'
+        required: false
+        example: k
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      trackingId:
+        name: trackingId
+        description: 'Must match the regex /^[a-zA-Z0-9_-]+$/. Must not be greater than 50 characters.'
+        required: false
+        example: h
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      recipient: '553642559314'
+      text_message: k
+      linkPreview: true
+      delayMessage: 14
+      mentionEveryone: false
+      mentioned:
+        - '553642559314'
+      messageToReply: k
+      trackingId: h
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/v1/messages/status/{messageId}'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consultar status de uma mensagem enviada'
+      description: |-
+        Retorna o status atual de uma mensagem específica identificada pelo message_id.
+        Útil para rastrear se a mensagem foi entregue ao destinatário.
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer zt_your_api_token_here'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      messageId:
+        name: messageId
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      messageId: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Operação realizada com sucesso",
+            "data": {
+              "message_id": "msg_abc123def456ghi789",
+              "status": "delivered",
+              "timestamp": "2024-01-15T10:35:20.000000Z",
+              "connection_id": "zapclass_123"
+            },
+            "timestamp": "2024-01-15T10:35:20.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "error": "api_error",
+            "message": "Token de API inválido ou expirado",
+            "timestamp": "2024-01-15T10:35:20.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "success": false,
+            "error": "api_error",
+            "message": "Erro ao consultar status da mensagem",
+            "timestamp": "2024-01-15T10:35:20.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/connection/info
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Obter informações da conexão WhatsApp'
+      description: |-
+        Retorna detalhes sobre a conexão WhatsApp associada ao token de API,
+        incluindo status, telefone conectado e informações de uso da API.
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer zt_your_api_token_here'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Operação realizada com sucesso",
+            "data": {
+              "connection_id": "zapclass_123",
+              "name": "Conexão Principal",
+              "status": "connected",
+              "phone": "5511999999999",
+              "api_usage_count": 42,
+              "api_rate_limit": 1000,
+              "api_last_used": "2024-01-15T10:25:30.000000Z"
+            },
+            "timestamp": "2024-01-15T10:30:45.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "error": "api_error",
+            "message": "Token de API inválido ou expirado",
+            "timestamp": "2024-01-15T10:30:45.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "success": false,
+            "error": "api_error",
+            "message": "Erro ao obter informações da conexão",
+            "timestamp": "2024-01-15T10:30:45.000000Z"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+    custom: []

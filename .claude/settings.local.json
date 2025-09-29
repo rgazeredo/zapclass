@@ -10,7 +10,9 @@
       "Bash(php artisan make:migration:*)",
       "Bash(docker-compose exec:*)",
       "WebFetch(domain:scramble.dedoc.co)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
