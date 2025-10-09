@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\V1\MessagingController;
-use App\Http\Controllers\Api\V2\MessagingController as V2MessagingController;
+use App\Http\Controllers\Api\V1\MessagingController as V1MessagingController;
 use App\Http\Middleware\ApiAuthentication;
 use Illuminate\Support\Facades\Route;
 
@@ -21,31 +20,37 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
     // Rotas de mensagens
     Route::prefix('messages')->group(function () {
         // Enviar mensagem de texto
-        Route::post('send-text', [MessagingController::class, 'sendText'])
-            ->name('api.messages.send-text');
+        Route::post('text', [V1MessagingController::class, 'text'])
+            ->name('api.messages.text');
 
         // Consultar status de mensagem
-        Route::get('status/{messageId}', [MessagingController::class, 'getMessageStatus'])
-            ->name('api.messages.status');
+        // Route::get('status/{messageId}', [MessagingController::class, 'getMessageStatus'])
+        //     ->name('api.messages.status');
     });
 
     // Rotas de conexão/instância
-    Route::prefix('connection')->group(function () {
-        // Obter informações da conexão
-        Route::get('info', [MessagingController::class, 'getConnectionInfo'])
-            ->name('api.connection.info');
-    });
+    // Route::prefix('connection')->group(function () {
+    //     // Obter informações da conexão
+    //     Route::get('info', [MessagingController::class, 'getConnectionInfo'])
+    //         ->name('api.connection.info');
+    // });
 });
 
-Route::prefix('v2')->middleware([ApiAuthentication::class])->group(function () {
+// Route::prefix('v2')->middleware([ApiAuthentication::class])->group(function () {
 
-    // Rotas de mensagens
-    Route::prefix('messages')->group(function () {
-        // Enviar mensagem avançada V2
-        Route::post('send-advanced-message', [V2MessagingController::class, 'sendAdvancedMessage'])
-            ->name('api.messages.send-advanced-message');
-    });
-});
+//     // Rotas de mensagens
+//     Route::prefix('messages')->group(function () {
+//         // Enviar mensagem avançada V2
+//         Route::post('send-advanced-message', [V2MessagingController::class, 'sendAdvancedMessage'])
+//             ->name('api.messages.send-advanced-message');
+//     });
+
+//     Route::prefix('connection')->group(function () {
+//         // Obter informações da conexão
+//         Route::get('info', [MessagingController::class, 'getConnectionInfo'])
+//             ->name('api.connection.info');
+//     });
+// });
 
 // Rota de health check (sem autenticação)
 Route::get('health', function () {

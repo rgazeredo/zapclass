@@ -24,61 +24,86 @@ class SendTextMessageRequest extends FormRequest
     {
         return [
             /**
-             * Número do destinatário no formato internacional brasileiro
-             * Deve incluir código do país (55) + DDD + número
-             * @example "5511987654321"
+             * Número do destinatário no formato internacional.
+             * Deve incluir código do país DDI + DDD + número
+             * @example "5511999999999"
              */
-            'recipient' => 'required|string|regex:/^55[1-9][0-9]{9,10}$/',
+            'number' => 'required|string',
 
             /**
-             * Conteúdo da mensagem de texto a ser enviada
+             * Conteúdo da mensagem de texto a ser enviada.
              * Suporta texto simples, emojis e caracteres especiais
              * @example "Olá! Bem-vindo à nossa plataforma ZapClass 🚀"
              */
-            'text_message' => 'required|string|max:4096',
+            'message' => 'required|string',
+
+            /**
+             * Atraso em milissegundos antes do envio (agendamento).
+             * Útil para envios programados ou intervalos entre mensagens.
+             * Aparecerá "Digitando..." antes do envio.
+             * @example 3000
+             */
+            'delay' => 'sometimes|integer',
+
+            /**
+             * Marca a mensagem como encaminhada para o destinatário.
+             * @example true
+             */
+            'forward' => 'sometimes|boolean',
 
             /**
              * Controla se links na mensagem devem exibir prévia automática
              * true: exibe prévia, false: apenas o link
              * @example true
              */
-            'linkPreview' => 'sometimes|boolean',
+            'link_preview' => 'sometimes|boolean',
 
             /**
-             * Atraso em segundos antes do envio (agendamento)
-             * Útil para envios programados ou intervalos entre mensagens
-             * @example 0
+             * Título personalizado para prévia de link
+             * Se fornecido, será exibido como o título da prévia do link
+             * @example "Confira este artigo incrível"
              */
-            'delayMessage' => 'sometimes|integer|min:0|max:3600',
+            'link_preview_title' => 'sometimes|string',
 
             /**
-             * Mencionar todos os participantes do grupo (apenas para grupos)
-             * true: menciona @todos, false: mensagem normal
-             * @example false
+             * Descrição personalizada para prévia de link
+             * Se fornecido, será exibido como a descrição da prévia do link
+             * @example "Confira este artigo incrível sobre programação"
              */
-            'mentionEveryone' => 'sometimes|boolean',
+            'link_preview_description' => 'sometimes|string',
 
             /**
-             * Lista de contatos a serem mencionados na mensagem
-             * Array de números de telefone para mencionar especificamente
-             * @example ["5511999999999", "5511888888888"]
+             * URL ou Base64da imagem personalizada para prévia de link
+             * Se fornecido, será exibido como a imagem da prévia do link
+             * @example "https://placehold.co/600x400.png"
              */
-            'mentioned' => 'sometimes|array',
-            'mentioned.*' => 'string|regex:/^55[1-9][0-9]{9,10}$/',
+            'link_preview_image' => 'sometimes|string',
 
             /**
-             * ID da mensagem para responder (criar thread)
-             * Cria uma resposta vinculada à mensagem original
-             * @example "msg_abc123xyz789"
+             * Controla se a prévia de link deve ser exibida em tamanho grande
+             * true: exibe em tamanho grande, false: exibe em tamanho padrão
+             * @example true
              */
-            'messageToReply' => 'sometimes|string|max:100',
+            'link_preview_large' => 'sometimes|boolean',
 
             /**
-             * Identificador personalizado para controle interno
-             * Útil para rastrear mensagens em seu sistema
-             * @example "order_2024_12345"
+             * Relação de números de telefone a serem mencionados na mensagem
+             * String separada por vírgula de números de telefone para mencionar especificamente
+             * @example "5511999999999,5511888888888"
              */
-            'trackingId' => 'sometimes|string|max:50|regex:/^[a-zA-Z0-9_-]+$/',
+            'mentions' => 'sometimes|string',
+
+            /**
+             * Marca a conversa como lida após o envio.
+             * @example true
+             */
+            'read' => 'sometimes|boolean',
+
+            /**
+             * Marca as últimas mensagens como lidas após o envio.
+             * @example true
+             */
+            'read_messages' => 'sometimes|boolean',
         ];
     }
 

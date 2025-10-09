@@ -18,73 +18,79 @@ class ApiAuthentication
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Extrair token do header Authorization
+        // Extrair token do header Authorization Bearer
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return $this->unauthorizedResponse('Token de autorização não fornecido');
         }
 
-        $clientToken = substr($authHeader, 7); // Remove "Bearer "
+        $token = substr($authHeader, 7); // Remove "Bearer " prefix
+
+        if (empty($token)) {
+            return $this->unauthorizedResponse('Token de autorização não fornecido');
+        }
 
         // Validar formato do token
-        if (!str_starts_with($clientToken, 'zt_')) {
+        if (!str_starts_with($token, 'zc_')) {
             return $this->unauthorizedResponse('Formato de token inválido');
         }
 
         // Buscar conexão por token (com cache de 5 minutos)
-        $cacheKey = "api_connection_{$clientToken}";
-        $connection = Cache::remember($cacheKey, 300, function () use ($clientToken) {
-            return WhatsAppConnection::findByClientCredentials($clientToken);
-        });
+        // $cacheKey = "api_connection_{$token}";
+        // $connection = Cache::remember($cacheKey, 300, function () use ($token) {
+        //     return WhatsAppConnection::findByApiKey($token);
+        // });
+
+        $connection = WhatsAppConnection::findByApiKey($token);
 
         if (!$connection) {
             Log::warning('API: Token inválido usado', [
-                'token' => substr($clientToken, 0, 10) . '...',
+                'token' => $token,
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent()
             ]);
 
-            return $this->unauthorizedResponse('Token inválido ou desabilitado');
+            return $this->errorResponse('Token inválido ou desabilitado', 400);
         }
 
         // Verificar se a conexão está ativa
         if (!$connection->isApiEnabled()) {
-            return $this->unauthorizedResponse('Acesso à API desabilitado para esta conexão');
+            return $this->errorResponse('Acesso à API desabilitado para esta conexão', 400);
         }
 
         // Verificar se a instância está conectada
         if (!$connection->isConnected()) {
-            return $this->errorResponse('Instância não está conectada ao WhatsApp', 503);
+            return $this->errorResponse('Instância não está conectada ao WhatsApp', 400);
         }
 
         // Rate limiting (simples por minuto)
-        $rateLimitKey = "api_rate_limit_{$connection->id}";
-        $currentRequests = Cache::get($rateLimitKey, 0);
+        // $rateLimitKey = "api_rate_limit_{$connection->id}";
+        // $currentRequests = Cache::get($rateLimitKey, 0);
 
-        if ($currentRequests >= $connection->api_rate_limit) {
-            Log::info('API: Rate limit excedido', [
-                'connection_id' => $connection->id,
-                'limit' => $connection->api_rate_limit,
-                'current' => $currentRequests
-            ]);
+        // if ($currentRequests >= $connection->api_rate_limit) {
+        //     Log::info('API: Rate limit excedido', [
+        //         'connection_id' => $connection->id,
+        //         'limit' => $connection->api_rate_limit,
+        //         'current' => $currentRequests
+        //     ]);
 
-            return $this->errorResponse('Rate limit excedido. Tente novamente em alguns segundos.', 429);
-        }
+        //     return $this->errorResponse('Rate limit excedido. Tente novamente em alguns segundos.', 429);
+        // }
 
         // Incrementar contador de rate limiting
-        Cache::put($rateLimitKey, $currentRequests + 1, 60); // 60 segundos
+        // Cache::put($rateLimitKey, $currentRequests + 1, 60); // 60 segundos
 
         // Adicionar conexão ao request para uso no controller
         $request->attributes->set('api_connection', $connection);
 
         // Log da requisição
-        Log::info('API: Requisição autenticada', [
-            'connection_id' => $connection->id,
-            'tenant_id' => $connection->tenant_id,
-            'endpoint' => $request->path(),
-            'method' => $request->method(),
-            'ip' => $request->ip()
-        ]);
+        // Log::info('API: Requisição autenticada', [
+        //     'connection_id' => $connection->id,
+        //     'tenant_id' => $connection->tenant_id,
+        //     'endpoint' => $request->path(),
+        //     'method' => $request->method(),
+        //     'ip' => $request->ip()
+        // ]);
 
         // Atualizar tracking de uso (assíncrono para não impactar performance)
         dispatch(function () use ($connection) {
@@ -113,7 +119,6 @@ class ApiAuthentication
     {
         return response()->json([
             'success' => false,
-            'error' => 'api_error',
             'message' => $message
         ], $status);
     }

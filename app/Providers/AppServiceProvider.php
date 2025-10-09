@@ -26,14 +26,14 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Desabilita as rotas padrão do Scramble
-        Scramble::ignoreDefaultRoutes();
+        // Scramble::ignoreDefaultRoutes();
 
-        Scramble::registerApi('v1', [
-            'api_path' => 'api/v1',
-        ])->expose(
-            ui: '/docs/api/v1',
-            document: '/docs/api/v1.json'
-        );
+        // Scramble::registerApi('v1', [
+        //     'api_path' => 'api/v1',
+        // ])->expose(
+        //     ui: '/docs/api/v1',
+        //     document: '/docs/api/v1.json'
+        // );
 
         // Scramble::registerApi('v2', [
         //     'api_path' => 'api/v2',
@@ -43,11 +43,11 @@ class AppServiceProvider extends ServiceProvider
         // );
 
         // Rota padrão que redireciona para a versão mais recente
-        Scramble::registerApi('default', [
-            'api_path' => 'api/v1', // Aponta para a versão mais recente
-        ])->expose(
-            ui: '/docs/api',
-            document: '/docs/api.json'
-        );
+        // Scramble::registerApi('default', [
+        //     'api_path' => 'api/v1', // Aponta para a versão mais recente
+        // ])->expose(
+        //     ui: '/docs/api',
+        //     document: '/docs/api.json'
+        // );
     }
 }

@@ -21,8 +21,7 @@ class WhatsAppConnection extends Model
         'status',
         'token',
         'instance_id',
-        'client_token',
-        'client_instance_id',
+        'api_key',
         'api_enabled',
         'api_rate_limit',
         'api_last_used_at',
@@ -83,12 +82,11 @@ class WhatsAppConnection extends Model
     // ========================================
 
     /**
-     * Generate client credentials for API access
+     * Generate API key for API access
      */
-    public function generateClientCredentials(): void
+    public function generateApiKey(): void
     {
-        $this->client_token = 'zt_' . Str::random(48); // zt = ZapToken
-        $this->client_instance_id = 'zi_' . Str::random(24); // zi = ZapInstance
+        $this->api_key = 'zc_' . Str::random(61); // zc = ZapClass (total 64 chars)
         $this->save();
     }
 
@@ -97,7 +95,7 @@ class WhatsAppConnection extends Model
      */
     public function isApiEnabled(): bool
     {
-        return $this->api_enabled && !empty($this->client_token) && !empty($this->client_instance_id);
+        return $this->api_enabled && !empty($this->api_key);
     }
 
     /**
@@ -105,8 +103,8 @@ class WhatsAppConnection extends Model
      */
     public function enableApi(int $rateLimit = 100): void
     {
-        if (empty($this->client_token) || empty($this->client_instance_id)) {
-            $this->generateClientCredentials();
+        if (empty($this->api_key)) {
+            $this->generateApiKey();
         }
 
         $this->api_enabled = true;
@@ -134,27 +132,27 @@ class WhatsAppConnection extends Model
     }
 
     /**
-     * Get masked client token for display
+     * Get masked API key for display
      */
-    public function getMaskedClientTokenAttribute(): string
+    public function getMaskedApiKeyAttribute(): string
     {
-        if (!$this->client_token) {
+        if (!$this->api_key) {
             return '';
         }
 
-        $start = substr($this->client_token, 0, 8);
-        $end = substr($this->client_token, -8);
-        $middle = str_repeat('*', max(0, strlen($this->client_token) - 16));
+        $start = substr($this->api_key, 0, 8);
+        $end = substr($this->api_key, -8);
+        $middle = str_repeat('*', max(0, strlen($this->api_key) - 16));
 
         return $start . $middle . $end;
     }
 
     /**
-     * Regenerate client credentials
+     * Regenerate API key
      */
-    public function regenerateClientCredentials(): void
+    public function regenerateApiKey(): void
     {
-        $this->generateClientCredentials();
+        $this->generateApiKey();
     }
 
     /**
@@ -163,22 +161,16 @@ class WhatsAppConnection extends Model
     public function scopeApiEnabled($query)
     {
         return $query->where('api_enabled', true)
-            ->whereNotNull('client_token')
-            ->whereNotNull('client_instance_id');
+            ->whereNotNull('api_key');
     }
 
     /**
-     * Find connection by client credentials
+     * Find connection by API key
      */
-    public static function findByClientCredentials(string $clientToken, ?string $clientInstanceId = null)
+    public static function findByApiKey(string $apiKey)
     {
-        $query = static::where('client_token', $clientToken)
-            ->where('api_enabled', true);
-
-        if ($clientInstanceId) {
-            $query->where('client_instance_id', $clientInstanceId);
-        }
-
-        return $query->first();
+        return static::where('api_key', $apiKey)
+            ->where('api_enabled', true)
+            ->first();
     }
 }

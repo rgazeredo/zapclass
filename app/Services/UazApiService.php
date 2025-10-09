@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\WhatsAppConnection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -306,33 +307,28 @@ class UazApiService
         }
     }
 
-    /**
-     * Enviar mensagem de texto
-     *
-     * @param string $instanceToken Token específico da instância
-     * @param array $messageData Dados da mensagem (recipient, text)
-     * @return array
-     * @throws Exception
-     */
-    public function sendMessage(string $instanceToken, array $messageData): array
+    public function messagesText(WhatsAppConnection $connection, array $payload): array
     {
         try {
-            Log::info('API: Enviando mensagem via', [
-                'instance_token' => substr($instanceToken, 0, 10) . '...',
-                'recipient' => $messageData['recipient']
-            ]);
+            // Log::info('API: Enviando mensagem via', [
+            //     'instance_token' => substr($instanceToken, 0, 10) . '...',
+            //     'recipient' => $messageData['recipient']
+            // ]);
 
             $response = Http::withHeaders([
-                'token' => $instanceToken,
+                'token' => $connection->token,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post(self::BASE_URL . '/send/text', [
-                'number' => $messageData['recipient'],
-                'text' => $messageData['text']
+                'number' => $payload['number'],
+                'text' => $payload['text'],
+                ...$payload
             ]);
 
             if (!$response->successful()) {
-                Log::error('API Error: sendMessage', [
+                Log::error('API Error: messagesText', [
+                    'token' => $connection->token,
+                    'payload' => $payload,
                     'status' => $response->status(),
                     'body' => $response->body()
                 ]);
@@ -346,11 +342,11 @@ class UazApiService
                 'response' => $data
             ]);
 
-            return $data;
+            return $data['id'];
         } catch (Exception $e) {
             Log::error('API Send Message Exception', [
                 'message' => $e->getMessage(),
-                'instance_token' => substr($instanceToken, 0, 10) . '...'
+                'instance_token' => substr($connection->token, 0, 10) . '...'
             ]);
 
             throw $e;
