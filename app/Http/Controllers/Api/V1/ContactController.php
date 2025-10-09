@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  * @tags Mensagens
  */
 
-class MessagingController extends Controller
+class ContactController extends Controller
 {
     protected UazApiService $uazApiService;
 
@@ -26,7 +26,78 @@ class MessagingController extends Controller
         $this->uazApiService = $uazApiService;
     }
 
-    public function text(Request $request): JsonResponse
+    public function add(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'phone' => 'required|string',
+                'name' => 'required|string',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            // Gerar ID único para rastreamento
+            $messageId = Str::random(20);
+
+            // Chamar API
+            // $response = $this->uazApiService->messagesText($connection, $request->all());
+
+            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+    
+    public function contacts(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Gerar ID único para rastreamento
+            $messageId = Str::random(20);
+
+            // Chamar API
+            // $response = $this->uazApiService->messagesText($connection, $request->all());
+
+            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+
+    public function details(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -44,20 +115,88 @@ class MessagingController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'number' => 'required|string',
-                'message' => 'required|string',
-                'delay' => 'nullable|string',
-                'forward' => 'nullable|string',
-                'link_preview' => 'nullable|boolean',
-                'link_preview_title' => 'nullable|string',
-                'link_preview_description' => 'nullable|string',
-                'link_preview_image' => 'nullable|string',
-                'link_preview_large' => 'nullable|boolean',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
+                'preview' => 'nullable|boolean',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            // Gerar ID único para rastreamento
+            $messageId = Str::random(20);
+
+            // Chamar API
+            // $response = $this->uazApiService->messagesText($connection, $request->all());
+
+            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+        
+    public function remove(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'phone' => 'required|string',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            // Gerar ID único para rastreamento
+            $messageId = Str::random(20);
+
+            // Chamar API
+            // $response = $this->uazApiService->messagesText($connection, $request->all());
+
+            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+        
+    public function block(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'number' => 'required|string',
+                'block' => 'required|boolean',
             ]);
 
 
@@ -80,7 +219,7 @@ class MessagingController extends Controller
         }
     }
 
-    public function media(Request $request): JsonResponse
+    public function blocklist(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -93,31 +232,6 @@ class MessagingController extends Controller
             // Validar se temos os dados necessários para chamar a API
             if (!$connection->token || !$connection->instance_id) {
                 abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-            }
-
-            // Valida se recebeu os campos obrigatórios da requisição
-            $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'type' => 'required|string',
-                'file' => 'nullable|string',
-                'delay' => 'nullable|string',
-                'forward' => 'nullable|string',
-                'link_preview' => 'nullable|boolean',
-                'link_preview_title' => 'nullable|string',
-                'link_preview_description' => 'nullable|string',
-                'link_preview_image' => 'nullable|string',
-                'link_preview_large' => 'nullable|boolean',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
-            ]);
-
-
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
             // Gerar ID único para rastreamento
@@ -134,6 +248,8 @@ class MessagingController extends Controller
             );
         }
     }
+        
+    
 
     /**
      * Consultar status de uma mensagem enviada

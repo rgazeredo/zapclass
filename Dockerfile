@@ -26,6 +26,6 @@ WORKDIR /var/www
 COPY . .
 
 RUN composer install
-RUN npm install && npm run build
+RUN npm cache clean --force && npm install && npm run build
 
 CMD ["php-fpm"]
