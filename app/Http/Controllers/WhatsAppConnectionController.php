@@ -21,68 +21,6 @@ class WhatsAppConnectionController extends Controller
     }
 
     /**
-     * Verificar e atualizar status de uma conexão
-     */
-    private function checkAndUpdateConnectionStatus(WhatsAppConnection $connection)
-    {
-        // Só verificar se a conexão tem token
-        if (!$connection->token) {
-            Log::info('Skipping status check for connection without token', [
-                'connection_id' => $connection->id,
-                'connection_name' => $connection->name
-            ]);
-            return;
-        }
-
-        try {
-            Log::info('Checking status for connection on page load', [
-                'connection_id' => $connection->id,
-                'connection_name' => $connection->name,
-                'current_status' => $connection->status
-            ]);
-
-            $statusData = $this->uazApiService->getInstanceStatus($connection->token);
-            $newStatus = $statusData['instance']['status'] ?? 'unknown';
-            $owner = $statusData['instance']['owner'] ?? null;
-
-            Log::info('Status check result', [
-                'connection_id' => $connection->id,
-                'old_status' => $connection->status,
-                'new_status' => $newStatus,
-                'owner' => $owner,
-                'api_response' => $statusData
-            ]);
-
-            // Atualizar status se mudou
-            if ($connection->status !== $newStatus) {
-                $updateData = ['status' => $newStatus];
-
-                // Se conectado e tem owner, atualizar phone também
-                if ($newStatus === 'connected' && !empty($owner)) {
-                    $updateData['phone'] = $owner;
-                }
-
-                $connection->update($updateData);
-
-                Log::info('Connection status updated on page load', [
-                    'connection_id' => $connection->id,
-                    'connection_name' => $connection->name,
-                    'old_status' => $connection->getOriginal('status'),
-                    'new_status' => $newStatus,
-                    'phone' => $owner
-                ]);
-            }
-        } catch (Exception $e) {
-            Log::error('Failed to check connection status on page load', [
-                'connection_id' => $connection->id,
-                'connection_name' => $connection->name,
-                'token' => $connection->token,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -536,6 +474,70 @@ class WhatsAppConnectionController extends Controller
 
             return redirect()->route('whatsapp.index')
                 ->with('warning', 'WhatsApp connection deleted, but there was an issue with the external API.');
+        }
+    }
+
+    /**
+     * Verificar e atualizar status de uma conexão
+     */
+    private function checkAndUpdateConnectionStatus(WhatsAppConnection $connection)
+    {
+        // Só verificar se a conexão tem token
+        if (!$connection->token) {
+            Log::info('Skipping status check for connection without token', [
+                'connection_id' => $connection->id,
+                'connection_name' => $connection->name
+            ]);
+            return;
+        }
+
+        try {
+            Log::info('Checking status for connection on page load', [
+                'connection_id' => $connection->id,
+                'connection_name' => $connection->name,
+                'current_status' => $connection->status
+            ]);
+
+            $statusData = $this->uazApiService->getInstanceStatus($connection->token);
+            $newStatus = $statusData['instance']['status'] ?? 'unknown';
+            $owner = $statusData['instance']['owner'] ?? null;
+
+            Log::info('Status check result', [
+                'connection_id' => $connection->id,
+                'old_status' => $connection->status,
+                'new_status' => $newStatus,
+                'owner' => $owner,
+                'api_response' => $statusData
+            ]);
+
+            // Atualizar status se mudou
+            if ($connection->status !== $newStatus) {
+                $updateData = ['status' => $newStatus];
+
+                // Se conectado e tem owner, atualizar phone também
+                if ($newStatus === 'connected' && !empty($owner)) {
+                    $updateData['phone'] = $owner;
+                }
+
+                $connection->update($updateData);
+
+                Log::info('Connection status updated on page load', [
+                    'connection_id' => $connection->id,
+                    'connection_name' => $connection->name,
+                    'old_status' => $connection->getOriginal('status'),
+                    'new_status' => $newStatus,
+                    'phone' => $owner
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('Failed to check connection status on page load', [
+                'connection_id' => $connection->id,
+                'connection_name' => $connection->name,
+                'token' => $connection->token,
+                'error' => $e->getMessage()
+            ]);
+
+            $connection->update(['status' => 'error']);
         }
     }
 }

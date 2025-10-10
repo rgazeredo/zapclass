@@ -54,13 +54,9 @@ class LabelController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesText($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -116,24 +112,29 @@ class LabelController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'labelid' => 'required|string',
-                'name' => 'nullable|string',
-                'color' => 'nullable|integer',
-                'delete' => 'nullable|boolean',
+                'number' => 'required|string',
+                'type' => 'required|string|in:image,video,document,audio,myaudio,ptt,sticker',
+                'file' => 'required|string',
+                'message' => 'nullable|string',
+                'doc_name' => 'nullable|string',
+                'document_name' => 'nullable|string',
+                'delay' => 'nullable|string',
+                'forward' => 'nullable|string',
+                'message_repy_id' => 'nullable|string',
+                'message_source' => 'nullable|string',
+                'message_id' => 'nullable|string',
+                'mentions' => 'nullable|string',
+                'read' => 'nullable|boolean',
+                'read_messages' => 'nullable|boolean',
             ]);
-
 
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesMedia($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -141,7 +142,7 @@ class LabelController extends Controller
             );
         }
     }
-    
+
 
     /**
      * Consultar status de uma mensagem enviada

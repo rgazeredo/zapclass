@@ -65,65 +65,9 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesText($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
-        } catch (Exception $e) {
-            return $this->errorResponse(
-                'Erro interno do servidor. Tente novamente em alguns instantes.',
-                500
-            );
-        }
-    }
-        
-    public function media(Request $request): JsonResponse
-    {
-        try {
-            $connection = $request->attributes->get('api_connection');
-
-            // Exemplos de respostas que o Scramble pode detectar
-            if (!$connection) {
-                abort(400, 'Token de autorização não fornecido');
-            }
-
-            // Validar se temos os dados necessários para chamar a API
-            if (!$connection->token || !$connection->instance_id) {
-                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-            }
-
-            // Valida se recebeu os campos obrigatórios da requisição
-            $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'type' => 'required|string',
-                'file' => 'nullable|string',
-                'message' => 'nullable|string',
-                'delay' => 'nullable|string',
-                'filename' => 'nullable|string',
-                'forward' => 'nullable|string',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
-            ]);
-
-
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
-            }
-
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -164,18 +108,14 @@ class MessageController extends Controller
                 'read_messages' => 'nullable|boolean',
             ]);
 
-
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
             // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
+            $response = $this->uazApiService->messagesMedia($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -236,7 +176,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function location(Request $request): JsonResponse
     {
         try {
@@ -288,7 +228,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function status(Request $request): JsonResponse
     {
         try {
@@ -335,7 +275,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function menuButtons(Request $request): JsonResponse
     {
         try {
@@ -386,7 +326,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function menuLists(Request $request): JsonResponse
     {
         try {
@@ -437,7 +377,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function menuPolls(Request $request): JsonResponse
     {
         try {
@@ -488,7 +428,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function menuCarousel(Request $request): JsonResponse
     {
         try {
@@ -538,7 +478,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function react(Request $request): JsonResponse
     {
         try {
@@ -580,7 +520,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function edit(Request $request): JsonResponse
     {
         try {
@@ -621,7 +561,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function delete(Request $request): JsonResponse
     {
         try {
@@ -661,7 +601,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function download(Request $request): JsonResponse
     {
         try {
@@ -707,7 +647,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function find(Request $request): JsonResponse
     {
         try {
@@ -751,7 +691,7 @@ class MessageController extends Controller
             );
         }
     }
-        
+
     public function markRead(Request $request): JsonResponse
     {
         try {
