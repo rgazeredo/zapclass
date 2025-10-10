@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class WhatsAppConnection extends Model
 {
+    use LogsActivity;
     protected $table = 'whatsapp_connections';
 
     protected $fillable = [
@@ -172,5 +175,30 @@ class WhatsAppConnection extends Model
         return static::where('api_key', $apiKey)
             ->where('api_enabled', true)
             ->first();
+    }
+
+    /**
+     * Configure activity log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'status',
+                'phone',
+                'admin_field_1',
+                'admin_field_2',
+                'api_enabled',
+                'api_rate_limit',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'Conexão WhatsApp criada',
+                'updated' => 'Conexão WhatsApp atualizada',
+                'deleted' => 'Conexão WhatsApp deletada',
+                default => "Conexão WhatsApp {$eventName}"
+            });
     }
 }

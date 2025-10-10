@@ -13,6 +13,18 @@ class UazApiService
     private const BASE_URL = 'https://w4digital.uazapi.com';
     private const TOKEN = 'X6qJRwJZ9UGQcvIcw5bvFrojp52YCtabXZBg2P4hajIJq97a30';
 
+    protected ApiLogger $logger;
+
+    public function __construct(ApiLogger $logger)
+    {
+        $this->logger = $logger;
+
+        // Propagar trace_id do request se existir
+        if (request()->attributes->has('trace_id')) {
+            $this->logger->setTraceId(request()->attributes->get('trace_id'));
+        }
+    }
+
     /**
      * Criar uma nova instância
      *
@@ -22,47 +34,58 @@ class UazApiService
      */
     public function createInstance(array $options = []): array
     {
-        try {
-            Log::error('API Error: createInstance', [
-                'name' => $options['name'],
-                'systemName' => $options['system_name'],
-                'adminField01' => $options['admin_field_1'] ?? null,
-                'adminField02' => $options['admin_field_2'] ?? null,
-                'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
-            ]);
+        $url = self::BASE_URL . '/instance/init';
+        $headers = [
+            'admintoken' => self::TOKEN,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+        $payload = [
+            'name' => $options['name'],
+            'systemName' => $options['system_name'],
+            'adminField01' => $options['admin_field_1'] ?? null,
+            'adminField02' => $options['admin_field_2'] ?? null,
+            'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
+        ];
 
-            $response = Http::withHeaders([
-                'admintoken' => self::TOKEN,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/instance/init', [
-                'name' => $options['name'],
-                'systemName' => $options['system_name'],
-                'adminField01' => $options['admin_field_1'] ?? null,
-                'adminField02' => $options['admin_field_2'] ?? null,
-                'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
-            ]);
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $payload);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $payload,
+                response: $response,
+                action: 'create_instance',
+                connection: null,
+                metadata: [
+                    'instance_name' => $options['name'],
+                    'system_name' => $options['system_name'],
+                ]
+            );
 
             if (!$response->successful()) {
-                Log::error('API Error: createInstance', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
                 throw new Exception('Falha ao criar instância: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Instance Created: createInstance', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Exception: createInstance', [
-                'message' => $e->getMessage()
-            ]);
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $payload,
+                exception: $e,
+                action: 'create_instance',
+                connection: null,
+                metadata: ['instance_name' => $options['name']]
+            );
 
             throw $e;
         }
@@ -177,38 +200,51 @@ class UazApiService
      */
     public function getInstanceStatus(string $token): array
     {
+        $url = self::BASE_URL . '/instance/status';
+        $headers = [
+            'token' => $token,
+            'Accept' => 'application/json',
+        ];
+
+        $this->logger->startTimer();
+
         try {
+            $response = Http::withHeaders($headers)->get($url);
 
-            Log::error('API Error: getInstanceStatus', [
-                'token' => $token
-            ]);
+            $connection = WhatsAppConnection::where('token', $token)->first();
 
-            $response = Http::withHeaders([
-                'token' => $token,
-                'Accept' => 'application/json',
-            ])->get(self::BASE_URL . '/instance/status');
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'GET',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                response: $response,
+                action: 'get_instance_status',
+                connection: $connection,
+                metadata: null
+            );
 
             if (!$response->successful()) {
-                Log::error('API Error: getInstanceStatus', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
                 throw new Exception('Falha ao obter status da instância: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Instance Status: getInstanceStatus', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Status Exception: getInstanceStatus', [
-                'message' => $e->getMessage(),
-                'token' => $token
-            ]);
+            $connection = WhatsAppConnection::where('token', $token)->first();
+
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'GET',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                exception: $e,
+                action: 'get_instance_status',
+                connection: $connection,
+                metadata: null
+            );
 
             throw $e;
         }
@@ -270,38 +306,52 @@ class UazApiService
      */
     public function disconnectInstance(string $instanceToken): array
     {
-        try {
-            Log::info('API: disconnectInstance', [
-                'instance_token' => $instanceToken
-            ]);
+        $url = self::BASE_URL . '/instance/disconnect';
+        $headers = [
+            'token' => $instanceToken,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
 
-            $response = Http::withHeaders([
-                'token' => $instanceToken,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/instance/disconnect', new \stdClass());
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, new \stdClass());
+
+            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                response: $response,
+                action: 'disconnect_instance',
+                connection: $connection,
+                metadata: null
+            );
 
             if (!$response->successful()) {
-                Log::error('API Error: disconnectInstance', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
                 throw new Exception('Falha ao desconectar instância: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Instance Disconnected', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Disconnect Exception', [
-                'message' => $e->getMessage(),
-                'instance_token' => $instanceToken
-            ]);
+            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                exception: $e,
+                action: 'disconnect_instance',
+                connection: $connection,
+                metadata: null
+            );
 
             throw $e;
         }
@@ -309,45 +359,220 @@ class UazApiService
 
     public function messagesText(WhatsAppConnection $connection, array $payload): array
     {
-        try {
-            // Log::info('API: Enviando mensagem via', [
-            //     'instance_token' => substr($instanceToken, 0, 10) . '...',
-            //     'recipient' => $messageData['recipient']
-            // ]);
+        $url = self::BASE_URL . '/send/text';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
 
-            $response = Http::withHeaders([
-                'token' => $connection->token,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/send/text', [
-                'number' => $payload['number'],
-                'text' => $payload['text'],
-                ...$payload
-            ]);
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'], // Obrigatório
+            'text' => $payload['message'], // message → text (Obrigatório)
+        ];
+
+        // Campos opcionais - Link Preview
+        if (isset($payload['link_preview'])) {
+            $requestData['linkPreview'] = $payload['link_preview']; // link_preview → linkPreview
+        }
+        if (isset($payload['link_preview_title'])) {
+            $requestData['linkPreviewTitle'] = $payload['link_preview_title']; // link_preview_title → linkPreviewTitle
+        }
+        if (isset($payload['link_preview_description'])) {
+            $requestData['linkPreviewDescription'] = $payload['link_preview_description']; // link_preview_description → linkPreviewDescription
+        }
+        if (isset($payload['link_preview_image'])) {
+            $requestData['linkPreviewImage'] = $payload['link_preview_image']; // link_preview_image → linkPreviewImage
+        }
+        if (isset($payload['link_preview_large'])) {
+            $requestData['linkPreviewLarge'] = $payload['link_preview_large']; // link_preview_large → linkPreviewLarge
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_text_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'message_preview' => substr($payload['message'], 0, 100),
+                ]
+            );
 
             if (!$response->successful()) {
-                Log::error('API Error: messagesText', [
-                    'token' => $connection->token,
-                    'payload' => $payload,
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
                 throw new Exception('Falha ao enviar mensagem: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Message Sent: sendMessage', [
-                'response' => $data
-            ]);
-
-            return $data['id'];
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Send Message Exception', [
-                'message' => $e->getMessage(),
-                'instance_token' => substr($connection->token, 0, 10) . '...'
-            ]);
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_text_message',
+                connection: $connection,
+                metadata: ['recipient' => $payload['number']]
+            );
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Enviar mensagem de mídia (imagem, vídeo, documento, áudio)
+     *
+     * @param WhatsAppConnection $connection
+     * @param array $payload
+     * @return array
+     * @throws Exception
+     */
+    public function messagesMedia(WhatsAppConnection $connection, array $payload): array
+    {
+        $url = self::BASE_URL . '/send/media';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'], // Obrigatório
+            'type' => $payload['type'], // Obrigatório (image, video, document, audio, myaudio, ptt, sticker)
+            'file' => $payload['file'], // Obrigatório (URL ou base64)
+        ];
+
+        // Campos opcionais - Caption/Texto
+        if (isset($payload['message'])) {
+            $requestData['text'] = $payload['message']; // message → text (caption/legenda)
+        }
+
+        // Campo opcional - Nome do documento
+        if (isset($payload['doc_name'])) {
+            $requestData['docName'] = $payload['doc_name']; // doc_name → docName
+        } elseif (isset($payload['document_name'])) {
+            $requestData['docName'] = $payload['document_name']; // document_name → docName (alternativa)
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar mídia: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'] ?? null,
+                ]
+            );
 
             throw $e;
         }
@@ -362,31 +587,54 @@ class UazApiService
      */
     public function getQrCode(string $instanceToken): array
     {
+        $url = self::BASE_URL . '/instance/connect';
+        $headers = [
+            'token' => $instanceToken,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $this->logger->startTimer();
+
         try {
-            // Formato correto encontrado através de testes: objeto vazio (stdClass)
-            $response = Http::withHeaders([
-                'token' => $instanceToken,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/instance/connect', new \stdClass());
+            $response = Http::withHeaders($headers)->post($url, new \stdClass());
+
+            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                response: $response,
+                action: 'get_qr_code',
+                connection: $connection,
+                metadata: null
+            );
 
             $json = $response->json();
 
-            Log::info('API QR Code', [
-                'instance' => $json['instance'],
-                'qrcode' => $json['instance']['qrcode'],
-            ]);
-
             if (empty($json) || empty($json['instance']['qrcode'])) {
-                throw new Exception('Falha ao obter QR Code: ' . $response->body() . ' - ' . self::BASE_URL . ' - ' . $instanceToken);
+                throw new Exception('Falha ao obter QR Code: ' . $response->body());
             }
 
             return $json;
         } catch (Exception $e) {
-            Log::error('API QR Exception', [
-                'message' => $e->getMessage(),
-                'instance_token' => $instanceToken
-            ]);
+            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                exception: $e,
+                action: 'get_qr_code',
+                connection: $connection,
+                metadata: null
+            );
 
             throw $e;
         }

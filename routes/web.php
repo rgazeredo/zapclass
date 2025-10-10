@@ -8,6 +8,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppConnectionController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Middleware\ApiLoggerMiddleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -80,26 +81,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    // WhatsApp connections routes
-    Route::resource('whatsapp', WhatsAppConnectionController::class);
-    Route::get('whatsapp/{whatsapp}/qrcode', [WhatsAppConnectionController::class, 'qrcode'])
-        ->name('whatsapp.qrcode');
-    Route::post('whatsapp/{whatsapp}/disconnect', [WhatsAppConnectionController::class, 'disconnect'])
-        ->name('whatsapp.disconnect');
-    Route::get('whatsapp/{whatsapp}/status', [WhatsAppConnectionController::class, 'status'])
-        ->name('whatsapp.status');
-    Route::post('whatsapp/{whatsapp}/update-status', [WhatsAppConnectionController::class, 'updateStatus'])
-        ->name('whatsapp.update-status');
+    // WhatsApp connections routes (com logging)
+    Route::middleware([ApiLoggerMiddleware::class])->group(function () {
+        Route::resource('whatsapp', WhatsAppConnectionController::class);
+        Route::get('whatsapp/{whatsapp}/qrcode', [WhatsAppConnectionController::class, 'qrcode'])
+            ->name('whatsapp.qrcode');
+        Route::post('whatsapp/{whatsapp}/disconnect', [WhatsAppConnectionController::class, 'disconnect'])
+            ->name('whatsapp.disconnect');
+        Route::get('whatsapp/{whatsapp}/status', [WhatsAppConnectionController::class, 'status'])
+            ->name('whatsapp.status');
+        Route::post('whatsapp/{whatsapp}/update-status', [WhatsAppConnectionController::class, 'updateStatus'])
+            ->name('whatsapp.update-status');
 
-    // Webhook management routes
-    Route::get('whatsapp/{connection}/webhooks', [WebhookController::class, 'index'])
-        ->name('webhooks.index');
-    Route::post('whatsapp/{connection}/webhooks', [WebhookController::class, 'store'])
-        ->name('webhooks.store');
-    Route::put('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'update'])
-        ->name('webhooks.update');
-    Route::delete('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'destroy'])
-        ->name('webhooks.destroy');
+        // Webhook management routes
+        Route::get('whatsapp/{connection}/webhooks', [WebhookController::class, 'index'])
+            ->name('webhooks.index');
+        Route::post('whatsapp/{connection}/webhooks', [WebhookController::class, 'store'])
+            ->name('webhooks.store');
+        Route::put('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'update'])
+            ->name('webhooks.update');
+        Route::delete('whatsapp/{connection}/webhooks/{webhook}', [WebhookController::class, 'destroy'])
+            ->name('webhooks.destroy');
+    });
 
     Route::patch('settings/theme', function () {
         request()->validate([
