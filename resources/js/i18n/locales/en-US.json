@@ -269,6 +269,8 @@
         "createConnectionDescription": "Fill in the data to create a new WhatsApp connection",
         "connectionNamePlaceholder": "Ex: Main WhatsApp",
         "adminFieldPlaceholder": "Optional administrative field",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "apiKey": "API Key (API_KEY)",
+        "apiKeyNotAvailable": "API Key not available. The instance may need to be recreated."
     }
 }

@@ -121,11 +121,7 @@ export default function WhatsAppIndex({
     };
 
     const handleShowWebhooks = (connectionId: number) => {
-        const connection = connections.find((c) => c.id === connectionId);
-        if (connection) {
-            setSelectedWebhookConnection(connection);
-            setWebhookModalOpen(true);
-        }
+        router.visit(`/whatsapp/${connectionId}/webhooks-page`);
     };
 
     const handleCloseWebhookModal = () => {

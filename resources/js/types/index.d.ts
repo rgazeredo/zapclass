@@ -53,8 +53,7 @@ export interface WhatsAppConnection {
     token?: string | null;
     instance_id?: string | null;
     status?: string | null;
-    client_token?: string | null;
-    client_instance_id?: string | null;
+    api_key?: string | null;
     api_enabled?: boolean | null;
     api_rate_limit?: number | null;
     api_last_used_at?: string | null;

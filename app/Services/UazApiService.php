@@ -654,9 +654,15 @@ class UazApiService
         try {
             // Preparar dados conforme documentação API
             $payload = [
+                'id' => $webhookData['id'],
                 'action' => 'add',
                 'url' => $webhookData['url']
             ];
+
+            // Adicionar campo enabled (boolean)
+            if (isset($webhookData['enabled'])) {
+                $payload['enabled'] = (bool) $webhookData['enabled'];
+            }
 
             // Adicionar eventos se especificados (API espera array, não string)
             if (isset($webhookData['events'])) {
@@ -665,13 +671,12 @@ class UazApiService
                     : $webhookData['events'];
             }
 
-            // TODO: Reativar quando API corrigir o excludeMessages
             // Adicionar eventos de exclusão se especificados (API espera array, não string)
-            // if (isset($webhookData['excludeMessages'])) {
-            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
-            //         ? explode(',', $webhookData['excludeMessages'])
-            //         : $webhookData['excludeMessages'];
-            // }
+            if (isset($webhookData['excludeMessages'])) {
+                $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+                    ? explode(',', $webhookData['excludeMessages'])
+                    : $webhookData['excludeMessages'];
+            }
 
             Log::info('API: Criando webhook via', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
@@ -717,22 +722,23 @@ class UazApiService
      *
      * @param string $instanceToken Token específico da instância
      * @param string $instanceId ID da instância
-     * @param string $webhookUrl URL do webhook para remover
+     * @param string $externalWebhookId ID externo do webhook para remover
      * @return array
      * @throws Exception
      */
-    public function deleteWebhook(string $instanceToken, string $instanceId, string $webhookUrl): array
+    public function deleteWebhook(string $instanceToken, string $instanceId, string $externalWebhookId): array
     {
         try {
             // Preparar dados conforme documentação API
             $payload = [
-                'action' => 'remove',
-                'url' => $webhookUrl
+                'action' => 'delete',
+                'id' => $externalWebhookId
             ];
 
-            Log::info('API: Deletando webhook via', [
+            Log::info('API: Deletando webhook via ID externo', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'instance_id' => $instanceId,
+                'external_webhook_id' => $externalWebhookId,
                 'payload' => $payload
             ]);
 
@@ -755,6 +761,7 @@ class UazApiService
             $data = $response->json();
 
             Log::info('Webhook Deleted: deleteWebhook', [
+                'external_webhook_id' => $externalWebhookId,
                 'response' => $data
             ]);
 
@@ -762,6 +769,7 @@ class UazApiService
         } catch (Exception $e) {
             Log::error('API Delete Webhook Exception', [
                 'message' => $e->getMessage(),
+                'external_webhook_id' => $externalWebhookId,
                 'instance_token' => substr($instanceToken, 0, 10) . '...'
             ]);
 
@@ -774,7 +782,7 @@ class UazApiService
      *
      * @param string $instanceToken Token específico da instância
      * @param string $instanceId ID da instância
-     * @param array $webhookData Dados do webhook
+     * @param array $webhookData Dados do webhook (deve incluir 'id' como external_webhook_id)
      * @return array
      * @throws Exception
      */
@@ -783,9 +791,15 @@ class UazApiService
         try {
             // Preparar dados conforme documentação API
             $payload = [
-                'action' => 'edit',
+                'action' => 'update',
+                'id' => $webhookData['id'], // Usar external_webhook_id
                 'url' => $webhookData['url']
             ];
+
+            // Adicionar campo enabled (boolean)
+            if (isset($webhookData['enabled'])) {
+                $payload['enabled'] = (bool) $webhookData['enabled'];
+            }
 
             // Adicionar eventos se especificados (API espera array, não string)
             if (isset($webhookData['events'])) {
@@ -794,17 +808,17 @@ class UazApiService
                     : $webhookData['events'];
             }
 
-            // TODO: Reativar quando API corrigir o excludeMessages
             // Adicionar eventos de exclusão se especificados (API espera array, não string)
-            // if (isset($webhookData['excludeMessages'])) {
-            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
-            //         ? explode(',', $webhookData['excludeMessages'])
-            //         : $webhookData['excludeMessages'];
-            // }
+            if (isset($webhookData['excludeMessages'])) {
+                $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+                    ? explode(',', $webhookData['excludeMessages'])
+                    : $webhookData['excludeMessages'];
+            }
 
-            Log::info('API: Editando webhook via', [
+            Log::info('API: Editando webhook via ID externo', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'instance_id' => $instanceId,
+                'external_webhook_id' => $webhookData['id'],
                 'payload' => $payload
             ]);
 
@@ -827,6 +841,7 @@ class UazApiService
             $data = $response->json();
 
             Log::info('Webhook Updated: updateWebhook', [
+                'external_webhook_id' => $webhookData['id'],
                 'response' => $data
             ]);
 
@@ -834,6 +849,7 @@ class UazApiService
         } catch (Exception $e) {
             Log::error('API Update Webhook Exception', [
                 'message' => $e->getMessage(),
+                'external_webhook_id' => $webhookData['id'] ?? null,
                 'instance_token' => substr($instanceToken, 0, 10) . '...'
             ]);
 

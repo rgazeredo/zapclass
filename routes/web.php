@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\Auth\RegisterWithPlanController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\WhatsAppConnectionController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Http\Controllers\WebhookController;
@@ -23,6 +24,10 @@ Route::post('/internal/pricing/create-sample-products', [PricingController::clas
 // WhatsApp Webhook route (public, no auth needed)
 Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'handle'])
     ->name('whatsapp.webhook');
+
+// WhatsApp Webhook Proxy - recebe da UazAPI e repassa para cliente
+Route::post('/webhooks/whatsapp/{webhookCode}', [\App\Http\Controllers\WhatsAppWebhookProxyController::class, 'handle'])
+    ->name('whatsapp.webhook.proxy');
 
 Route::get('/', function () {
     return Inertia::render('Landing/Index');
@@ -81,6 +86,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    // Billing routes
+    Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
+    Route::post('billing/setup-intent', [BillingController::class, 'createSetupIntent'])->name('billing.setup-intent');
+    Route::post('billing/payment-method', [BillingController::class, 'addPaymentMethod'])->name('billing.payment-method.add');
+    Route::put('billing/payment-method/default', [BillingController::class, 'updateDefaultPaymentMethod'])->name('billing.payment-method.default');
+    Route::delete('billing/payment-method', [BillingController::class, 'removePaymentMethod'])->name('billing.payment-method.remove');
+    Route::post('billing/subscription/{subscription}/cancel', [BillingController::class, 'cancelSubscription'])->name('billing.subscription.cancel');
+    Route::post('billing/subscription/{subscription}/resume', [BillingController::class, 'resumeSubscription'])->name('billing.subscription.resume');
+    Route::get('billing/invoice/{invoice}/download', [BillingController::class, 'downloadInvoice'])->name('billing.invoice.download');
+
     // WhatsApp connections routes (com logging)
     Route::middleware([ApiLoggerMiddleware::class])->group(function () {
         Route::resource('whatsapp', WhatsAppConnectionController::class);
@@ -93,7 +108,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('whatsapp/{whatsapp}/update-status', [WhatsAppConnectionController::class, 'updateStatus'])
             ->name('whatsapp.update-status');
 
-        // Webhook management routes
+        // Webhook management page
+        Route::get('whatsapp/{connection}/webhooks-page', function ($connectionId) {
+            $connection = \App\Models\WhatsAppConnection::where('id', $connectionId)
+                ->where('tenant_id', Auth::user()->tenant_id)
+                ->firstOrFail();
+
+            return Inertia::render('WhatsApp/Webhooks/Index', [
+                'connection' => $connection
+            ]);
+        })->name('webhooks.page');
+
+        // Webhook management API routes
         Route::get('whatsapp/{connection}/webhooks', [WebhookController::class, 'index'])
             ->name('webhooks.index');
         Route::post('whatsapp/{connection}/webhooks', [WebhookController::class, 'store'])
