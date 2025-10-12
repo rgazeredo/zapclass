@@ -272,5 +272,107 @@
         "saving": "Salvando...",
         "apiKey": "Chave da API (API_KEY)",
         "apiKeyNotAvailable": "Chave da API não disponível. A instância pode precisar ser recriada."
+    },
+    "auth": {
+        "login": {
+            "title": "Entrar na sua conta",
+            "pageTitle": "Entrar",
+            "description": "Digite seu email e senha abaixo para entrar",
+            "emailLabel": "Endereço de email",
+            "emailPlaceholder": "email@exemplo.com",
+            "passwordLabel": "Senha",
+            "passwordPlaceholder": "Senha",
+            "rememberMe": "Lembrar-me",
+            "forgotPassword": "Esqueceu a senha?",
+            "loginButton": "Entrar",
+            "noAccount": "Não tem uma conta?",
+            "signUp": "Cadastre-se",
+            "emailRequired": "Por favor, insira um endereço de email válido",
+            "passwordRequired": "Senha é obrigatória"
+        },
+        "register": {
+            "title": "Criar uma conta",
+            "pageTitle": "Cadastrar",
+            "description": "Digite seus dados abaixo para criar sua conta",
+            "nameLabel": "Nome",
+            "namePlaceholder": "Nome completo",
+            "emailLabel": "Endereço de email",
+            "emailPlaceholder": "email@exemplo.com",
+            "passwordLabel": "Senha",
+            "passwordPlaceholder": "Senha",
+            "confirmPasswordLabel": "Confirmar senha",
+            "confirmPasswordPlaceholder": "Confirmar senha",
+            "createAccountButton": "Criar conta",
+            "haveAccount": "Já tem uma conta?",
+            "logIn": "Entrar",
+            "nameRequired": "Nome é obrigatório",
+            "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+            "emailInvalid": "Por favor, insira um endereço de email válido",
+            "passwordMinLength": "Senha deve ter pelo menos 8 caracteres",
+            "passwordsDontMatch": "As senhas não coincidem"
+        },
+        "forgotPassword": {
+            "title": "Esqueceu a senha",
+            "pageTitle": "Esqueceu a senha",
+            "description": "Digite seu email para receber um link de redefinição de senha"
+        },
+        "resetPassword": {
+            "title": "Redefinir senha",
+            "pageTitle": "Redefinir senha",
+            "description": "Por favor, insira sua nova senha abaixo",
+            "confirmPasswordPlaceholder": "Confirmar senha"
+        },
+        "confirmPassword": {
+            "title": "Confirmar senha",
+            "pageTitle": "Confirmar senha"
+        },
+        "verifyEmail": {
+            "title": "Verificar email",
+            "pageTitle": "Verificação de email",
+            "description": "Por favor, verifique seu endereço de email clicando no link que acabamos de enviar para você."
+        }
+    },
+    "settings": {
+        "profile": {
+            "title": "Configurações do perfil",
+            "pageTitle": "Configurações do perfil",
+            "heading": "Informações do perfil",
+            "description": "Atualize seu nome e endereço de email",
+            "nameLabel": "Nome",
+            "namePlaceholder": "Nome completo",
+            "emailLabel": "Endereço de email",
+            "emailPlaceholder": "Endereço de email",
+            "emailUnverified": "Seu endereço de email não foi verificado.",
+            "resendVerification": "Clique aqui para reenviar o email de verificação.",
+            "verificationSent": "Um novo link de verificação foi enviado para seu endereço de email.",
+            "saveButton": "Salvar",
+            "saved": "Salvo",
+            "nameRequired": "Nome é obrigatório",
+            "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+            "emailInvalid": "Por favor, insira um endereço de email válido"
+        },
+        "password": {
+            "title": "Configurações de senha",
+            "pageTitle": "Configurações de senha",
+            "heading": "Atualizar senha",
+            "description": "Certifique-se de que sua conta está usando uma senha longa e aleatória para permanecer segura",
+            "currentPasswordLabel": "Senha atual",
+            "currentPasswordPlaceholder": "Senha atual",
+            "newPasswordLabel": "Nova senha",
+            "newPasswordPlaceholder": "Nova senha",
+            "confirmPasswordLabel": "Confirmar senha",
+            "confirmPasswordPlaceholder": "Confirmar senha",
+            "saveButton": "Salvar senha",
+            "saved": "Salvo",
+            "currentPasswordRequired": "Senha atual é obrigatória",
+            "passwordMinLength": "Senha deve ter pelo menos 8 caracteres",
+            "passwordsDontMatch": "As senhas não coincidem"
+        },
+        "appearance": {
+            "title": "Configurações de aparência",
+            "pageTitle": "Configurações de aparência",
+            "heading": "Configurações de aparência",
+            "description": "Atualize as configurações de aparência da sua conta"
+        }
     }
 }

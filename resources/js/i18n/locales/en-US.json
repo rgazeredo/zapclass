@@ -272,5 +272,107 @@
         "saving": "Saving...",
         "apiKey": "API Key (API_KEY)",
         "apiKeyNotAvailable": "API Key not available. The instance may need to be recreated."
+    },
+    "auth": {
+        "login": {
+            "title": "Log in to your account",
+            "pageTitle": "Log in",
+            "description": "Enter your email and password below to log in",
+            "emailLabel": "Email address",
+            "emailPlaceholder": "email@example.com",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "Password",
+            "rememberMe": "Remember me",
+            "forgotPassword": "Forgot password?",
+            "loginButton": "Log in",
+            "noAccount": "Don't have an account?",
+            "signUp": "Sign up",
+            "emailRequired": "Please enter a valid email address",
+            "passwordRequired": "Password is required"
+        },
+        "register": {
+            "title": "Create an account",
+            "pageTitle": "Register",
+            "description": "Enter your details below to create your account",
+            "nameLabel": "Name",
+            "namePlaceholder": "Full name",
+            "emailLabel": "Email address",
+            "emailPlaceholder": "email@example.com",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "Password",
+            "confirmPasswordLabel": "Confirm password",
+            "confirmPasswordPlaceholder": "Confirm password",
+            "createAccountButton": "Create account",
+            "haveAccount": "Already have an account?",
+            "logIn": "Log in",
+            "nameRequired": "Name is required",
+            "nameMinLength": "Name must be at least 2 characters",
+            "emailInvalid": "Please enter a valid email address",
+            "passwordMinLength": "Password must be at least 8 characters",
+            "passwordsDontMatch": "Passwords don't match"
+        },
+        "forgotPassword": {
+            "title": "Forgot password",
+            "pageTitle": "Forgot password",
+            "description": "Enter your email to receive a password reset link"
+        },
+        "resetPassword": {
+            "title": "Reset password",
+            "pageTitle": "Reset password",
+            "description": "Please enter your new password below",
+            "confirmPasswordPlaceholder": "Confirm password"
+        },
+        "confirmPassword": {
+            "title": "Confirm password",
+            "pageTitle": "Confirm password"
+        },
+        "verifyEmail": {
+            "title": "Verify email",
+            "pageTitle": "Email verification",
+            "description": "Please verify your email address by clicking on the link we just emailed to you."
+        }
+    },
+    "settings": {
+        "profile": {
+            "title": "Profile settings",
+            "pageTitle": "Profile settings",
+            "heading": "Profile information",
+            "description": "Update your name and email address",
+            "nameLabel": "Name",
+            "namePlaceholder": "Full name",
+            "emailLabel": "Email address",
+            "emailPlaceholder": "Email address",
+            "emailUnverified": "Your email address is unverified.",
+            "resendVerification": "Click here to resend the verification email.",
+            "verificationSent": "A new verification link has been sent to your email address.",
+            "saveButton": "Save",
+            "saved": "Saved",
+            "nameRequired": "Name is required",
+            "nameMinLength": "Name must be at least 2 characters",
+            "emailInvalid": "Please enter a valid email address"
+        },
+        "password": {
+            "title": "Password settings",
+            "pageTitle": "Password settings",
+            "heading": "Update password",
+            "description": "Ensure your account is using a long, random password to stay secure",
+            "currentPasswordLabel": "Current password",
+            "currentPasswordPlaceholder": "Current password",
+            "newPasswordLabel": "New password",
+            "newPasswordPlaceholder": "New password",
+            "confirmPasswordLabel": "Confirm password",
+            "confirmPasswordPlaceholder": "Confirm password",
+            "saveButton": "Save password",
+            "saved": "Saved",
+            "currentPasswordRequired": "Current password is required",
+            "passwordMinLength": "Password must be at least 8 characters",
+            "passwordsDontMatch": "Passwords don't match"
+        },
+        "appearance": {
+            "title": "Appearance settings",
+            "pageTitle": "Appearance settings",
+            "heading": "Appearance settings",
+            "description": "Update your account's appearance settings"
+        }
     }
 }

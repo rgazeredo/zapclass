@@ -11,27 +11,29 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useHookForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
 }
 
-const loginSchema = z.object({
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(1, 'Password is required'),
-    remember: z.boolean().optional().default(false),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: false,
     });
+
+    const loginSchema = z.object({
+        email: z.string().email(t('auth.login.emailRequired')),
+        password: z.string().min(1, t('auth.login.passwordRequired')),
+        remember: z.boolean().optional().default(false),
+    });
+
+    type LoginFormValues = z.infer<typeof loginSchema>;
 
     const form = useHookForm({
         resolver: zodResolver(loginSchema),
@@ -47,8 +49,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in" />
+        <AuthLayout title={t('auth.login.title')} description={t('auth.login.description')}>
+            <Head title={t('auth.login.pageTitle')} />
 
             {status && (
                 <div className="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-600">
@@ -64,11 +66,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email address</FormLabel>
+                                    <FormLabel>{t('auth.login.emailLabel')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
-                                            placeholder="email@example.com"
+                                            placeholder={t('auth.login.emailPlaceholder')}
                                             autoFocus
                                             autoComplete="email"
                                             {...field}
@@ -90,13 +92,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             render={({ field }) => (
                                 <FormItem>
                                     <div className="flex items-center">
-                                        <FormLabel>Password</FormLabel>
+                                        <FormLabel>{t('auth.login.passwordLabel')}</FormLabel>
                                         {canResetPassword && (
                                             <Link
                                                 href={request()}
                                                 className="ml-auto text-sm text-primary underline-offset-4 hover:underline"
                                             >
-                                                Forgot password?
+                                                {t('auth.login.forgotPassword')}
                                             </Link>
                                         )}
                                     </div>
@@ -104,7 +106,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         <div className="relative">
                                             <Input
                                                 type={showPassword ? 'text' : 'password'}
-                                                placeholder="Password"
+                                                placeholder={t('auth.login.passwordPlaceholder')}
                                                 autoComplete="current-password"
                                                 {...field}
                                                 onChange={(e) => {
@@ -148,7 +150,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         />
                                     </FormControl>
                                     <div className="space-y-1 leading-none">
-                                        <FormLabel>Remember me</FormLabel>
+                                        <FormLabel>{t('auth.login.rememberMe')}</FormLabel>
                                     </div>
                                 </FormItem>
                             )}
@@ -156,17 +158,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                         <Button type="submit" className="w-full" disabled={processing}>
                             {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Log in
+                            {t('auth.login.loginButton')}
                         </Button>
                     </div>
 
                     <div className="text-center text-sm text-muted-foreground">
-                        Don't have an account?{' '}
+                        {t('auth.login.noAccount')}{' '}
                         <Link
                             href={register()}
                             className="text-primary underline-offset-4 hover:underline"
                         >
-                            Sign up
+                            {t('auth.login.signUp')}
                         </Link>
                     </div>
                 </form>

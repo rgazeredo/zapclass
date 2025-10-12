@@ -12,31 +12,33 @@ import { IconCheck, IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react
 import { useForm as useHookForm } from 'react-hook-form';
 import { useState } from 'react';
 import * as z from 'zod';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Password settings',
-        href: edit().url,
-    },
-];
-
-const passwordSchema = z.object({
-    current_password: z.string().min(1, 'Current password is required'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    password_confirmation: z.string(),
-}).refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match",
-    path: ["password_confirmation"],
-});
-
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+import { useTranslation } from 'react-i18next';
 
 export default function Password() {
+    const { t } = useTranslation();
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const { post, processing } = useForm();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.password.title'),
+            href: edit().url,
+        },
+    ];
+
+    const passwordSchema = z.object({
+        current_password: z.string().min(1, t('settings.password.currentPasswordRequired')),
+        password: z.string().min(8, t('settings.password.passwordMinLength')),
+        password_confirmation: z.string(),
+    }).refine((data) => data.password === data.password_confirmation, {
+        message: t('settings.password.passwordsDontMatch'),
+        path: ["password_confirmation"],
+    });
+
+    type PasswordFormValues = z.infer<typeof passwordSchema>;
 
     const form = useHookForm({
         resolver: zodResolver(passwordSchema),
@@ -61,11 +63,11 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Password settings" />
+            <Head title={t('settings.password.pageTitle')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall title={t('settings.password.heading')} description={t('settings.password.description')} />
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -74,12 +76,12 @@ export default function Password() {
                                 name="current_password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Current password</FormLabel>
+                                        <FormLabel>{t('settings.password.currentPasswordLabel')}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     type={showCurrentPassword ? 'text' : 'password'}
-                                                    placeholder="Current password"
+                                                    placeholder={t('settings.password.currentPasswordPlaceholder')}
                                                     autoComplete="current-password"
                                                     {...field}
                                                 />
@@ -108,12 +110,12 @@ export default function Password() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>New password</FormLabel>
+                                        <FormLabel>{t('settings.password.newPasswordLabel')}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     type={showPassword ? 'text' : 'password'}
-                                                    placeholder="New password"
+                                                    placeholder={t('settings.password.newPasswordPlaceholder')}
                                                     autoComplete="new-password"
                                                     {...field}
                                                 />
@@ -142,12 +144,12 @@ export default function Password() {
                                 name="password_confirmation"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Confirm password</FormLabel>
+                                        <FormLabel>{t('settings.password.confirmPasswordLabel')}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     type={showConfirmPassword ? 'text' : 'password'}
-                                                    placeholder="Confirm password"
+                                                    placeholder={t('settings.password.confirmPasswordPlaceholder')}
                                                     autoComplete="new-password"
                                                     {...field}
                                                 />
@@ -174,13 +176,13 @@ export default function Password() {
                             <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing} data-test="update-password-button">
                                     {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Save password
+                                    {t('settings.password.saveButton')}
                                 </Button>
 
                                 {recentlySuccessful && (
                                     <div className="flex items-center gap-2 text-sm text-green-600">
                                         <IconCheck className="h-4 w-4" />
-                                        Saved
+                                        {t('settings.password.saved')}
                                     </div>
                                 )}
                             </div>
