@@ -514,22 +514,39 @@
         "forgotPassword": {
             "title": "Esqueceu a senha",
             "pageTitle": "Esqueceu a senha",
-            "description": "Digite seu email para receber um link de redefinição de senha"
+            "description": "Digite seu email para receber um link de redefinição de senha",
+            "emailLabel": "Endereço de email",
+            "emailPlaceholder": "email@exemplo.com",
+            "sendButton": "Enviar link de redefinição",
+            "returnToLogin": "Ou, retorne para",
+            "logIn": "entrar"
         },
         "resetPassword": {
             "title": "Redefinir senha",
             "pageTitle": "Redefinir senha",
             "description": "Por favor, insira sua nova senha abaixo",
-            "confirmPasswordPlaceholder": "Confirmar senha"
+            "emailLabel": "Email",
+            "passwordLabel": "Senha",
+            "passwordPlaceholder": "Senha",
+            "confirmPasswordLabel": "Confirmar senha",
+            "confirmPasswordPlaceholder": "Confirmar senha",
+            "resetButton": "Redefinir senha"
         },
         "confirmPassword": {
-            "title": "Confirmar senha",
-            "pageTitle": "Confirmar senha"
+            "title": "Confirme sua senha",
+            "pageTitle": "Confirmar senha",
+            "description": "Esta é uma área segura da aplicação. Por favor, confirme sua senha antes de continuar.",
+            "passwordLabel": "Senha",
+            "passwordPlaceholder": "Senha",
+            "confirmButton": "Confirmar senha"
         },
         "verifyEmail": {
             "title": "Verificar email",
             "pageTitle": "Verificação de email",
-            "description": "Por favor, verifique seu endereço de email clicando no link que acabamos de enviar para você."
+            "description": "Por favor, verifique seu endereço de email clicando no link que acabamos de enviar para você.",
+            "verificationSent": "Um novo link de verificação foi enviado para o endereço de email fornecido durante o cadastro.",
+            "resendButton": "Reenviar email de verificação",
+            "logoutButton": "Sair"
         }
     },
     "settings": {

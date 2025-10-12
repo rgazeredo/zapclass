@@ -514,22 +514,39 @@
         "forgotPassword": {
             "title": "Forgot password",
             "pageTitle": "Forgot password",
-            "description": "Enter your email to receive a password reset link"
+            "description": "Enter your email to receive a password reset link",
+            "emailLabel": "Email address",
+            "emailPlaceholder": "email@example.com",
+            "sendButton": "Email password reset link",
+            "returnToLogin": "Or, return to",
+            "logIn": "log in"
         },
         "resetPassword": {
             "title": "Reset password",
             "pageTitle": "Reset password",
             "description": "Please enter your new password below",
-            "confirmPasswordPlaceholder": "Confirm password"
+            "emailLabel": "Email",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "Password",
+            "confirmPasswordLabel": "Confirm password",
+            "confirmPasswordPlaceholder": "Confirm password",
+            "resetButton": "Reset password"
         },
         "confirmPassword": {
-            "title": "Confirm password",
-            "pageTitle": "Confirm password"
+            "title": "Confirm your password",
+            "pageTitle": "Confirm password",
+            "description": "This is a secure area of the application. Please confirm your password before continuing.",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "Password",
+            "confirmButton": "Confirm password"
         },
         "verifyEmail": {
             "title": "Verify email",
             "pageTitle": "Email verification",
-            "description": "Please verify your email address by clicking on the link we just emailed to you."
+            "description": "Please verify your email address by clicking on the link we just emailed to you.",
+            "verificationSent": "A new verification link has been sent to the email address you provided during registration.",
+            "resendButton": "Resend verification email",
+            "logoutButton": "Log out"
         }
     },
     "settings": {
