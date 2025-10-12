@@ -149,6 +149,45 @@ const excludeMessagesInfo: Record<string, { title: string; description: string; 
     },
 };
 
+// Todos os eventos disponíveis
+const availableEvents = [
+    'connection',
+    'history',
+    'messages',
+    'messages_update',
+    'call',
+    'contacts',
+    'presence',
+    'groups',
+    'labels',
+    'chats',
+    'chat_labels',
+    'blocks',
+    'leads',
+    'sender',
+];
+
+// Eventos padrão (sem os de alto volume)
+const defaultEvents = [
+    'connection',
+    'messages',
+    'messages_update',
+    'call',
+    'contacts',
+    'groups',
+    'labels',
+    'chats',
+    'chat_labels',
+    'blocks',
+    'leads',
+    'sender',
+];
+
+// Eventos de alto volume (alertar usuário)
+const highVolumeEvents = ['presence', 'history'];
+
+const availableExcludeMessages = ['wasSentByApi', 'wasNotSentByApi', 'fromMeYes', 'fromMeNo', 'isGroupYes', 'isGroupNo'];
+
 export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }: WebhookFormModalProps) {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
@@ -161,45 +200,6 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
         exclude_events: ['wasSentByApi'] as string[],
         enabled: true,
     });
-
-    // Todos os eventos disponíveis
-    const availableEvents = [
-        'connection',
-        'history',
-        'messages',
-        'messages_update',
-        'call',
-        'contacts',
-        'presence',
-        'groups',
-        'labels',
-        'chats',
-        'chat_labels',
-        'blocks',
-        'leads',
-        'sender',
-    ];
-
-    // Eventos padrão (sem os de alto volume)
-    const defaultEvents = [
-        'connection',
-        'messages',
-        'messages_update',
-        'call',
-        'contacts',
-        'groups',
-        'labels',
-        'chats',
-        'chat_labels',
-        'blocks',
-        'leads',
-        'sender',
-    ];
-
-    // Eventos de alto volume (alertar usuário)
-    const highVolumeEvents = ['presence', 'history'];
-
-    const availableExcludeMessages = ['wasSentByApi', 'wasNotSentByApi', 'fromMeYes', 'fromMeNo', 'isGroupYes', 'isGroupNo'];
 
     useEffect(() => {
         if (open) {

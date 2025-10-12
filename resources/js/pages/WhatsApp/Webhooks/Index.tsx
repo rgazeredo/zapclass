@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { IconArrowLeft, IconEdit, IconPlus, IconTrash, IconWebhook } from '@tabler/icons-react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WebhookDeleteDialog } from './WebhookDeleteDialog';
 import { WebhookFormModal } from './WebhookFormModal';
@@ -43,7 +43,7 @@ export default function WebhooksIndex({ connection }: Props) {
     const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
     const [webhookToDelete, setWebhookToDelete] = useState<Webhook | null>(null);
 
-    const loadWebhooks = async () => {
+    const loadWebhooks = useCallback(async () => {
         setIsLoading(true);
         setError(null);
 
@@ -62,11 +62,11 @@ export default function WebhooksIndex({ connection }: Props) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [connection.id, t]);
 
     useEffect(() => {
         loadWebhooks();
-    }, [connection.id]);
+    }, [loadWebhooks]);
 
     const handleAddWebhook = () => {
         setEditingWebhook(null);
