@@ -25,7 +25,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const loginSchema = z.object({
         email: z.string().email(t('auth.login.emailRequired')),
         password: z.string().min(1, t('auth.login.passwordRequired')),
-        remember: z.boolean().default(false),
+        remember: z.boolean(),
     });
 
     type LoginFormValues = z.infer<typeof loginSchema>;
