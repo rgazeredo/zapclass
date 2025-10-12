@@ -292,8 +292,33 @@ class WhatsAppConnectionController extends Controller
                 'connection_name' => $whatsapp->name
             ]);
 
-            // Gerar novo QR code
-            $qrData = $this->uazApiService->getQrCode($whatsapp->token);
+            // Tentar gerar novo QR code com retry logic
+            $maxAttempts = 3;
+            $attempt = 0;
+            $qrData = null;
+
+            while ($attempt < $maxAttempts) {
+                $attempt++;
+
+                try {
+                    // Aguardar um pouco antes de pedir o QR code
+                    if ($attempt > 1) {
+                        sleep($attempt * 2);
+                    }
+
+                    $qrData = $this->uazApiService->getQrCode($whatsapp->token);
+
+                    // Verificar se o QR code foi gerado
+                    if (!empty($qrData['instance']['qrcode'])) {
+                        break;
+                    }
+                } catch (Exception $e) {
+                    Log::warning('Failed to get QR code after disconnect on attempt ' . $attempt, [
+                        'connection_id' => $whatsapp->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -333,13 +358,93 @@ class WhatsAppConnectionController extends Controller
         }
 
         try {
-            $qrData = $this->uazApiService->getQrCode($whatsapp->token);
+            // Tentar gerar QR code com retry logic
+            $maxAttempts = 5;
+            $attempt = 0;
+            $qrData = null;
+            $lastError = null;
+
+            while ($attempt < $maxAttempts) {
+                $attempt++;
+
+                try {
+                    Log::info('Attempting to get QR code', [
+                        'connection_id' => $whatsapp->id,
+                        'attempt' => $attempt,
+                        'max_attempts' => $maxAttempts
+                    ]);
+
+                    $qrData = $this->uazApiService->getQrCode($whatsapp->token);
+
+                    // Verificar se o QR code foi gerado
+                    if (!empty($qrData['instance']['qrcode'])) {
+                        Log::info('QR code generated successfully', [
+                            'connection_id' => $whatsapp->id,
+                            'attempt' => $attempt
+                        ]);
+
+                        return response()->json([
+                            'success' => true,
+                            'qrcode' => $qrData
+                        ]);
+                    }
+
+                    // Se não tem QR code mas a instância está "connecting", aguardar
+                    if ($qrData['instance']['status'] === 'connecting') {
+                        $lastError = 'Instance is still initializing, waiting...';
+
+                        Log::info('Instance still connecting, waiting before retry', [
+                            'connection_id' => $whatsapp->id,
+                            'attempt' => $attempt,
+                            'wait_time' => $attempt * 2
+                        ]);
+
+                        // Aguardar progressivamente: 2s, 4s, 6s, 8s, 10s
+                        if ($attempt < $maxAttempts) {
+                            sleep($attempt * 2);
+                            continue;
+                        }
+                    }
+
+                    // Se chegou aqui, algo está errado
+                    $lastError = 'QR code not generated. Instance status: ' . ($qrData['instance']['status'] ?? 'unknown');
+                    break;
+
+                } catch (Exception $e) {
+                    $lastError = $e->getMessage();
+
+                    Log::warning('Failed to get QR code on attempt', [
+                        'connection_id' => $whatsapp->id,
+                        'attempt' => $attempt,
+                        'error' => $lastError
+                    ]);
+
+                    // Aguardar antes de tentar novamente
+                    if ($attempt < $maxAttempts) {
+                        sleep($attempt * 2);
+                    }
+                }
+            }
+
+            // Se chegou aqui, todas as tentativas falharam
+            Log::error('Failed to generate QR code after all attempts', [
+                'connection_id' => $whatsapp->id,
+                'attempts' => $maxAttempts,
+                'last_error' => $lastError
+            ]);
 
             return response()->json([
-                'success' => true,
-                'qrcode' => $qrData
-            ]);
+                'success' => false,
+                'message' => 'Failed to generate QR code after ' . $maxAttempts . ' attempts. Last error: ' . $lastError,
+                'attempts' => $maxAttempts
+            ], 500);
+
         } catch (Exception $e) {
+            Log::error('Unexpected error generating QR code', [
+                'connection_id' => $whatsapp->id,
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate QR code: ' . $e->getMessage()
