@@ -4,13 +4,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
 import { request } from '@/routes/password';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { IconLoader2, IconEye, IconEyeOff } from '@tabler/icons-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm as useHookForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useForm as useHookForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 
 interface LoginProps {
     status?: string;
@@ -29,7 +29,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const loginSchema = z.object({
         email: z.string().email(t('auth.login.emailRequired')),
         password: z.string().min(1, t('auth.login.passwordRequired')),
-        remember: z.boolean().optional().default(false),
+        remember: z.boolean().default(false),
     });
 
     type LoginFormValues = z.infer<typeof loginSchema>;
@@ -51,11 +51,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title={t('auth.login.title')} description={t('auth.login.description')}>
             <Head title={t('auth.login.pageTitle')} />
 
-            {status && (
-                <div className="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            {status && <div className="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-600">{status}</div>}
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -93,10 +89,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     <div className="flex items-center">
                                         <FormLabel>{t('auth.login.passwordLabel')}</FormLabel>
                                         {canResetPassword && (
-                                            <Link
-                                                href={request()}
-                                                className="ml-auto text-sm text-primary underline-offset-4 hover:underline"
-                                            >
+                                            <Link href={request()} className="ml-auto text-sm text-primary underline-offset-4 hover:underline">
                                                 {t('auth.login.forgotPassword')}
                                             </Link>
                                         )}
@@ -117,14 +110,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
                                                 onClick={() => setShowPassword(!showPassword)}
                                             >
-                                                {showPassword ? (
-                                                    <IconEyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <IconEye className="h-4 w-4" />
-                                                )}
+                                                {showPassword ? <IconEyeOff className="h-4 w-4" /> : <IconEye className="h-4 w-4" />}
                                             </Button>
                                         </div>
                                     </FormControl>
@@ -138,7 +127,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             control={form.control}
                             name="remember"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
