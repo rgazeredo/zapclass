@@ -271,7 +271,84 @@
         "adminFieldPlaceholder": "Campo administrativo opcional",
         "saving": "Salvando...",
         "apiKey": "Chave da API (API_KEY)",
-        "apiKeyNotAvailable": "Chave da API não disponível. A instância pode precisar ser recriada."
+        "apiKeyNotAvailable": "Chave da API não disponível. A instância pode precisar ser recriada.",
+        "errorGeneratingQR": "Erro ao gerar QR code",
+        "attemptsRealized": "Tentativas realizadas: {attempts}",
+        "unknownError": "Erro desconhecido",
+        "errorDisconnecting": "Erro ao desconectar instância",
+        "errorDeletingWebhook": "Erro ao deletar webhook. Tente novamente.",
+        "webhookDelete": {
+            "confirmTitle": "Confirmar Exclusão",
+            "confirmDescription": "Tem certeza que deseja excluir este webhook?",
+            "events": "Eventos:",
+            "warningDescription": "Esta ação não pode ser desfeita. O webhook será removido permanentemente e parará de receber eventos.",
+            "cancel": "Cancelar",
+            "deleting": "Excluindo...",
+            "deleteButton": "Excluir Webhook"
+        }
+    },
+    "billing": {
+        "paymentMethods": {
+            "title": "Métodos de Pagamento",
+            "accountNotConfigured": "Sua conta ainda não está configurada para pagamentos.",
+            "youHaveMethods": "Você tem {count} método(s) de pagamento cadastrado(s)",
+            "noMethods": "Nenhum método de pagamento cadastrado",
+            "addMethod": "Adicionar Método de Pagamento",
+            "addNewCard": "Adicione um novo cartão de crédito para suas assinaturas",
+            "stripeRedirectInfo": "Para adicionar um método de pagamento, você será redirecionado para uma página segura do Stripe onde poderá inserir os dados do seu cartão de forma segura.",
+            "stripeRedirectToast": "Para adicionar um método de pagamento, você será redirecionado para uma página segura do Stripe.",
+            "errorCreatingMethod": "Erro ao criar método de pagamento",
+            "cancel": "Cancelar",
+            "processing": "Processando...",
+            "continue": "Continuar",
+            "addCardPrompt": "Adicione um cartão de crédito para gerenciar suas assinaturas",
+            "card": "Cartão",
+            "expiresIn": "Expira em",
+            "default": "Padrão",
+            "setAsDefault": "Definir como Padrão",
+            "remove": "Remover",
+            "removeMethodTitle": "Remover método de pagamento?",
+            "removeMethodDescription": "Tem certeza que deseja remover este método de pagamento? Esta ação não pode ser desfeita.",
+            "removeDefaultWarning": "Atenção: Este é seu método de pagamento padrão. Defina outro como padrão antes de remover.",
+            "yesRemove": "Sim, remover"
+        }
+    },
+    "subscription": {
+        "cancel": {
+            "pageTitle": "Pagamento Cancelado",
+            "title": "Pagamento Cancelado",
+            "description": "O processo de pagamento foi interrompido",
+            "selectedPlan": "Plano Selecionado: {name}",
+            "perMonth": "por mês",
+            "perYear": "por ano",
+            "includedFeatures": "Recursos inclusos:",
+            "andMoreFeatures": "E mais {count} recursos...",
+            "tryAgain": "Tentar Novamente",
+            "backToHome": "Voltar ao Início",
+            "needHelp": "Precisa de ajuda?",
+            "helpDescription": "Entre em contato conosco pelo WhatsApp ou email. Estamos aqui para auxiliá-lo com qualquer dúvida sobre nossos planos."
+        },
+        "success": {
+            "pageTitle": "Assinatura Confirmada",
+            "title": "Pagamento Confirmado!",
+            "description": "Sua assinatura foi ativada com sucesso",
+            "welcomeToZapClass": "Bem-vindo ao ZapClass!",
+            "company": "Empresa:",
+            "activePlan": "Plano Ativo: {name}",
+            "includedFeatures": "Recursos inclusos:",
+            "defaultFeatures": {
+                "whatsappConnection": "Conexão WhatsApp",
+                "completeDashboard": "Dashboard completo",
+                "unlimitedMessages": "Mensagens ilimitadas",
+                "technicalSupport": "Suporte técnico"
+            },
+            "subscriptionId": "ID da Assinatura:",
+            "status": "Status:",
+            "statusActive": "Ativa",
+            "accessDashboard": "Acessar Dashboard",
+            "nextSteps": "Próximos passos:",
+            "nextStepsDescription": "Explore o dashboard e comece a configurar sua conta. Se precisar de ajuda, nossa equipe está pronta para auxiliá-lo."
+        }
     },
     "auth": {
         "login": {

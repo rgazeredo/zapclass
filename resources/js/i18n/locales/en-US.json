@@ -271,7 +271,84 @@
         "adminFieldPlaceholder": "Optional administrative field",
         "saving": "Saving...",
         "apiKey": "API Key (API_KEY)",
-        "apiKeyNotAvailable": "API Key not available. The instance may need to be recreated."
+        "apiKeyNotAvailable": "API Key not available. The instance may need to be recreated.",
+        "errorGeneratingQR": "Error generating QR code",
+        "attemptsRealized": "Attempts made: {attempts}",
+        "unknownError": "Unknown error",
+        "errorDisconnecting": "Error disconnecting instance",
+        "errorDeletingWebhook": "Error deleting webhook. Please try again.",
+        "webhookDelete": {
+            "confirmTitle": "Confirm Deletion",
+            "confirmDescription": "Are you sure you want to delete this webhook?",
+            "events": "Events:",
+            "warningDescription": "This action cannot be undone. The webhook will be permanently removed and will stop receiving events.",
+            "cancel": "Cancel",
+            "deleting": "Deleting...",
+            "deleteButton": "Delete Webhook"
+        }
+    },
+    "billing": {
+        "paymentMethods": {
+            "title": "Payment Methods",
+            "accountNotConfigured": "Your account is not yet configured for payments.",
+            "youHaveMethods": "You have {count} payment method(s) registered",
+            "noMethods": "No payment methods registered",
+            "addMethod": "Add Payment Method",
+            "addNewCard": "Add a new credit card for your subscriptions",
+            "stripeRedirectInfo": "To add a payment method, you will be redirected to a secure Stripe page where you can enter your card details securely.",
+            "stripeRedirectToast": "To add a payment method, you will be redirected to a secure Stripe page.",
+            "errorCreatingMethod": "Error creating payment method",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "continue": "Continue",
+            "addCardPrompt": "Add a credit card to manage your subscriptions",
+            "card": "Card",
+            "expiresIn": "Expires",
+            "default": "Default",
+            "setAsDefault": "Set as Default",
+            "remove": "Remove",
+            "removeMethodTitle": "Remove payment method?",
+            "removeMethodDescription": "Are you sure you want to remove this payment method? This action cannot be undone.",
+            "removeDefaultWarning": "Warning: This is your default payment method. Set another as default before removing.",
+            "yesRemove": "Yes, remove"
+        }
+    },
+    "subscription": {
+        "cancel": {
+            "pageTitle": "Payment Cancelled",
+            "title": "Payment Cancelled",
+            "description": "The payment process was interrupted",
+            "selectedPlan": "Selected Plan: {name}",
+            "perMonth": "per month",
+            "perYear": "per year",
+            "includedFeatures": "Included features:",
+            "andMoreFeatures": "And {count} more features...",
+            "tryAgain": "Try Again",
+            "backToHome": "Back to Home",
+            "needHelp": "Need help?",
+            "helpDescription": "Contact us via WhatsApp or email. We're here to help you with any questions about our plans."
+        },
+        "success": {
+            "pageTitle": "Subscription Confirmed",
+            "title": "Payment Confirmed!",
+            "description": "Your subscription has been successfully activated",
+            "welcomeToZapClass": "Welcome to ZapClass!",
+            "company": "Company:",
+            "activePlan": "Active Plan: {name}",
+            "includedFeatures": "Included features:",
+            "defaultFeatures": {
+                "whatsappConnection": "WhatsApp Connection",
+                "completeDashboard": "Complete Dashboard",
+                "unlimitedMessages": "Unlimited Messages",
+                "technicalSupport": "Technical Support"
+            },
+            "subscriptionId": "Subscription ID:",
+            "status": "Status:",
+            "statusActive": "Active",
+            "accessDashboard": "Access Dashboard",
+            "nextSteps": "Next steps:",
+            "nextStepsDescription": "Explore the dashboard and start setting up your account. If you need help, our team is ready to assist you."
+        }
     },
     "auth": {
         "login": {

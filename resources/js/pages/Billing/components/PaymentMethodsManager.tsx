@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -58,6 +59,7 @@ export default function PaymentMethodsManager({
     defaultPaymentMethod,
     tenant,
 }: PaymentMethodsManagerProps) {
+    const { t } = useTranslation();
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -107,16 +109,16 @@ export default function PaymentMethodsManager({
             if (data.client_secret) {
                 // Redirect to Stripe's hosted page or implement Stripe Elements here
                 // For simplicity, we'll show a message
-                toast.info('Para adicionar um método de pagamento, você será redirecionado para uma página segura do Stripe.', {
+                toast.info(t('billing.paymentMethods.stripeRedirectToast'), {
                     duration: 5000,
                 });
                 // In a real implementation, you would use Stripe Elements here
             }
         } catch (error) {
             console.error('Error creating setup intent:', error);
-            toast.error('Erro ao criar método de pagamento', {
+            toast.error(t('billing.paymentMethods.errorCreatingMethod'), {
                 duration: 5000,
-                description: error instanceof Error ? error.message : 'Erro desconhecido',
+                description: error instanceof Error ? error.message : t('whatsapp.unknownError'),
             });
         } finally {
             setIsLoading(false);
@@ -128,7 +130,7 @@ export default function PaymentMethodsManager({
         return (
             <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400">
-                    Sua conta ainda não está configurada para pagamentos.
+                    {t('billing.paymentMethods.accountNotConfigured')}
                 </p>
             </div>
         );
@@ -139,28 +141,26 @@ export default function PaymentMethodsManager({
             <div className="flex justify-between items-center mb-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                     {paymentMethods.length > 0
-                        ? `Você tem ${paymentMethods.length} método(s) de pagamento cadastrado(s)`
-                        : 'Nenhum método de pagamento cadastrado'}
+                        ? t('billing.paymentMethods.youHaveMethods', { count: paymentMethods.length })
+                        : t('billing.paymentMethods.noMethods')}
                 </p>
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
                             <IconPlus className="w-4 h-4 mr-2" />
-                            Adicionar Método de Pagamento
+                            {t('billing.paymentMethods.addMethod')}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Adicionar Método de Pagamento</DialogTitle>
+                            <DialogTitle>{t('billing.paymentMethods.addMethod')}</DialogTitle>
                             <DialogDescription>
-                                Adicione um novo cartão de crédito para suas assinaturas
+                                {t('billing.paymentMethods.addNewCard')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Para adicionar um método de pagamento, você será redirecionado para
-                                uma página segura do Stripe onde poderá inserir os dados do seu
-                                cartão de forma segura.
+                                {t('billing.paymentMethods.stripeRedirectInfo')}
                             </p>
                         </div>
                         <DialogFooter>
@@ -169,10 +169,10 @@ export default function PaymentMethodsManager({
                                 onClick={() => setIsAddDialogOpen(false)}
                                 disabled={isLoading}
                             >
-                                Cancelar
+                                {t('billing.paymentMethods.cancel')}
                             </Button>
                             <Button onClick={handleAddPaymentMethod} disabled={isLoading}>
-                                {isLoading ? 'Processando...' : 'Continuar'}
+                                {isLoading ? t('billing.paymentMethods.processing') : t('billing.paymentMethods.continue')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -183,10 +183,10 @@ export default function PaymentMethodsManager({
                 <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
                     <IconCreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-500 dark:text-gray-400">
-                        Nenhum método de pagamento cadastrado
+                        {t('billing.paymentMethods.noMethods')}
                     </p>
                     <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                        Adicione um cartão de crédito para gerenciar suas assinaturas
+                        {t('billing.paymentMethods.addCardPrompt')}
                     </p>
                 </div>
             ) : (
@@ -206,17 +206,17 @@ export default function PaymentMethodsManager({
                                         {getBrandIcon(pm.brand)}
                                         <div>
                                             <CardTitle className="text-base">
-                                                {pm.brand?.toUpperCase() || 'Cartão'} •••• {pm.last4}
+                                                {pm.brand?.toUpperCase() || t('billing.paymentMethods.card')} •••• {pm.last4}
                                             </CardTitle>
                                             <CardDescription>
-                                                Expira em {pm.exp_month}/{pm.exp_year}
+                                                {t('billing.paymentMethods.expiresIn')} {pm.exp_month}/{pm.exp_year}
                                             </CardDescription>
                                         </div>
                                     </div>
                                     {defaultPaymentMethod?.id === pm.id && (
                                         <Badge variant="default" className="bg-green-500">
                                             <IconCheck className="w-3 h-3 mr-1" />
-                                            Padrão
+                                            {t('billing.paymentMethods.default')}
                                         </Badge>
                                     )}
                                 </div>
@@ -230,7 +230,7 @@ export default function PaymentMethodsManager({
                                             className="flex-1"
                                             onClick={() => handleSetDefault(pm.id)}
                                         >
-                                            Definir como Padrão
+                                            {t('billing.paymentMethods.setAsDefault')}
                                         </Button>
                                     )}
                                     <AlertDialog>
@@ -241,33 +241,30 @@ export default function PaymentMethodsManager({
                                                 className={defaultPaymentMethod?.id !== pm.id ? '' : 'flex-1'}
                                             >
                                                 <IconTrash className="w-4 h-4 mr-2" />
-                                                Remover
+                                                {t('billing.paymentMethods.remove')}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Remover método de pagamento?
+                                                    {t('billing.paymentMethods.removeMethodTitle')}
                                                 </AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Tem certeza que deseja remover este método de
-                                                    pagamento? Esta ação não pode ser desfeita.
+                                                    {t('billing.paymentMethods.removeMethodDescription')}
                                                     {defaultPaymentMethod?.id === pm.id && (
                                                         <span className="block mt-2 text-yellow-600 dark:text-yellow-500 font-medium">
-                                                            Atenção: Este é seu método de pagamento
-                                                            padrão. Defina outro como padrão antes de
-                                                            remover.
+                                                            {t('billing.paymentMethods.removeDefaultWarning')}
                                                         </span>
                                                     )}
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogCancel>{t('billing.paymentMethods.cancel')}</AlertDialogCancel>
                                                 <AlertDialogAction
                                                     onClick={() => handleRemove(pm.id)}
                                                     className="bg-red-600 hover:bg-red-700"
                                                 >
-                                                    Sim, remover
+                                                    {t('billing.paymentMethods.yesRemove')}
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>

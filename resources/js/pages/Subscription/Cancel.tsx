@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { IconX, IconArrowLeft, IconRefresh } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 interface CancelProps {
     tenant?: {
@@ -17,6 +18,8 @@ interface CancelProps {
 }
 
 export default function Cancel({ tenant, message }: CancelProps) {
+    const { t } = useTranslation();
+
     const formatPrice = (price: number, currency: string) => {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
@@ -26,7 +29,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
 
     return (
         <>
-            <Head title="Pagamento Cancelado" />
+            <Head title={t('subscription.cancel.pageTitle')} />
 
             <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
                 <div className="max-w-md w-full">
@@ -36,10 +39,10 @@ export default function Cancel({ tenant, message }: CancelProps) {
                             <IconX className="w-10 h-10 text-red-600" />
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            Pagamento Cancelado
+                            {t('subscription.cancel.title')}
                         </h1>
                         <p className="text-gray-600">
-                            O processo de pagamento foi interrompido
+                            {t('subscription.cancel.description')}
                         </p>
                     </div>
 
@@ -54,7 +57,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
                         {tenant && tenant.plan_metadata && (
                             <div className="border-t border-gray-200 pt-4 mb-6">
                                 <h3 className="font-medium text-gray-900 mb-2 text-center">
-                                    Plano Selecionado: {tenant.plan_metadata.name}
+                                    {t('subscription.cancel.selectedPlan', { name: tenant.plan_metadata.name })}
                                 </h3>
 
                                 <div className="bg-gray-50 rounded-md p-4 mb-4">
@@ -63,7 +66,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
                                             {formatPrice(tenant.plan_metadata.price, tenant.plan_metadata.currency)}
                                         </div>
                                         <div className="text-sm text-gray-600">
-                                            por {tenant.plan_metadata.interval === 'month' ? 'mês' : 'ano'}
+                                            {tenant.plan_metadata.interval === 'month' ? t('subscription.cancel.perMonth') : t('subscription.cancel.perYear')}
                                         </div>
                                     </div>
 
@@ -72,13 +75,13 @@ export default function Cancel({ tenant, message }: CancelProps) {
                                     </p>
 
                                     <div className="text-xs text-gray-600">
-                                        <p className="font-medium mb-2">Recursos inclusos:</p>
+                                        <p className="font-medium mb-2">{t('subscription.cancel.includedFeatures')}</p>
                                         <ul className="space-y-1">
                                             {tenant.plan_metadata.features.slice(0, 3).map((feature, index) => (
                                                 <li key={index}>• {feature}</li>
                                             ))}
                                             {tenant.plan_metadata.features.length > 3 && (
-                                                <li>• E mais {tenant.plan_metadata.features.length - 3} recursos...</li>
+                                                <li>• {t('subscription.cancel.andMoreFeatures', { count: tenant.plan_metadata.features.length - 3 })}</li>
                                             )}
                                         </ul>
                                     </div>
@@ -94,7 +97,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
                                     className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
                                 >
                                     <IconRefresh className="w-4 h-4 mr-2" />
-                                    Tentar Novamente
+                                    {t('subscription.cancel.tryAgain')}
                                 </Link>
                             )}
 
@@ -103,7 +106,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
                                 className="inline-flex items-center justify-center w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-200 transition-colors font-medium"
                             >
                                 <IconArrowLeft className="w-4 h-4 mr-2" />
-                                Voltar ao Início
+                                {t('subscription.cancel.backToHome')}
                             </Link>
                         </div>
                     </div>
@@ -111,8 +114,7 @@ export default function Cancel({ tenant, message }: CancelProps) {
                     {/* Help Info */}
                     <div className="bg-orange-50 rounded-lg p-4 text-center">
                         <p className="text-sm text-orange-800">
-                            <strong>Precisa de ajuda?</strong> Entre em contato conosco pelo WhatsApp
-                            ou email. Estamos aqui para auxiliá-lo com qualquer dúvida sobre nossos planos.
+                            <strong>{t('subscription.cancel.needHelp')}</strong> {t('subscription.cancel.helpDescription')}
                         </p>
                     </div>
                 </div>
