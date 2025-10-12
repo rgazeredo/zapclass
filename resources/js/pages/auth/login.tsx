@@ -3,7 +3,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
 import { request } from '@/routes/password';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { IconLoader2, IconEye, IconEyeOff } from '@tabler/icons-react';
@@ -165,7 +164,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <div className="text-center text-sm text-muted-foreground">
                         {t('auth.login.noAccount')}{' '}
                         <Link
-                            href={register()}
+                            href="/register-with-plan"
                             className="text-primary underline-offset-4 hover:underline"
                         >
                             {t('auth.login.signUp')}
