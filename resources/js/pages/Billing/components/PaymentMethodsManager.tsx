@@ -1,24 +1,3 @@
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-} from '@/components/ui/dialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -30,7 +9,14 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { IconCreditCard, IconPlus, IconTrash, IconCheck } from '@tabler/icons-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { router } from '@inertiajs/react';
+import { IconCheck, IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 interface PaymentMethod {
@@ -54,18 +40,14 @@ interface PaymentMethodsManagerProps {
     tenant: Tenant;
 }
 
-export default function PaymentMethodsManager({
-    paymentMethods,
-    defaultPaymentMethod,
-    tenant,
-}: PaymentMethodsManagerProps) {
+export default function PaymentMethodsManager({ paymentMethods, defaultPaymentMethod, tenant }: PaymentMethodsManagerProps) {
     const { t } = useTranslation();
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const getBrandIcon = (brand: string | null) => {
+    const getBrandIcon = () => {
         // You can add specific brand icons here
-        return <IconCreditCard className="w-6 h-6" />;
+        return <IconCreditCard className="h-6 w-6" />;
     };
 
     const handleSetDefault = (paymentMethodId: string) => {
@@ -77,7 +59,7 @@ export default function PaymentMethodsManager({
                 onSuccess: () => {
                     // Success message will be shown via flash
                 },
-            }
+            },
         );
     };
 
@@ -128,17 +110,15 @@ export default function PaymentMethodsManager({
 
     if (!tenant.stripe_id) {
         return (
-            <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">
-                    {t('billing.paymentMethods.accountNotConfigured')}
-                </p>
+            <div className="py-12 text-center">
+                <p className="text-gray-500 dark:text-gray-400">{t('billing.paymentMethods.accountNotConfigured')}</p>
             </div>
         );
     }
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
+            <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                     {paymentMethods.length > 0
                         ? t('billing.paymentMethods.youHaveMethods', { count: paymentMethods.length })
@@ -147,28 +127,20 @@ export default function PaymentMethodsManager({
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
-                            <IconPlus className="w-4 h-4 mr-2" />
+                            <IconPlus className="mr-2 h-4 w-4" />
                             {t('billing.paymentMethods.addMethod')}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>{t('billing.paymentMethods.addMethod')}</DialogTitle>
-                            <DialogDescription>
-                                {t('billing.paymentMethods.addNewCard')}
-                            </DialogDescription>
+                            <DialogDescription>{t('billing.paymentMethods.addNewCard')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {t('billing.paymentMethods.stripeRedirectInfo')}
-                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('billing.paymentMethods.stripeRedirectInfo')}</p>
                         </div>
                         <DialogFooter>
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsAddDialogOpen(false)}
-                                disabled={isLoading}
-                            >
+                            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isLoading}>
                                 {t('billing.paymentMethods.cancel')}
                             </Button>
                             <Button onClick={handleAddPaymentMethod} disabled={isLoading}>
@@ -180,30 +152,19 @@ export default function PaymentMethodsManager({
             </div>
 
             {paymentMethods.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                    <IconCreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                        {t('billing.paymentMethods.noMethods')}
-                    </p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                        {t('billing.paymentMethods.addCardPrompt')}
-                    </p>
+                <div className="rounded-lg border-2 border-dashed border-gray-300 py-12 text-center dark:border-gray-700">
+                    <IconCreditCard className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                    <p className="text-gray-500 dark:text-gray-400">{t('billing.paymentMethods.noMethods')}</p>
+                    <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">{t('billing.paymentMethods.addCardPrompt')}</p>
                 </div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                     {paymentMethods.map((pm) => (
-                        <Card
-                            key={pm.id}
-                            className={
-                                defaultPaymentMethod?.id === pm.id
-                                    ? 'border-primary border-2'
-                                    : ''
-                            }
-                        >
+                        <Card key={pm.id} className={defaultPaymentMethod?.id === pm.id ? 'border-2 border-primary' : ''}>
                             <CardHeader className="pb-3">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-3">
-                                        {getBrandIcon(pm.brand)}
+                                        {getBrandIcon()}
                                         <div>
                                             <CardTitle className="text-base">
                                                 {pm.brand?.toUpperCase() || t('billing.paymentMethods.card')} •••• {pm.last4}
@@ -215,7 +176,7 @@ export default function PaymentMethodsManager({
                                     </div>
                                     {defaultPaymentMethod?.id === pm.id && (
                                         <Badge variant="default" className="bg-green-500">
-                                            <IconCheck className="w-3 h-3 mr-1" />
+                                            <IconCheck className="mr-1 h-3 w-3" />
                                             {t('billing.paymentMethods.default')}
                                         </Badge>
                                     )}
@@ -224,35 +185,24 @@ export default function PaymentMethodsManager({
                             <CardContent className="space-y-2">
                                 <div className="flex gap-2">
                                     {defaultPaymentMethod?.id !== pm.id && (
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="flex-1"
-                                            onClick={() => handleSetDefault(pm.id)}
-                                        >
+                                        <Button size="sm" variant="outline" className="flex-1" onClick={() => handleSetDefault(pm.id)}>
                                             {t('billing.paymentMethods.setAsDefault')}
                                         </Button>
                                     )}
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                className={defaultPaymentMethod?.id !== pm.id ? '' : 'flex-1'}
-                                            >
-                                                <IconTrash className="w-4 h-4 mr-2" />
+                                            <Button size="sm" variant="destructive" className={defaultPaymentMethod?.id !== pm.id ? '' : 'flex-1'}>
+                                                <IconTrash className="mr-2 h-4 w-4" />
                                                 {t('billing.paymentMethods.remove')}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
-                                                <AlertDialogTitle>
-                                                    {t('billing.paymentMethods.removeMethodTitle')}
-                                                </AlertDialogTitle>
+                                                <AlertDialogTitle>{t('billing.paymentMethods.removeMethodTitle')}</AlertDialogTitle>
                                                 <AlertDialogDescription>
                                                     {t('billing.paymentMethods.removeMethodDescription')}
                                                     {defaultPaymentMethod?.id === pm.id && (
-                                                        <span className="block mt-2 text-yellow-600 dark:text-yellow-500 font-medium">
+                                                        <span className="mt-2 block font-medium text-yellow-600 dark:text-yellow-500">
                                                             {t('billing.paymentMethods.removeDefaultWarning')}
                                                         </span>
                                                     )}
@@ -260,10 +210,7 @@ export default function PaymentMethodsManager({
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>{t('billing.paymentMethods.cancel')}</AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    onClick={() => handleRemove(pm.id)}
-                                                    className="bg-red-600 hover:bg-red-700"
-                                                >
+                                                <AlertDialogAction onClick={() => handleRemove(pm.id)} className="bg-red-600 hover:bg-red-700">
                                                     {t('billing.paymentMethods.yesRemove')}
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>

@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -65,35 +66,36 @@ export default function BillingIndex({
     defaultPaymentMethod,
     invoices,
 }: BillingProps) {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('subscriptions');
 
     return (
         <AppLayout>
-            <Head title="Billing & Assinaturas" />
+            <Head title={t('billing.billingIndex.pageTitle')} />
 
             <div className="container mx-auto py-8 px-4">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        Billing & Assinaturas
+                        {t('billing.billingIndex.heading')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
-                        Gerencie suas assinaturas, métodos de pagamento e histórico de faturas
+                        {t('billing.billingIndex.description')}
                     </p>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-8">
-                        <TabsTrigger value="subscriptions">Assinaturas</TabsTrigger>
-                        <TabsTrigger value="payment-methods">Métodos de Pagamento</TabsTrigger>
-                        <TabsTrigger value="invoices">Histórico de Pagamentos</TabsTrigger>
+                        <TabsTrigger value="subscriptions">{t('billing.billingIndex.tabSubscriptions')}</TabsTrigger>
+                        <TabsTrigger value="payment-methods">{t('billing.billingIndex.tabPaymentMethods')}</TabsTrigger>
+                        <TabsTrigger value="invoices">{t('billing.billingIndex.tabInvoices')}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="subscriptions" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Minhas Assinaturas</CardTitle>
+                                <CardTitle>{t('billing.subscriptionsList.title')}</CardTitle>
                                 <CardDescription>
-                                    Visualize e gerencie suas assinaturas ativas
+                                    {t('billing.subscriptionsList.description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -105,9 +107,9 @@ export default function BillingIndex({
                     <TabsContent value="payment-methods" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Métodos de Pagamento</CardTitle>
+                                <CardTitle>{t('billing.paymentMethods.title')}</CardTitle>
                                 <CardDescription>
-                                    Gerencie seus cartões de crédito e formas de pagamento
+                                    {t('billing.paymentMethods.title')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -123,9 +125,9 @@ export default function BillingIndex({
                     <TabsContent value="invoices" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Histórico de Pagamentos</CardTitle>
+                                <CardTitle>{t('billing.invoiceHistory.title')}</CardTitle>
                                 <CardDescription>
-                                    Visualize e baixe suas faturas anteriores
+                                    {t('billing.invoiceHistory.description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

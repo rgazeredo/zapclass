@@ -6,6 +6,7 @@ import { Head, router } from '@inertiajs/react';
 import { IconArrowLeft, IconEdit, IconPlus, IconTrash, IconWebhook } from '@tabler/icons-react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { WebhookDeleteDialog } from './WebhookDeleteDialog';
 import { WebhookFormModal } from './WebhookFormModal';
 
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export default function WebhooksIndex({ connection }: Props) {
+    const { t } = useTranslation();
     const [webhooks, setWebhooks] = useState<Webhook[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -51,11 +53,11 @@ export default function WebhooksIndex({ connection }: Props) {
             if (response.data.success) {
                 setWebhooks(response.data.webhooks);
             } else {
-                throw new Error(response.data.message || 'Erro ao carregar webhooks');
+                throw new Error(response.data.message || t('whatsapp.webhooksIndex.errorLoading'));
             }
         } catch (error) {
             console.error('Error loading webhooks:', error);
-            const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || error.message : 'Erro ao carregar webhooks';
+            const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || error.message : t('whatsapp.webhooksIndex.errorLoading');
             setError(errorMessage);
         } finally {
             setIsLoading(false);
@@ -94,7 +96,7 @@ export default function WebhooksIndex({ connection }: Props) {
 
     return (
         <AppLayout>
-            <Head title={`Webhooks - ${connection.name}`} />
+            <Head title={t('whatsapp.webhooksIndex.pageTitle', { name: connection.name })} />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
                 {/* Header */}
@@ -106,16 +108,16 @@ export default function WebhooksIndex({ connection }: Props) {
                         <div>
                             <div className="flex items-center gap-2">
                                 <IconWebhook className="h-6 w-6 text-primary" />
-                                <h1 className="text-2xl font-bold">Webhooks</h1>
+                                <h1 className="text-2xl font-bold">{t('whatsapp.webhooksIndex.heading')}</h1>
                             </div>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Conexão: <strong>{connection.name}</strong> ({connection.system_name})
+                                {t('whatsapp.webhooksIndex.connection')} <strong>{connection.name}</strong> ({connection.system_name})
                             </p>
                         </div>
                     </div>
                     <Button onClick={handleAddWebhook}>
                         <IconPlus className="mr-2 h-4 w-4" />
-                        Adicionar Webhook
+                        {t('whatsapp.webhooksIndex.addWebhook')}
                     </Button>
                 </div>
 
@@ -135,7 +137,7 @@ export default function WebhooksIndex({ connection }: Props) {
                             <CardContent className="flex items-center justify-center py-12">
                                 <div className="text-center">
                                     <div className="mb-2 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
-                                    <p className="text-sm text-muted-foreground">Carregando webhooks...</p>
+                                    <p className="text-sm text-muted-foreground">{t('whatsapp.webhooksIndex.loading')}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -143,13 +145,13 @@ export default function WebhooksIndex({ connection }: Props) {
                         <Card>
                             <CardContent className="py-12 text-center">
                                 <IconWebhook className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                                <h3 className="mb-2 text-lg font-semibold">Nenhum webhook cadastrado</h3>
+                                <h3 className="mb-2 text-lg font-semibold">{t('whatsapp.webhooksIndex.noWebhooks')}</h3>
                                 <p className="mb-4 text-sm text-muted-foreground">
-                                    Comece adicionando seu primeiro webhook para receber eventos em tempo real
+                                    {t('whatsapp.webhooksIndex.noWebhooksDescription')}
                                 </p>
                                 <Button onClick={handleAddWebhook}>
                                     <IconPlus className="mr-2 h-4 w-4" />
-                                    Adicionar Primeiro Webhook
+                                    {t('whatsapp.webhooksIndex.addFirstWebhook')}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -163,10 +165,10 @@ export default function WebhooksIndex({ connection }: Props) {
                                             <div className="mb-3 flex items-center gap-2">
                                                 <code className="rounded bg-muted px-3 py-1.5 text-sm font-medium">{webhook.url}</code>
                                                 <Badge variant={webhook.enabled ? 'default' : 'secondary'}>
-                                                    {webhook.enabled ? 'Habilitado' : 'Desabilitado'}
+                                                    {webhook.enabled ? t('whatsapp.webhooksIndex.enabled') : t('whatsapp.webhooksIndex.disabled')}
                                                 </Badge>
                                                 <Badge variant={webhook.synced ? 'default' : 'destructive'}>
-                                                    {webhook.synced ? 'Sincronizado' : 'Não Sincronizado'}
+                                                    {webhook.synced ? t('whatsapp.webhooksIndex.synced') : t('whatsapp.webhooksIndex.notSynced')}
                                                 </Badge>
                                             </div>
 
@@ -174,7 +176,7 @@ export default function WebhooksIndex({ connection }: Props) {
                                             <div className="space-y-2">
                                                 {webhook.events && webhook.events.length > 0 && (
                                                     <div>
-                                                        <span className="text-xs font-medium text-muted-foreground">Eventos:</span>
+                                                        <span className="text-xs font-medium text-muted-foreground">{t('whatsapp.webhooksIndex.events')}</span>
                                                         <div className="mt-1 flex flex-wrap gap-1">
                                                             {webhook.events.map((event) => (
                                                                 <Badge key={event} variant="outline" className="text-xs">
@@ -187,7 +189,7 @@ export default function WebhooksIndex({ connection }: Props) {
 
                                                 {webhook.exclude_events && webhook.exclude_events.length > 0 && (
                                                     <div>
-                                                        <span className="text-xs font-medium text-muted-foreground">Filtros:</span>
+                                                        <span className="text-xs font-medium text-muted-foreground">{t('whatsapp.webhooksIndex.filters')}</span>
                                                         <div className="mt-1 flex flex-wrap gap-1">
                                                             {webhook.exclude_events.map((event) => (
                                                                 <Badge key={event} variant="outline" className="bg-red-50 text-xs text-red-700">
@@ -201,7 +203,7 @@ export default function WebhooksIndex({ connection }: Props) {
 
                                             {/* Metadata */}
                                             <div className="mt-3 text-xs text-muted-foreground">
-                                                Criado em {new Date(webhook.created_at).toLocaleString('pt-BR')}
+                                                {t('whatsapp.webhooksIndex.createdAt')} {new Date(webhook.created_at).toLocaleString('pt-BR')}
                                             </div>
                                         </div>
 

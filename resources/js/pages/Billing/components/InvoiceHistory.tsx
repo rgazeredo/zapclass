@@ -11,6 +11,7 @@ import {
 import { IconDownload, IconExternalLink, IconReceipt } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 interface Invoice {
     id: string;
@@ -29,18 +30,20 @@ interface InvoiceHistoryProps {
 }
 
 export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
+    const { t } = useTranslation();
+
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid':
-                return <Badge variant="default" className="bg-green-500">Pago</Badge>;
+                return <Badge variant="default" className="bg-green-500">{t('billing.invoiceHistory.statusPaid')}</Badge>;
             case 'open':
-                return <Badge variant="secondary">Em Aberto</Badge>;
+                return <Badge variant="secondary">{t('billing.invoiceHistory.statusOpen')}</Badge>;
             case 'void':
-                return <Badge variant="destructive">Cancelado</Badge>;
+                return <Badge variant="destructive">{t('billing.invoiceHistory.statusVoid')}</Badge>;
             case 'uncollectible':
-                return <Badge variant="destructive">Não Cobrável</Badge>;
+                return <Badge variant="destructive">{t('billing.invoiceHistory.statusUncollectible')}</Badge>;
             case 'draft':
-                return <Badge variant="secondary">Rascunho</Badge>;
+                return <Badge variant="secondary">{t('billing.invoiceHistory.statusDraft')}</Badge>;
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
@@ -62,10 +65,10 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
             <div className="text-center py-12">
                 <IconReceipt className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">
-                    Nenhuma fatura encontrada
+                    {t('billing.invoiceHistory.noInvoices')}
                 </p>
                 <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                    Suas faturas aparecerão aqui assim que forem geradas
+                    {t('billing.invoiceHistory.noInvoicesDescription')}
                 </p>
             </div>
         );
@@ -76,18 +79,18 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Número</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Valor</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
+                        <TableHead>{t('billing.invoiceHistory.tableHeaders.number')}</TableHead>
+                        <TableHead>{t('billing.invoiceHistory.tableHeaders.date')}</TableHead>
+                        <TableHead>{t('billing.invoiceHistory.tableHeaders.amount')}</TableHead>
+                        <TableHead>{t('billing.invoiceHistory.tableHeaders.status')}</TableHead>
+                        <TableHead className="text-right">{t('billing.invoiceHistory.tableHeaders.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {invoices.map((invoice) => (
                         <TableRow key={invoice.id}>
                             <TableCell className="font-medium">
-                                {invoice.number || `Fatura ${invoice.id.substring(0, 8)}`}
+                                {invoice.number || t('billing.invoiceHistory.invoiceNumber', { id: invoice.id.substring(0, 8) })}
                             </TableCell>
                             <TableCell>
                                 {format(new Date(invoice.created), 'dd/MM/yyyy HH:mm', {
@@ -101,7 +104,7 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
                                     </div>
                                     {invoice.amount_due > 0 && invoice.amount_due !== invoice.amount_paid && (
                                         <div className="text-xs text-gray-500">
-                                            Devido: {formatCurrency(invoice.amount_due, invoice.currency)}
+                                            {t('billing.invoiceHistory.amountDue')} {formatCurrency(invoice.amount_due, invoice.currency)}
                                         </div>
                                     )}
                                 </div>
@@ -116,7 +119,7 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
                                             onClick={() => window.open(invoice.hosted_invoice_url, '_blank')}
                                         >
                                             <IconExternalLink className="w-4 h-4 mr-2" />
-                                            Visualizar
+                                            {t('billing.invoiceHistory.viewButton')}
                                         </Button>
                                     )}
                                     {invoice.invoice_pdf && invoice.status === 'paid' && (
@@ -126,7 +129,7 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
                                             onClick={() => handleDownload(invoice.id)}
                                         >
                                             <IconDownload className="w-4 h-4 mr-2" />
-                                            Download
+                                            {t('billing.invoiceHistory.downloadButton')}
                                         </Button>
                                     )}
                                 </div>
@@ -138,13 +141,13 @@ export default function InvoiceHistory({ invoices }: InvoiceHistoryProps) {
 
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                    Informações sobre as Faturas
+                    {t('billing.invoiceHistory.infoTitle')}
                 </h4>
                 <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                    <li>• As faturas são geradas automaticamente no início de cada ciclo de cobrança</li>
-                    <li>• Você pode baixar o PDF das faturas pagas a qualquer momento</li>
-                    <li>• Em caso de falha no pagamento, você receberá uma notificação por email</li>
-                    <li>• Todas as faturas são armazenadas de forma segura no Stripe</li>
+                    <li>• {t('billing.invoiceHistory.infoList.automatic')}</li>
+                    <li>• {t('billing.invoiceHistory.infoList.download')}</li>
+                    <li>• {t('billing.invoiceHistory.infoList.failureNotification')}</li>
+                    <li>• {t('billing.invoiceHistory.infoList.stripeStorage')}</li>
                 </ul>
             </div>
         </div>

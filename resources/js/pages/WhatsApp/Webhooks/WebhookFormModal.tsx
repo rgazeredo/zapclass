@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { IconCheck, IconEdit, IconInfoCircle, IconWebhook, IconX } from '@tabler/icons-react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Webhook {
     id: number;
@@ -150,6 +151,7 @@ const excludeMessagesInfo: Record<string, { title: string; description: string; 
 };
 
 export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }: WebhookFormModalProps) {
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | React.ReactNode | null>(null);
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -310,7 +312,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
             if (response.data.success) {
                 onSaved();
             } else {
-                throw new Error(response.data.message || 'Erro ao salvar webhook');
+                throw new Error(response.data.message || t('whatsapp.webhookForm.errorSaving'));
             }
         } catch (error) {
             console.error('Error saving webhook:', error);
@@ -326,10 +328,10 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                             <p className="font-medium">{error.response.data.message}</p>
                             {existingWebhook && (
                                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                                    <p className="text-sm font-medium text-amber-900">Webhook existente:</p>
+                                    <p className="text-sm font-medium text-amber-900">{t('whatsapp.webhookForm.existingWebhook')}</p>
                                     <code className="mt-1 block text-xs text-amber-700">{existingWebhook.url}</code>
                                     {existingWebhook.events && existingWebhook.events.length > 0 && (
-                                        <p className="mt-1 text-xs text-amber-600">Eventos: {existingWebhook.events.join(', ')}</p>
+                                        <p className="mt-1 text-xs text-amber-600">{t('whatsapp.webhookForm.events')} {existingWebhook.events.join(', ')}</p>
                                     )}
                                 </div>
                             )}
@@ -346,7 +348,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                             <div className="space-y-2">
                                 <p className="font-medium">{message}</p>
                                 <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                                    <p className="text-sm font-medium text-red-900">Filtros conflitantes:</p>
+                                    <p className="text-sm font-medium text-red-900">{t('whatsapp.webhookForm.conflictingFilters')}</p>
                                     <div className="mt-2 flex gap-2">
                                         {conflictingFilters.map((filter: string) => (
                                             <code key={filter} className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
@@ -356,19 +358,19 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                     </div>
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                    💡 Esses filtros excluem tipos opostos de mensagens. Ativar ambos significa que nenhuma mensagem seria recebida.
+                                    {t('whatsapp.webhookForm.conflictingFiltersExplanation')}
                                 </p>
                             </div>,
                         );
                     } else {
-                        setError(message || 'Erro de validação');
+                        setError(message || t('whatsapp.webhookForm.validationError'));
                     }
                 } else {
                     const errorMessage = error.response?.data?.message || error.message;
                     setError(errorMessage);
                 }
             } else {
-                setError('Erro ao salvar webhook. Tente novamente.');
+                setError(t('whatsapp.webhookForm.errorTryAgain'));
             }
         } finally {
             setIsLoading(false);
@@ -381,9 +383,9 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <IconWebhook className="h-5 w-5" />
-                        {webhook ? 'Editar Webhook' : 'Adicionar Novo Webhook'}
+                        {webhook ? t('whatsapp.webhookForm.editTitle') : t('whatsapp.webhookForm.addTitle')}
                     </DialogTitle>
-                    <DialogDescription>Configure a URL e os eventos que deseja receber</DialogDescription>
+                    <DialogDescription>{t('whatsapp.webhookForm.description')}</DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4">
@@ -402,10 +404,9 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                         <div className="flex items-start gap-2">
                             <IconWebhook className="mt-0.5 h-5 w-5 text-blue-600" />
                             <div>
-                                <p className="text-sm font-medium text-blue-900">Sistema de Proxy de Webhooks</p>
+                                <p className="text-sm font-medium text-blue-900">{t('whatsapp.webhookForm.proxyTitle')}</p>
                                 <p className="mt-1 text-xs text-blue-700">
-                                    Os webhooks são recebidos primeiro pelo nosso servidor e depois encaminhados para sua URL. Isso garante segurança e
-                                    permite filtros adicionais.
+                                    {t('whatsapp.webhookForm.proxyDescription')}
                                 </p>
                             </div>
                         </div>
@@ -413,22 +414,22 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
 
                     {/* URL Field */}
                     <div>
-                        <Label htmlFor="webhook-url">URL do Webhook</Label>
+                        <Label htmlFor="webhook-url">{t('whatsapp.webhookForm.urlLabel')}</Label>
                         <Input
                             id="webhook-url"
                             type="url"
-                            placeholder="https://seu-site.com/webhook"
+                            placeholder={t('whatsapp.webhookForm.urlPlaceholder')}
                             value={formData.url}
                             onChange={(e) => setFormData((prev) => ({ ...prev, url: e.target.value }))}
                         />
-                        <p className="mt-1 text-xs text-gray-500">Esta é a URL do seu servidor onde você receberá os eventos do WhatsApp</p>
+                        <p className="mt-1 text-xs text-gray-500">{t('whatsapp.webhookForm.urlHelp')}</p>
                     </div>
 
                     {/* Enabled Toggle */}
                     <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                            <Label htmlFor="webhook-enabled">Webhook Habilitado</Label>
-                            <p className="text-sm text-gray-500">Quando desabilitado, o webhook não receberá eventos</p>
+                            <Label htmlFor="webhook-enabled">{t('whatsapp.webhookForm.enabledLabel')}</Label>
+                            <p className="text-sm text-gray-500">{t('whatsapp.webhookForm.enabledHelp')}</p>
                         </div>
                         <Switch
                             id="webhook-enabled"
@@ -455,16 +456,16 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                 }}
                             />
                             <Label htmlFor="advanced-options" className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Avançado
+                                {t('whatsapp.webhookForm.advancedLabel')}
                             </Label>
-                            <p className="text-sm text-gray-500">Selecionar eventos específicos e filtros de mensagens</p>
+                            <p className="text-sm text-gray-500">{t('whatsapp.webhookForm.advancedHelp')}</p>
                         </div>
 
                         {/* Events Section */}
                         {showAdvanced && (
                             <div>
                                 <div className="mb-2 flex items-center gap-2">
-                                    <Label>Escutar eventos</Label>
+                                    <Label>{t('whatsapp.webhookForm.eventsLabel')}</Label>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -472,13 +473,13 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                             </TooltipTrigger>
                                             <TooltipContent side="right" className="max-w-sm">
                                                 <p className="text-xs">
-                                                    Clique em cada evento para ver detalhes. Eventos com ⚠️ geram alto volume de requisições.
+                                                    {t('whatsapp.webhookForm.eventsTooltip')}
                                                 </p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
-                                <p className="mb-2 text-sm text-gray-500">Clique nos eventos para selecioná-los. Passe o mouse para ver detalhes.</p>
+                                <p className="mb-2 text-sm text-gray-500">{t('whatsapp.webhookForm.eventsHelp')}</p>
                                 <div className="grid grid-cols-4 gap-2">
                                     {availableEvents.map((event) => {
                                         const isHighVolume = highVolumeEvents.includes(event);
@@ -504,7 +505,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                                 {isHighVolume && !isSelected && <span className="text-[10px] font-semibold text-amber-600">⚠️</span>}
                                                                 {isSelected && <IconCheck className="h-3 w-3" />}
                                                             </div>
-                                                            {isHighVolume && <p className="mt-0.5 text-[10px] text-gray-600">Alto volume</p>}
+                                                            {isHighVolume && <p className="mt-0.5 text-[10px] text-gray-600">{t('whatsapp.webhookForm.highVolume')}</p>}
                                                         </div>
                                                     </TooltipTrigger>
                                                     {info && (
@@ -513,7 +514,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                                 <p className="text-sm font-semibold">{info.title}</p>
                                                                 <p className="text-xs">{info.description}</p>
                                                                 <div className="text-xs">
-                                                                    <p className="mb-1 font-medium">Exemplos:</p>
+                                                                    <p className="mb-1 font-medium">{t('whatsapp.webhookForm.examples')}</p>
                                                                     <ul className="list-inside list-disc space-y-0.5 text-gray-300">
                                                                         {info.examples.map((example, idx) => (
                                                                             <li key={idx}>{example}</li>
@@ -535,19 +536,19 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                         <div className="flex items-start gap-2">
                                             <IconX className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
                                             <div>
-                                                <p className="text-sm font-medium text-amber-900">⚠️ Eventos de alto volume selecionados</p>
+                                                <p className="text-sm font-medium text-amber-900">{t('whatsapp.webhookForm.highVolumeWarning')}</p>
                                                 <div className="mt-1 space-y-1 text-xs text-amber-700">
                                                     {formData.events.includes('presence') && (
                                                         <p>
-                                                            <strong>presence:</strong> Pode gerar milhares de webhooks por dia e sobrecarregar seu servidor.
+                                                            <strong>presence:</strong> {t('whatsapp.webhookForm.presenceWarning')}
                                                         </p>
                                                     )}
                                                     {formData.events.includes('history') && (
                                                         <p>
-                                                            <strong>history:</strong> Pode enviar centenas de mensagens antigas de uma vez.
+                                                            <strong>history:</strong> {t('whatsapp.webhookForm.historyWarning')}
                                                         </p>
                                                     )}
-                                                    <p className="mt-2 font-medium">⚠️ Use apenas se realmente necessário.</p>
+                                                    <p className="mt-2 font-medium">{t('whatsapp.webhookForm.useOnlyIfNeeded')}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -562,20 +563,20 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                 <div className="rounded-lg bg-blue-50 p-3">
                                     <div className="flex items-center gap-2">
                                         <IconCheck className="h-4 w-4 text-blue-600" />
-                                        <span className="text-sm font-medium text-blue-800">Eventos recomendados serão escutados</span>
+                                        <span className="text-sm font-medium text-blue-800">{t('whatsapp.webhookForm.recommendedEvents')}</span>
                                     </div>
                                     <p className="mt-1 text-xs text-blue-600">{defaultEvents.join(', ')}</p>
                                     <p className="mt-2 text-xs text-gray-600">
-                                        💡 Eventos de alto volume foram excluídos. Ative o modo Avançado se precisar deles.
+                                        {t('whatsapp.webhookForm.highVolumeExcluded')}
                                     </p>
                                 </div>
                                 <div className="rounded-lg border border-green-200 bg-green-50 p-3">
                                     <div className="flex items-center gap-2">
                                         <IconCheck className="h-4 w-4 text-green-600" />
-                                        <span className="text-sm font-medium text-green-800">Proteção contra loops ativada</span>
+                                        <span className="text-sm font-medium text-green-800">{t('whatsapp.webhookForm.loopProtection')}</span>
                                     </div>
                                     <p className="mt-1 text-xs text-green-700">
-                                        Mensagens via API (<strong>wasSentByApi</strong>) filtradas automaticamente. Ative o modo Avançado para personalizar.
+                                        {t('whatsapp.webhookForm.loopProtectionDescription')}
                                     </p>
                                 </div>
                             </div>
@@ -585,14 +586,14 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                         {showAdvanced && (
                             <div className="mt-4 border-t border-gray-200 pt-4">
                                 <div className="mb-2 flex items-center gap-2">
-                                    <Label>Filtros de Mensagens</Label>
+                                    <Label>{t('whatsapp.webhookForm.filtersLabel')}</Label>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <IconInfoCircle className="h-4 w-4 cursor-help text-gray-400" />
                                             </TooltipTrigger>
                                             <TooltipContent side="right" className="max-w-sm">
-                                                <p className="text-xs">Use filtros para EXCLUIR mensagens específicas. Útil para evitar loops infinitos.</p>
+                                                <p className="text-xs">{t('whatsapp.webhookForm.filtersTooltip')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -602,15 +603,15 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                     <div className="flex items-start gap-2">
                                         <IconCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
                                         <div>
-                                            <p className="text-xs font-medium text-amber-900">Recomendado: wasSentByApi</p>
+                                            <p className="text-xs font-medium text-amber-900">{t('whatsapp.webhookForm.recommendedFilter')}</p>
                                             <p className="mt-1 text-xs text-amber-700">
-                                                Filtramos mensagens via API para evitar loops. Personalize os filtros abaixo.
+                                                {t('whatsapp.webhookForm.recommendedFilterDescription')}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <p className="mb-3 text-sm text-gray-500">Selecione tipos de mensagem para EXCLUIR. Passe o mouse para detalhes.</p>
+                                <p className="mb-3 text-sm text-gray-500">{t('whatsapp.webhookForm.filtersHelp')}</p>
                                 <div className="grid grid-cols-3 gap-2">
                                     {availableExcludeMessages.map((filter) => {
                                         const isSelected = formData.exclude_events.includes(filter);
@@ -641,15 +642,15 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                                 <p className="text-sm font-semibold">{info.title}</p>
                                                                 <p className="text-xs">{info.description}</p>
                                                                 <div className="mt-2 rounded bg-blue-500/10 p-2">
-                                                                    <p className="text-xs font-medium text-blue-200">Caso de uso:</p>
+                                                                    <p className="text-xs font-medium text-blue-200">{t('whatsapp.webhookForm.useCase')}</p>
                                                                     <p className="mt-1 text-xs text-gray-300">{info.useCase}</p>
                                                                 </div>
                                                                 {info.conflictsWith && (
                                                                     <div className="mt-2 rounded bg-amber-500/10 p-2">
-                                                                        <p className="text-xs font-medium text-amber-200">⚠️ Mutuamente exclusivo com:</p>
+                                                                        <p className="text-xs font-medium text-amber-200">{t('whatsapp.webhookForm.mutuallyExclusive')}</p>
                                                                         <code className="mt-1 block text-xs text-amber-300">{info.conflictsWith}</code>
                                                                         <p className="mt-1 text-[10px] text-gray-400">
-                                                                            Ao selecionar este filtro, o conflitante será automaticamente desmarcado
+                                                                            {t('whatsapp.webhookForm.autoDeselect')}
                                                                         </p>
                                                                     </div>
                                                                 )}
@@ -668,9 +669,9 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                         <div className="flex items-start gap-2">
                                             <IconCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
                                             <div>
-                                                <p className="text-sm font-medium text-blue-900">Filtros ativos</p>
+                                                <p className="text-sm font-medium text-blue-900">{t('whatsapp.webhookForm.activeFilters')}</p>
                                                 <p className="mt-1 text-xs text-blue-700">
-                                                    Você não receberá webhooks para: <strong>{formData.exclude_events.join(', ')}</strong>
+                                                    {t('whatsapp.webhookForm.activeFiltersDescription', { filters: formData.exclude_events.join(', ') })}
                                                 </p>
                                             </div>
                                         </div>
@@ -683,10 +684,10 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                     {/* Actions */}
                     <div className="flex gap-2 pt-4">
                         <Button onClick={handleSave} disabled={isLoading || !formData.url}>
-                            {isLoading ? 'Salvando...' : webhook ? 'Atualizar Webhook' : 'Criar Webhook'}
+                            {isLoading ? t('whatsapp.webhookForm.saving') : webhook ? t('whatsapp.webhookForm.update') : t('whatsapp.webhookForm.create')}
                         </Button>
                         <Button variant="outline" onClick={onClose}>
-                            Cancelar
+                            {t('whatsapp.webhookForm.cancel')}
                         </Button>
                     </div>
                 </div>

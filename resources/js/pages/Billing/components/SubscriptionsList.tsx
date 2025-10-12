@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 interface Subscription {
     id: number;
@@ -44,28 +45,30 @@ interface SubscriptionsListProps {
 }
 
 export default function SubscriptionsList({ subscriptions }: SubscriptionsListProps) {
+    const { t } = useTranslation();
+
     const getStatusBadge = (subscription: Subscription) => {
         if (subscription.on_trial) {
-            return <Badge variant="secondary">Em Período de Teste</Badge>;
+            return <Badge variant="secondary">{t('billing.subscriptionsList.statusOnTrial')}</Badge>;
         }
 
         if (subscription.cancelled && subscription.on_grace_period) {
-            return <Badge variant="destructive">Cancelada (Período de Carência)</Badge>;
+            return <Badge variant="destructive">{t('billing.subscriptionsList.statusCancelledGrace')}</Badge>;
         }
 
         if (subscription.cancelled) {
-            return <Badge variant="destructive">Cancelada</Badge>;
+            return <Badge variant="destructive">{t('billing.subscriptionsList.statusCancelled')}</Badge>;
         }
 
         switch (subscription.status) {
             case 'active':
-                return <Badge variant="default" className="bg-green-500">Ativa</Badge>;
+                return <Badge variant="default" className="bg-green-500">{t('billing.subscriptionsList.statusActive')}</Badge>;
             case 'past_due':
-                return <Badge variant="destructive">Pagamento Atrasado</Badge>;
+                return <Badge variant="destructive">{t('billing.subscriptionsList.statusPastDue')}</Badge>;
             case 'unpaid':
-                return <Badge variant="destructive">Não Paga</Badge>;
+                return <Badge variant="destructive">{t('billing.subscriptionsList.statusUnpaid')}</Badge>;
             case 'incomplete':
-                return <Badge variant="secondary">Incompleta</Badge>;
+                return <Badge variant="secondary">{t('billing.subscriptionsList.statusIncomplete')}</Badge>;
             default:
                 return <Badge variant="secondary">{subscription.status}</Badge>;
         }
@@ -101,7 +104,7 @@ export default function SubscriptionsList({ subscriptions }: SubscriptionsListPr
         return (
             <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400">
-                    Você ainda não possui assinaturas ativas.
+                    {t('billing.subscriptionsList.noSubscriptions')}
                 </p>
             </div>
         );
@@ -112,12 +115,12 @@ export default function SubscriptionsList({ subscriptions }: SubscriptionsListPr
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Data de Início</TableHead>
-                        <TableHead>Término do Trial</TableHead>
-                        <TableHead>Data de Término</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
+                        <TableHead>{t('billing.subscriptionsList.tableHeaders.type')}</TableHead>
+                        <TableHead>{t('billing.subscriptionsList.tableHeaders.status')}</TableHead>
+                        <TableHead>{t('billing.subscriptionsList.tableHeaders.startDate')}</TableHead>
+                        <TableHead>{t('billing.subscriptionsList.tableHeaders.trialEnd')}</TableHead>
+                        <TableHead>{t('billing.subscriptionsList.tableHeaders.endDate')}</TableHead>
+                        <TableHead className="text-right">{t('billing.subscriptionsList.tableHeaders.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -153,35 +156,33 @@ export default function SubscriptionsList({ subscriptions }: SubscriptionsListPr
                                         variant="outline"
                                         onClick={() => handleResumeSubscription(subscription.id)}
                                     >
-                                        Reativar
+                                        {t('billing.subscriptionsList.resumeButton')}
                                     </Button>
                                 ) : subscription.is_active && !subscription.cancelled ? (
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button size="sm" variant="destructive">
-                                                Cancelar
+                                                {t('billing.subscriptionsList.cancelButton')}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Tem certeza que deseja cancelar?
+                                                    {t('billing.subscriptionsList.cancelDialogTitle')}
                                                 </AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Ao cancelar sua assinatura, você continuará tendo
-                                                    acesso aos recursos até o final do período já pago.
-                                                    Após isso, sua conta será desativada.
+                                                    {t('billing.subscriptionsList.cancelDialogDescription')}
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel>Voltar</AlertDialogCancel>
+                                                <AlertDialogCancel>{t('billing.subscriptionsList.cancelDialogBack')}</AlertDialogCancel>
                                                 <AlertDialogAction
                                                     onClick={() =>
                                                         handleCancelSubscription(subscription.id)
                                                     }
                                                     className="bg-red-600 hover:bg-red-700"
                                                 >
-                                                    Sim, cancelar assinatura
+                                                    {t('billing.subscriptionsList.cancelDialogConfirm')}
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
