@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { IconCheck, IconEdit, IconInfoCircle, IconWebhook, IconX } from '@tabler/icons-react';
+import { IconCheck, IconInfoCircle, IconWebhook, IconX } from '@tabler/icons-react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -331,7 +330,9 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                     <p className="text-sm font-medium text-amber-900">{t('whatsapp.webhookForm.existingWebhook')}</p>
                                     <code className="mt-1 block text-xs text-amber-700">{existingWebhook.url}</code>
                                     {existingWebhook.events && existingWebhook.events.length > 0 && (
-                                        <p className="mt-1 text-xs text-amber-600">{t('whatsapp.webhookForm.events')} {existingWebhook.events.join(', ')}</p>
+                                        <p className="mt-1 text-xs text-amber-600">
+                                            {t('whatsapp.webhookForm.events')} {existingWebhook.events.join(', ')}
+                                        </p>
                                     )}
                                 </div>
                             )}
@@ -357,9 +358,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-600">
-                                    {t('whatsapp.webhookForm.conflictingFiltersExplanation')}
-                                </p>
+                                <p className="text-sm text-gray-600">{t('whatsapp.webhookForm.conflictingFiltersExplanation')}</p>
                             </div>,
                         );
                     } else {
@@ -405,9 +404,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                             <IconWebhook className="mt-0.5 h-5 w-5 text-blue-600" />
                             <div>
                                 <p className="text-sm font-medium text-blue-900">{t('whatsapp.webhookForm.proxyTitle')}</p>
-                                <p className="mt-1 text-xs text-blue-700">
-                                    {t('whatsapp.webhookForm.proxyDescription')}
-                                </p>
+                                <p className="mt-1 text-xs text-blue-700">{t('whatsapp.webhookForm.proxyDescription')}</p>
                             </div>
                         </div>
                     </div>
@@ -455,7 +452,10 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                     }
                                 }}
                             />
-                            <Label htmlFor="advanced-options" className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            <Label
+                                htmlFor="advanced-options"
+                                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
                                 {t('whatsapp.webhookForm.advancedLabel')}
                             </Label>
                             <p className="text-sm text-gray-500">{t('whatsapp.webhookForm.advancedHelp')}</p>
@@ -472,9 +472,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                 <IconInfoCircle className="h-4 w-4 cursor-help text-gray-400" />
                                             </TooltipTrigger>
                                             <TooltipContent side="right" className="max-w-sm">
-                                                <p className="text-xs">
-                                                    {t('whatsapp.webhookForm.eventsTooltip')}
-                                                </p>
+                                                <p className="text-xs">{t('whatsapp.webhookForm.eventsTooltip')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -502,10 +500,16 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                         >
                                                             <div className="flex items-center justify-between gap-1">
                                                                 <span className="text-xs font-medium">{event}</span>
-                                                                {isHighVolume && !isSelected && <span className="text-[10px] font-semibold text-amber-600">⚠️</span>}
+                                                                {isHighVolume && !isSelected && (
+                                                                    <span className="text-[10px] font-semibold text-amber-600">⚠️</span>
+                                                                )}
                                                                 {isSelected && <IconCheck className="h-3 w-3" />}
                                                             </div>
-                                                            {isHighVolume && <p className="mt-0.5 text-[10px] text-gray-600">{t('whatsapp.webhookForm.highVolume')}</p>}
+                                                            {isHighVolume && (
+                                                                <p className="mt-0.5 text-[10px] text-gray-600">
+                                                                    {t('whatsapp.webhookForm.highVolume')}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     </TooltipTrigger>
                                                     {info && (
@@ -566,18 +570,14 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                         <span className="text-sm font-medium text-blue-800">{t('whatsapp.webhookForm.recommendedEvents')}</span>
                                     </div>
                                     <p className="mt-1 text-xs text-blue-600">{defaultEvents.join(', ')}</p>
-                                    <p className="mt-2 text-xs text-gray-600">
-                                        {t('whatsapp.webhookForm.highVolumeExcluded')}
-                                    </p>
+                                    <p className="mt-2 text-xs text-gray-600">{t('whatsapp.webhookForm.highVolumeExcluded')}</p>
                                 </div>
                                 <div className="rounded-lg border border-green-200 bg-green-50 p-3">
                                     <div className="flex items-center gap-2">
                                         <IconCheck className="h-4 w-4 text-green-600" />
                                         <span className="text-sm font-medium text-green-800">{t('whatsapp.webhookForm.loopProtection')}</span>
                                     </div>
-                                    <p className="mt-1 text-xs text-green-700">
-                                        {t('whatsapp.webhookForm.loopProtectionDescription')}
-                                    </p>
+                                    <p className="mt-1 text-xs text-green-700">{t('whatsapp.webhookForm.loopProtectionDescription')}</p>
                                 </div>
                             </div>
                         )}
@@ -604,9 +604,7 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                         <IconCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
                                         <div>
                                             <p className="text-xs font-medium text-amber-900">{t('whatsapp.webhookForm.recommendedFilter')}</p>
-                                            <p className="mt-1 text-xs text-amber-700">
-                                                {t('whatsapp.webhookForm.recommendedFilterDescription')}
-                                            </p>
+                                            <p className="mt-1 text-xs text-amber-700">{t('whatsapp.webhookForm.recommendedFilterDescription')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -623,14 +621,18 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                     <TooltipTrigger asChild>
                                                         <div
                                                             className={`cursor-pointer rounded border p-3 text-sm transition-colors ${
-                                                                isSelected ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-200 hover:border-gray-300'
+                                                                isSelected
+                                                                    ? 'border-red-500 bg-red-50 text-red-700'
+                                                                    : 'border-gray-200 hover:border-gray-300'
                                                             }`}
                                                             onClick={() => toggleEventSelection(filter, 'exclude_events')}
                                                         >
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <div className="flex-1">
                                                                     <span className="block text-xs font-medium">{filter}</span>
-                                                                    {info && <span className="mt-0.5 block text-[10px] text-gray-500">{info.title}</span>}
+                                                                    {info && (
+                                                                        <span className="mt-0.5 block text-[10px] text-gray-500">{info.title}</span>
+                                                                    )}
                                                                 </div>
                                                                 {isSelected && <IconCheck className="h-3 w-3 flex-shrink-0" />}
                                                             </div>
@@ -642,13 +644,19 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                                                 <p className="text-sm font-semibold">{info.title}</p>
                                                                 <p className="text-xs">{info.description}</p>
                                                                 <div className="mt-2 rounded bg-blue-500/10 p-2">
-                                                                    <p className="text-xs font-medium text-blue-200">{t('whatsapp.webhookForm.useCase')}</p>
+                                                                    <p className="text-xs font-medium text-blue-200">
+                                                                        {t('whatsapp.webhookForm.useCase')}
+                                                                    </p>
                                                                     <p className="mt-1 text-xs text-gray-300">{info.useCase}</p>
                                                                 </div>
                                                                 {info.conflictsWith && (
                                                                     <div className="mt-2 rounded bg-amber-500/10 p-2">
-                                                                        <p className="text-xs font-medium text-amber-200">{t('whatsapp.webhookForm.mutuallyExclusive')}</p>
-                                                                        <code className="mt-1 block text-xs text-amber-300">{info.conflictsWith}</code>
+                                                                        <p className="text-xs font-medium text-amber-200">
+                                                                            {t('whatsapp.webhookForm.mutuallyExclusive')}
+                                                                        </p>
+                                                                        <code className="mt-1 block text-xs text-amber-300">
+                                                                            {info.conflictsWith}
+                                                                        </code>
                                                                         <p className="mt-1 text-[10px] text-gray-400">
                                                                             {t('whatsapp.webhookForm.autoDeselect')}
                                                                         </p>
@@ -671,7 +679,9 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                                             <div>
                                                 <p className="text-sm font-medium text-blue-900">{t('whatsapp.webhookForm.activeFilters')}</p>
                                                 <p className="mt-1 text-xs text-blue-700">
-                                                    {t('whatsapp.webhookForm.activeFiltersDescription', { filters: formData.exclude_events.join(', ') })}
+                                                    {t('whatsapp.webhookForm.activeFiltersDescription', {
+                                                        filters: formData.exclude_events.join(', '),
+                                                    })}
                                                 </p>
                                             </div>
                                         </div>
@@ -684,7 +694,11 @@ export function WebhookFormModal({ open, onClose, connection, webhook, onSaved }
                     {/* Actions */}
                     <div className="flex gap-2 pt-4">
                         <Button onClick={handleSave} disabled={isLoading || !formData.url}>
-                            {isLoading ? t('whatsapp.webhookForm.saving') : webhook ? t('whatsapp.webhookForm.update') : t('whatsapp.webhookForm.create')}
+                            {isLoading
+                                ? t('whatsapp.webhookForm.saving')
+                                : webhook
+                                  ? t('whatsapp.webhookForm.update')
+                                  : t('whatsapp.webhookForm.create')}
                         </Button>
                         <Button variant="outline" onClick={onClose}>
                             {t('whatsapp.webhookForm.cancel')}
