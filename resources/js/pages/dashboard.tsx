@@ -3,18 +3,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem, type User } from '@/types';
-import { Head } from '@inertiajs/react';
+import billing from '@/routes/billing';
+import whatsapp from '@/routes/whatsapp';
+import api from '@/routes/api';
+import { type BreadcrumbItem, type User, type WhatsAppConnection } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import {
     IconBuilding,
     IconCalendar,
-    IconBook,
     IconUser,
-    IconHeadphones,
     IconSettings,
     IconUsersGroup,
     IconChartBar,
-    IconShield
+    IconShield,
+    IconBrandWhatsapp,
+    IconWebhook,
+    IconCreditCard,
+    IconBook,
+    IconSparkles,
+    IconFileDescription,
+    IconCircleCheck,
+    IconCircleX
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,10 +39,39 @@ interface DashboardProps {
             };
         };
     };
+    connections?: WhatsAppConnection[];
+    connectionsCount?: number;
+    connectedCount?: number;
+    subscriptions?: Array<{
+        id: string;
+        name: string;
+        stripe_status: string;
+        stripe_price?: string;
+        trial_ends_at?: string;
+        ends_at?: string;
+    }>;
+    webhooksCount?: number;
 }
 
-function ClientDashboard({ tenant }: { tenant?: DashboardProps['auth']['user']['tenant'] }) {
+function ClientDashboard({
+    tenant,
+    connections = [],
+    connectionsCount = 0,
+    connectedCount = 0,
+    subscriptions = [],
+    webhooksCount = 0
+}: {
+    tenant?: DashboardProps['auth']['user']['tenant'];
+    connections?: WhatsAppConnection[];
+    connectionsCount?: number;
+    connectedCount?: number;
+    subscriptions?: DashboardProps['subscriptions'];
+    webhooksCount?: number;
+}) {
     const { t } = useTranslation();
+
+    const activeSubscription = subscriptions?.find(sub => sub.stripe_status === 'active' || sub.stripe_status === 'trialing');
+
     return (
         <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
             {tenant && (
@@ -49,135 +87,210 @@ function ClientDashboard({ tenant }: { tenant?: DashboardProps['auth']['user']['
                     </CardHeader>
                 </Card>
             )}
+
+            {/* Statistics Cards */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">{t('dashboard.myClasses')}</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <IconBrandWhatsapp className="h-5 w-5" />
+                            {t('dashboard.whatsappConnections')}
+                        </CardTitle>
                         <CardDescription>
-                            {t('dashboard.trackEnrolledClasses')}
+                            {t('dashboard.connectionsOverview')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-blue-600 mb-2">
-                            5
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <div className="text-3xl font-bold text-blue-600">
+                                    {connectionsCount}
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                    {t('dashboard.connectionsContracted')}
+                                </p>
+                            </div>
+                            <div>
+                                <div className="text-3xl font-bold text-green-600">
+                                    {connectedCount}
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                    {t('dashboard.connectionsActive')}
+                                </p>
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-600">
-                            {t('dashboard.activeClasses')}
-                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">{t('dashboard.progress')}</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <IconCreditCard className="h-5 w-5" />
+                            {t('dashboard.mySubscriptions')}
+                        </CardTitle>
                         <CardDescription>
-                            {t('dashboard.yourOverallProgress')}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-green-600 mb-2">
-                            75%
-                        </div>
-                        <p className="text-sm text-gray-600">
-                            {t('dashboard.completed')}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">{t('dashboard.nextClass')}</CardTitle>
-                        <CardDescription>
-                            {t('dashboard.yourNextActivity')}
+                            {t('dashboard.activeSubscriptions')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="text-lg font-semibold text-gray-900 mb-1">
-                            {t('dashboard.mathematics')}
+                            {activeSubscription ? activeSubscription.name : t('dashboard.noActivePlan')}
                         </div>
                         <p className="text-sm text-gray-600">
-                            {t('dashboard.today')}, 14:00
+                            {activeSubscription ? t('dashboard.activePlan') : ''}
+                        </p>
+                        <Link href={billing.index().url}>
+                            <Button variant="link" className="px-0 mt-2">
+                                {t('dashboard.viewSubscriptions')} →
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <IconWebhook className="h-5 w-5" />
+                            {t('dashboard.webhooks')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('dashboard.configuredWebhooks')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-purple-600 mb-2">
+                            {webhooksCount}
+                        </div>
+                        <p className="text-sm text-gray-600">
+                            {webhooksCount === 1 ? t('dashboard.webhook') : t('dashboard.webhooks_plural')}
                         </p>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
+                {/* My Connections */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('dashboard.recentClasses')}</CardTitle>
+                        <CardTitle>{t('dashboard.myConnections')}</CardTitle>
                         <CardDescription>
-                            {t('dashboard.yourLatestActivities')}
+                            {t('dashboard.connectedConnections')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <h4 className="font-medium">{t('dashboard.portuguese')}</h4>
-                                    <p className="text-sm text-gray-600">Aula 15 - {t('dashboard.grammar')}</p>
+                        <div className="space-y-3">
+                            {connections.length > 0 ? (
+                                connections.slice(0, 5).map((connection) => (
+                                    <div key={connection.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <IconBrandWhatsapp className="h-5 w-5 text-green-600" />
+                                            <div>
+                                                <h4 className="font-medium">{connection.name}</h4>
+                                                <p className="text-sm text-gray-600">{connection.phone || t('whatsapp.notDefined')}</p>
+                                            </div>
+                                        </div>
+                                        <Badge variant={connection.status === 'connected' ? 'default' : 'secondary'}>
+                                            {connection.status === 'connected' ? (
+                                                <span className="flex items-center gap-1">
+                                                    <IconCircleCheck className="h-3 w-3" />
+                                                    {t('dashboard.connected')}
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-1">
+                                                    <IconCircleX className="h-3 w-3" />
+                                                    {t('dashboard.disconnected')}
+                                                </span>
+                                            )}
+                                        </Badge>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8">
+                                    <IconBrandWhatsapp className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                    <p className="text-gray-500 mb-2">{t('dashboard.noConnectionsYet')}</p>
+                                    <p className="text-sm text-gray-400 mb-4">
+                                        {t('dashboard.createYourFirstConnection')}
+                                    </p>
+                                    <Link href={whatsapp.index().url}>
+                                        <Button size="sm">
+                                            {t('dashboard.addConnection')}
+                                        </Button>
+                                    </Link>
                                 </div>
-                                <Badge variant="secondary">{t('dashboard.completedBadge')}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <h4 className="font-medium">{t('dashboard.history')}</h4>
-                                    <p className="text-sm text-gray-600">Aula 8 - {t('dashboard.middleAges')}</p>
-                                </div>
-                                <Badge variant="secondary">{t('dashboard.completedBadge')}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                                <div>
-                                    <h4 className="font-medium">{t('dashboard.mathematics')}</h4>
-                                    <p className="text-sm text-gray-600">Aula 12 - {t('dashboard.algebra')}</p>
-                                </div>
-                                <Badge>{t('dashboard.inProgressBadge')}</Badge>
-                            </div>
+                            )}
+                            {connections.length > 0 && (
+                                <Link href={whatsapp.index().url}>
+                                    <Button variant="outline" className="w-full mt-3">
+                                        {t('dashboard.manageConnections')}
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
 
+                {/* Courses Coming Soon */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                            <IconBook className="h-5 w-5" />
+                            {t('dashboard.courses')}
+                        </CardTitle>
                         <CardDescription>
-                            {t('dashboard.quickAccessToMainFeatures')}
+                            {t('dashboard.comingSoon')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Button className="h-20 flex-col gap-2">
-                                <IconBook className="h-5 w-5" />
-                                <div className="text-center">
-                                    <span className="text-sm">{t('dashboard.view')}</span>
-                                    <br />
-                                    <span className="font-semibold">{t('dashboard.classes')}</span>
-                                </div>
-                            </Button>
-                            <Button variant="outline" className="h-20 flex-col gap-2">
-                                <IconUser className="h-5 w-5" />
-                                <div className="text-center">
-                                    <span className="text-sm">{t('dashboard.my')}</span>
-                                    <br />
-                                    <span className="font-semibold">{t('dashboard.profile')}</span>
-                                </div>
-                            </Button>
-                            <Button variant="outline" className="h-20 flex-col gap-2">
-                                <IconHeadphones className="h-5 w-5" />
-                                <div className="text-center">
-                                    <span className="text-sm">{t('dashboard.support')}</span>
-                                    <br />
-                                    <span className="font-semibold">{t('dashboard.contact')}</span>
-                                </div>
-                            </Button>
-                            <Button variant="outline" className="h-20 flex-col gap-2">
-                                <IconSettings className="h-5 w-5" />
-                                <span className="font-semibold">{t('dashboard.settings')}</span>
-                            </Button>
+                        <div className="text-center py-8">
+                            <IconSparkles className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+                            <p className="text-gray-600 mb-2">
+                                {t('dashboard.coursesDescription')}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                {t('dashboard.stayTuned')}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Quick Access */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('dashboard.quickAccess')}</CardTitle>
+                    <CardDescription>
+                        {t('dashboard.accessMainFeatures')}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="/docs/api" target="_blank" rel="noopener noreferrer">
+                            <Button variant="outline" className="h-20 w-full flex-col gap-2">
+                                <IconFileDescription className="h-5 w-5" />
+                                <span className="font-semibold text-center">{t('dashboard.apiDocumentation')}</span>
+                            </Button>
+                        </a>
+                        <Link href={billing.index().url}>
+                            <Button variant="outline" className="h-20 w-full flex-col gap-2">
+                                <IconCreditCard className="h-5 w-5" />
+                                <span className="font-semibold text-center">{t('dashboard.billing')}</span>
+                            </Button>
+                        </Link>
+                        <Link href={whatsapp.index().url}>
+                            <Button variant="outline" className="h-20 w-full flex-col gap-2">
+                                <IconBrandWhatsapp className="h-5 w-5" />
+                                <span className="font-semibold text-center">{t('whatsapp.connections')}</span>
+                            </Button>
+                        </Link>
+                        <Link href="/settings">
+                            <Button variant="outline" className="h-20 w-full flex-col gap-2">
+                                <IconSettings className="h-5 w-5" />
+                                <span className="font-semibold text-center">{t('dashboard.settings')}</span>
+                            </Button>
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -395,7 +508,17 @@ function AdminDashboard({ allTenants }: { allTenants?: Array<{ id: number; name:
     );
 }
 
-export default function Dashboard({ auth, tenants }: DashboardProps & { tenants?: Array<{ id: number; name: string; slug: string; users_count: number; is_active: boolean }> }) {
+export default function Dashboard({
+    auth,
+    tenants,
+    connections,
+    connectionsCount,
+    connectedCount,
+    subscriptions,
+    webhooksCount
+}: DashboardProps & {
+    tenants?: Array<{ id: number; name: string; slug: string; users_count: number; is_active: boolean }>;
+}) {
     const isAdmin = auth.user.role === 'admin';
     const { t } = useTranslation();
 
@@ -409,7 +532,18 @@ export default function Dashboard({ auth, tenants }: DashboardProps & { tenants?
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('dashboard.title')} ${isAdmin ? `- ${t('dashboard.administration')}` : auth.user.tenant ? `- ${auth.user.tenant.name}` : `- ${t('dashboard.clientAdmin')}`}`} />
-            {isAdmin ? <AdminDashboard allTenants={tenants} /> : <ClientDashboard tenant={auth.user.tenant} />}
+            {isAdmin ? (
+                <AdminDashboard allTenants={tenants} />
+            ) : (
+                <ClientDashboard
+                    tenant={auth.user.tenant}
+                    connections={connections}
+                    connectionsCount={connectionsCount}
+                    connectedCount={connectedCount}
+                    subscriptions={subscriptions}
+                    webhooksCount={webhooksCount}
+                />
+            )}
         </AppLayout>
     );
 }

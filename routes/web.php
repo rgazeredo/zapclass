@@ -78,9 +78,49 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('dashboard', compact('tenants'));
         }
 
-        // Se é client, carregar com tenant
+        // Se é client, carregar com tenant e dados do WhatsApp
         if ($user->isClient()) {
             $user->load('tenant');
+
+            // Buscar conexões WhatsApp do tenant
+            $connections = \App\Models\WhatsAppConnection::where('tenant_id', $user->tenant_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $connectionsCount = $connections->count();
+            $connectedCount = $connections->where('status', 'connected')->count();
+
+            // Buscar assinaturas ativas do tenant
+            $subscriptions = [];
+            if ($user->tenant && method_exists($user->tenant, 'subscriptions')) {
+                $subscriptions = $user->tenant->subscriptions()
+                    ->active()
+                    ->get()
+                    ->map(function ($subscription) {
+                        return [
+                            'id' => $subscription->id,
+                            'name' => $subscription->name,
+                            'stripe_status' => $subscription->stripe_status,
+                            'stripe_price' => $subscription->stripe_price,
+                            'trial_ends_at' => $subscription->trial_ends_at,
+                            'ends_at' => $subscription->ends_at,
+                        ];
+                    });
+            }
+
+            // Contar webhooks configurados
+            $webhooksCount = \App\Models\Webhook::whereIn(
+                'whatsapp_connection_id',
+                $connections->pluck('id')
+            )->count();
+
+            return Inertia::render('dashboard', [
+                'connections' => $connections,
+                'connectionsCount' => $connectionsCount,
+                'connectedCount' => $connectedCount,
+                'subscriptions' => $subscriptions,
+                'webhooksCount' => $webhooksCount,
+            ]);
         }
 
         return Inertia::render('dashboard');
