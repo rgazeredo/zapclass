@@ -44,22 +44,40 @@ class WhatsAppWebhookProxyController extends Controller
             $clientUrl = $webhook->url;
             $payload = $request->all();
 
+            // Adicionar URL base da aplicação no payload
             $payload['BaseUrl'] = config('app.url');
 
-            $headers = [
+            // Headers padrão limpos e seguros (sem expor infraestrutura interna)
+            $defaultHeaders = [
                 'Content-Type' => 'application/json',
                 'User-Agent' => 'ZapClass-Webhook/1.0',
+                'Accept' => 'application/json',
                 'X-Webhook-Source' => 'zapclass',
                 'X-Webhook-Code' => $webhookCode,
+                'X-Webhook-Event' => $payload['event'] ?? 'unknown',
             ];
+
+            // Mesclar com headers customizados do webhook (se existirem)
+            // Headers customizados têm prioridade sobre os padrão
+            $customHeaders = $webhook->custom_headers ?? [];
+            $headers = array_merge($defaultHeaders, $customHeaders);
 
             Log::info('Forwarding webhook to client', [
                 'webhook_code' => $webhookCode,
                 'client_url' => $clientUrl,
+                'default_headers' => $defaultHeaders,
+                'custom_headers' => $customHeaders,
+                'final_headers' => $headers,
             ]);
 
-            // Enviar para o cliente
-            $response = Http::timeout(30)
+            // Enviar para o cliente com headers limpos
+            // withOptions(['allow_redirects' => false]) evita seguir redirects
+            // que poderiam adicionar headers extras
+            $response = Http::withOptions([
+                'allow_redirects' => false,
+                'http_errors' => false,
+            ])
+                ->timeout(30)
                 ->withHeaders($headers)
                 ->post($clientUrl, $payload);
 

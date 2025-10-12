@@ -15,6 +15,7 @@ class Webhook extends Model
         'webhook_code',
         'events',
         'exclude_events',
+        'custom_headers',
         'enabled',
         'synced',
         'external_webhook_id',
@@ -23,6 +24,7 @@ class Webhook extends Model
     protected $casts = [
         'events' => 'array',
         'exclude_events' => 'array',
+        'custom_headers' => 'array',
         'enabled' => 'boolean',
         'synced' => 'boolean',
     ];
