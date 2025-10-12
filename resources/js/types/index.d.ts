@@ -1,5 +1,5 @@
 import { InertiaLinkProps } from '@inertiajs/react';
-import { LucideIcon } from 'lucide-react';
+import { TablerIcon } from '@tabler/icons-react';
 
 export interface Auth {
     user: User;
@@ -18,9 +18,10 @@ export interface NavGroup {
 export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
-    icon?: LucideIcon | null;
+    icon?: TablerIcon | null;
     isActive?: boolean;
     items?: NavItem[];
+    target?: string;
 }
 
 export interface SharedData {

@@ -8,7 +8,8 @@
         "contact": "Contact",
         "login": "Login",
         "language": "EN",
-        "platform": "Platform"
+        "platform": "Platform",
+        "menu": "Menu"
     },
     "hero": {
         "badge": "New course",
@@ -348,6 +349,7 @@
         }
     },
     "billing": {
+        "title": "Subscriptions",
         "paymentMethods": {
             "title": "Payment Methods",
             "accountNotConfigured": "Your account is not yet configured for payments.",
@@ -473,6 +475,10 @@
             "nextStepsDescription": "Explore the dashboard and start setting up your account. If you need help, our team is ready to assist you."
         }
     },
+    "api": {
+        "title": "API Documentation",
+        "description": "Access the complete API documentation for ZapClass"
+    },
     "auth": {
         "login": {
             "title": "Log in to your account",
@@ -550,6 +556,9 @@
         }
     },
     "settings": {
+        "title": "Settings",
+        "pageTitle": "Settings",
+        "description": "Manage your profile and account settings",
         "profile": {
             "title": "Profile settings",
             "pageTitle": "Profile settings",

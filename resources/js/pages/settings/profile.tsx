@@ -1,4 +1,3 @@
-import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -11,10 +10,10 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { IconCheck, IconLoader2 } from '@tabler/icons-react';
-import { useForm as useHookForm } from 'react-hook-form';
 import { useState } from 'react';
-import * as z from 'zod';
+import { useForm as useHookForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { t } = useTranslation();
@@ -72,11 +71,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     <FormItem>
                                         <FormLabel>{t('settings.profile.nameLabel')}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder={t('settings.profile.namePlaceholder')}
-                                                autoComplete="name"
-                                                {...field}
-                                            />
+                                            <Input placeholder={t('settings.profile.namePlaceholder')} autoComplete="name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -116,9 +111,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     </p>
 
                                     {status === 'verification-link-sent' && (
-                                        <div className="mt-2 text-sm font-medium text-green-600">
-                                            {t('settings.profile.verificationSent')}
-                                        </div>
+                                        <div className="mt-2 text-sm font-medium text-green-600">{t('settings.profile.verificationSent')}</div>
                                     )}
                                 </div>
                             )}
@@ -139,8 +132,6 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                         </form>
                     </Form>
                 </div>
-
-                <DeleteUser />
             </SettingsLayout>
         </AppLayout>
     );

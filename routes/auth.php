@@ -18,9 +18,9 @@ Route::middleware('guest')->group(function () {
     //     ->name('register.store');
 
     // Redirect old register route to register-with-plan
-    Route::get('register', function () {
-        return redirect('/register-with-plan');
-    })->name('register');
+    // Route::get('register', function () {
+    //     return redirect('/register-with-plan');
+    // })->name('register');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

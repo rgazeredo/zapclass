@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface PricingPlan {
     id: string;
@@ -27,7 +27,7 @@ export function usePricing() {
                 setLoading(true);
                 setError(null);
 
-                const response = await fetch('/api/pricing/plans');
+                const response = await fetch('/internal/pricing/plans');
 
                 if (!response.ok) {
                     throw new Error('Erro ao buscar planos');
@@ -65,48 +65,37 @@ function getStaticPlans(): PricingPlan[] {
             product_id: 'static-basic',
             name: 'Básico',
             description: 'Ideal para pequenos negócios',
-            price: 29.90,
+            price: 29.9,
             currency: 'BRL',
             interval: 'month',
             interval_count: 1,
             type: 'basic',
-            features: [
-                '1 Conexão WhatsApp',
-                '1.000 mensagens/mês',
-                'Dashboard básico',
-                'Suporte por email'
-            ],
+            features: ['1 Conexão WhatsApp', '1.000 mensagens/mês', 'Dashboard básico', 'Suporte por email'],
             popular: false,
             stripe_price_id: '',
-            metadata: {}
+            metadata: {},
         },
         {
             id: 'static-professional',
             product_id: 'static-professional',
             name: 'Profissional',
             description: 'Para empresas em crescimento',
-            price: 59.90,
+            price: 59.9,
             currency: 'BRL',
             interval: 'month',
             interval_count: 1,
             type: 'professional',
-            features: [
-                '3 Conexões WhatsApp',
-                '5.000 mensagens/mês',
-                'Dashboard avançado',
-                'API acesso completo',
-                'Suporte prioritário'
-            ],
+            features: ['3 Conexões WhatsApp', '5.000 mensagens/mês', 'Dashboard avançado', 'API acesso completo', 'Suporte prioritário'],
             popular: true,
             stripe_price_id: '',
-            metadata: {}
+            metadata: {},
         },
         {
             id: 'static-enterprise',
             product_id: 'static-enterprise',
             name: 'Empresarial',
             description: 'Para grandes volumes',
-            price: 149.90,
+            price: 149.9,
             currency: 'BRL',
             interval: 'month',
             interval_count: 1,
@@ -117,11 +106,11 @@ function getStaticPlans(): PricingPlan[] {
                 'Dashboard empresarial',
                 'API completa + Webhooks',
                 'Cursos exclusivos',
-                'Suporte 24/7'
+                'Suporte 24/7',
             ],
             popular: false,
             stripe_price_id: '',
-            metadata: {}
-        }
+            metadata: {},
+        },
     ];
 }

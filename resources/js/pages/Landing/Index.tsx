@@ -3,6 +3,7 @@ import { IconChartBar, IconCheck, IconHeadphones, IconLoader2, IconMenu2, IconSh
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
+import AppLogo from '../../components/app-logo';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -42,11 +43,8 @@ export default function LandingPage() {
                 <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex items-center justify-between">
-                            <div
-                                className="cursor-pointer text-2xl font-bold text-gray-900 transition-colors hover:text-gray-700"
-                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                            >
-                                ZapClass
+                            <div className="cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                                <AppLogo />
                             </div>
 
                             {/* Desktop Navigation */}

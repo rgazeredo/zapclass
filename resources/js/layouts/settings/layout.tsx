@@ -7,21 +7,22 @@ import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import { t } from 'i18next';
 import { type PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: t('settings.profile.title'),
         href: edit(),
         icon: null,
     },
     {
-        title: 'Password',
+        title: t('settings.password.title'),
         href: editPassword(),
         icon: null,
     },
     {
-        title: 'Appearance',
+        title: t('settings.appearance.title'),
         href: editAppearance(),
         icon: null,
     },
@@ -37,7 +38,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Settings" description="Manage your profile and account settings" />
+            <Heading title={t('settings.pageTitle')} description={t('settings.description')} />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">

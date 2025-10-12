@@ -8,7 +8,8 @@
         "contact": "Contato",
         "login": "Entrar",
         "language": "PT",
-        "platform": "Plataforma"
+        "platform": "Plataforma",
+        "menu": "Menu"
     },
     "hero": {
         "badge": "Novo curso",
@@ -348,6 +349,7 @@
         }
     },
     "billing": {
+        "title": "Assinaturas",
         "paymentMethods": {
             "title": "Métodos de Pagamento",
             "accountNotConfigured": "Sua conta ainda não está configurada para pagamentos.",
@@ -428,8 +430,8 @@
             "cancelDialogConfirm": "Sim, cancelar assinatura"
         },
         "billingIndex": {
-            "pageTitle": "Billing & Assinaturas",
-            "heading": "Billing & Assinaturas",
+            "pageTitle": "Assinaturas",
+            "heading": "Assinaturas",
             "description": "Gerencie suas assinaturas, métodos de pagamento e histórico de faturas",
             "tabSubscriptions": "Assinaturas",
             "tabPaymentMethods": "Métodos de Pagamento",
@@ -472,6 +474,10 @@
             "nextSteps": "Próximos passos:",
             "nextStepsDescription": "Explore o dashboard e comece a configurar sua conta. Se precisar de ajuda, nossa equipe está pronta para auxiliá-lo."
         }
+    },
+    "api": {
+        "title": "Documentação da API",
+        "description": "Acesse a documentação completa da API do ZapClass"
     },
     "auth": {
         "login": {
@@ -550,8 +556,11 @@
         }
     },
     "settings": {
+        "title": "Configurações",
+        "pageTitle": "Configurações",
+        "description": "Gerenciar suas configurações de perfil e conta",
         "profile": {
-            "title": "Configurações do perfil",
+            "title": "Perfil",
             "pageTitle": "Configurações do perfil",
             "heading": "Informações do perfil",
             "description": "Atualize seu nome e endereço de email",
@@ -569,7 +578,7 @@
             "emailInvalid": "Por favor, insira um endereço de email válido"
         },
         "password": {
-            "title": "Configurações de senha",
+            "title": "Senha",
             "pageTitle": "Configurações de senha",
             "heading": "Atualizar senha",
             "description": "Certifique-se de que sua conta está usando uma senha longa e aleatória para permanecer segura",
@@ -586,7 +595,7 @@
             "passwordsDontMatch": "As senhas não coincidem"
         },
         "appearance": {
-            "title": "Configurações de aparência",
+            "title": "Aparência",
             "pageTitle": "Configurações de aparência",
             "heading": "Configurações de aparência",
             "description": "Atualize as configurações de aparência da sua conta"

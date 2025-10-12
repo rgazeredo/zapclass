@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
 import { request } from '@/routes/password';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
@@ -20,7 +20,6 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const { post, processing } = useForm();
 
     const loginSchema = z.object({
         email: z.string().email(t('auth.login.emailRequired')),
@@ -40,7 +39,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     });
 
     const onSubmit = (data: LoginFormValues) => {
-        post('/login', data);
+        router.post('/login', data);
     };
 
     return (
@@ -127,8 +126,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             )}
                         />
 
-                        <Button type="submit" className="w-full" disabled={processing}>
-                            {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                            {form.formState.isSubmitting && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {t('auth.login.loginButton')}
                         </Button>
                     </div>
