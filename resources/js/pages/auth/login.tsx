@@ -20,11 +20,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const { setData, post, processing, errors } = useForm({
-        email: '',
-        password: '',
-        remember: false,
-    });
+    const { post, processing } = useForm();
 
     const loginSchema = z.object({
         email: z.string().email(t('auth.login.emailRequired')),
@@ -43,8 +39,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         },
     });
 
-    const onSubmit = () => {
-        post('/login');
+    const onSubmit = (data: LoginFormValues) => {
+        post('/login', data);
     };
 
     return (
@@ -69,14 +65,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                             autoFocus
                                             autoComplete="email"
                                             {...field}
-                                            onChange={(e) => {
-                                                field.onChange(e);
-                                                setData('email', e.target.value);
-                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />
-                                    {errors.email && <div className="text-sm text-red-600">{errors.email}</div>}
                                 </FormItem>
                             )}
                         />
@@ -101,10 +92,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                 placeholder={t('auth.login.passwordPlaceholder')}
                                                 autoComplete="current-password"
                                                 {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                    setData('password', e.target.value);
-                                                }}
                                             />
                                             <Button
                                                 type="button"
@@ -118,7 +105,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         </div>
                                     </FormControl>
                                     <FormMessage />
-                                    {errors.password && <div className="text-sm text-red-600">{errors.password}</div>}
                                 </FormItem>
                             )}
                         />
@@ -131,10 +117,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
-                                            onCheckedChange={(checked) => {
-                                                field.onChange(checked);
-                                                setData('remember', !!checked);
-                                            }}
+                                            onCheckedChange={field.onChange}
                                         />
                                     </FormControl>
                                     <div className="space-y-1 leading-none">
@@ -148,16 +131,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {t('auth.login.loginButton')}
                         </Button>
-                    </div>
-
-                    <div className="text-center text-sm text-muted-foreground">
-                        {t('auth.login.noAccount')}{' '}
-                        <Link
-                            href="/register-with-plan"
-                            className="text-primary underline-offset-4 hover:underline"
-                        >
-                            {t('auth.login.signUp')}
-                        </Link>
                     </div>
                 </form>
             </Form>
