@@ -40,7 +40,7 @@ export default function Password() {
 
     type PasswordFormValues = z.infer<typeof passwordSchema>;
 
-    const form = useHookForm({
+    const form = useHookForm<PasswordFormValues>({
         resolver: zodResolver(passwordSchema),
         defaultValues: {
             current_password: '',
@@ -49,7 +49,7 @@ export default function Password() {
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: PasswordFormValues) => {
         post(edit().url, {
             ...data,
             preserveScroll: true,

@@ -29,7 +29,7 @@ export default function Register() {
 
     type RegisterFormValues = z.infer<typeof registerSchema>;
 
-    const form = useHookForm({
+    const form = useHookForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: '',
@@ -39,7 +39,7 @@ export default function Register() {
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: RegisterFormValues) => {
         post('/register', data);
     };
 

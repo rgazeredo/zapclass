@@ -7,8 +7,6 @@ import { type BreadcrumbItem, type User } from '@/types';
 import { Head } from '@inertiajs/react';
 import {
     IconBuilding,
-    IconUsers,
-    IconTrendingUp,
     IconCalendar,
     IconBook,
     IconUser,
@@ -16,7 +14,6 @@ import {
     IconSettings,
     IconUsersGroup,
     IconChartBar,
-    IconCash,
     IconShield
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +26,7 @@ interface DashboardProps {
                 id: number;
                 name: string;
                 slug: string;
-                settings: Record<string, any>;
+                settings: Record<string, unknown>;
             };
         };
     };

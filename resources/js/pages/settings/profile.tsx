@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { IconCheck, IconLoader2 } from '@tabler/icons-react';
 import { useForm as useHookForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 
@@ -36,7 +36,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     type ProfileFormValues = z.infer<typeof profileSchema>;
 
-    const form = useHookForm({
+    const form = useHookForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             name: auth.user.name || '',
@@ -44,7 +44,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: ProfileFormValues) => {
         post(edit().url, {
             ...data,
             preserveScroll: true,

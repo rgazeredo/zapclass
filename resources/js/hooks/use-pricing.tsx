@@ -13,7 +13,7 @@ export interface PricingPlan {
     features: string[];
     popular: boolean;
     stripe_price_id: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
 }
 
 export function usePricing() {

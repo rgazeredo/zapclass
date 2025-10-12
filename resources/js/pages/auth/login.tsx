@@ -21,7 +21,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const { data, setData, post, processing, errors } = useForm({
+    const { setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: false,
@@ -35,7 +35,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     type LoginFormValues = z.infer<typeof loginSchema>;
 
-    const form = useHookForm({
+    const form = useHookForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
             email: '',
@@ -44,7 +44,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         },
     });
 
-    const onSubmit = (formData: LoginFormValues) => {
+    const onSubmit = () => {
         post('/login');
     };
 
