@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import axios from 'axios';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Webhook {
     id: number;
@@ -58,7 +59,10 @@ export function WebhookDeleteDialog({ webhook, connection, onClose, onDeleted }:
             }
         } catch (error) {
             console.error('Error deleting webhook:', error);
-            alert('Erro ao deletar webhook. Tente novamente.');
+            toast.error('Erro ao deletar webhook. Tente novamente.', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         } finally {
             setIsDeleting(false);
         }

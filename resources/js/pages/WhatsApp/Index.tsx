@@ -14,6 +14,7 @@ import { IconApi, IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 interface WhatsAppIndexProps {
     connections: WhatsAppConnection[];
@@ -225,11 +226,17 @@ export default function WhatsAppIndex({
                 console.log(`QR Code generated for connection ${connectionId}. Starting status polling...`);
                 startStatusPolling(connectionId);
             } else {
-                alert(data.message || 'Erro ao gerar QR code');
+                toast.error(data.message || 'Erro ao gerar QR code', {
+                    duration: 5000,
+                    description: data.attempts ? `Tentativas realizadas: ${data.attempts}` : undefined,
+                });
             }
         } catch (error) {
             console.error('Erro ao gerar QR code:', error);
-            alert('Erro ao gerar QR code');
+            toast.error('Erro ao gerar QR code', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         } finally {
             setIsGeneratingQR(false);
         }
@@ -263,11 +270,16 @@ export default function WhatsAppIndex({
                     router.reload();
                 }, 1000);
             } else {
-                alert(data.message || 'Erro ao desconectar instância');
+                toast.error(data.message || 'Erro ao desconectar instância', {
+                    duration: 5000,
+                });
             }
         } catch (error) {
             console.error('Erro ao desconectar instância:', error);
-            alert('Erro ao desconectar instância');
+            toast.error('Erro ao desconectar instância', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         }
     };
 

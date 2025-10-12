@@ -30,6 +30,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { IconCreditCard, IconPlus, IconTrash, IconCheck } from '@tabler/icons-react';
+import { toast } from 'sonner';
 
 interface PaymentMethod {
     id: string;
@@ -106,11 +107,17 @@ export default function PaymentMethodsManager({
             if (data.client_secret) {
                 // Redirect to Stripe's hosted page or implement Stripe Elements here
                 // For simplicity, we'll show a message
-                alert('Para adicionar um método de pagamento, você será redirecionado para uma página segura do Stripe.');
+                toast.info('Para adicionar um método de pagamento, você será redirecionado para uma página segura do Stripe.', {
+                    duration: 5000,
+                });
                 // In a real implementation, you would use Stripe Elements here
             }
         } catch (error) {
             console.error('Error creating setup intent:', error);
+            toast.error('Erro ao criar método de pagamento', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         } finally {
             setIsLoading(false);
             setIsAddDialogOpen(false);

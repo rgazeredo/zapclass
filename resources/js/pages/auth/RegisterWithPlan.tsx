@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../../components/ui/input';
 import { IconLoader2, IconEye, IconEyeOff, IconArrowLeft } from '@tabler/icons-react';
 import PlanSummary from '../../components/PlanSummary';
+import { toast } from 'sonner';
 
 interface Plan {
     id: string;
@@ -117,7 +118,10 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
             }
         } catch (error: any) {
             console.error('Erro ao enviar formulário:', error);
-            alert('Erro ao processar cadastro. Tente novamente.');
+            toast.error('Erro ao processar cadastro. Tente novamente.', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         } finally {
             setIsSubmitting(false);
         }
