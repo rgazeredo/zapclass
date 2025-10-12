@@ -43,6 +43,9 @@ class WhatsAppWebhookProxyController extends Controller
             // Repassar o webhook para a URL do cliente
             $clientUrl = $webhook->url;
             $payload = $request->all();
+
+            $payload['BaseUrl'] = config('app.url');
+
             $headers = [
                 'Content-Type' => 'application/json',
                 'User-Agent' => 'ZapClass-Webhook/1.0',
@@ -72,7 +75,6 @@ class WhatsAppWebhookProxyController extends Controller
                 'message' => 'Webhook received and forwarded',
                 'client_status' => $response->status(),
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Error processing webhook', [
                 'webhook_code' => $webhookCode,
