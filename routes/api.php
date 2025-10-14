@@ -4,6 +4,10 @@ use App\Http\Controllers\Api\V1\MessageController as V1MessageController;
 use App\Http\Controllers\Api\V1\ContactController as V1ContactController;
 use App\Http\Controllers\Api\V1\LabelController as V1LabelController;
 use App\Http\Controllers\Api\V1\GroupController as V1GroupController;
+use App\Http\Controllers\Api\V1\CommunityController as V1CommunityController;
+use App\Http\Controllers\Api\V1\QuickreplyController as V1QuickreplyController;
+use App\Http\Controllers\Api\V1\CampaignController as V1CampaignController;
+use App\Http\Controllers\Api\V1\ProfileController as V1ProfileController;
 use App\Http\Middleware\ApiAuthentication;
 use Illuminate\Support\Facades\Route;
 
@@ -128,6 +132,98 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('update-name', [V1GroupController::class, 'updateName'])
             ->name('api.groups.update-name');
 
+        Route::post('update-description', [V1GroupController::class, 'updateDescription'])
+            ->name('api.groups.update-description');
+
+        Route::post('update-image', [V1GroupController::class, 'updateImage'])
+            ->name('api.groups.update-image');
+
+        Route::post('update-locked', [V1GroupController::class, 'updateLocked'])
+            ->name('api.groups.update-locked');
+
+        Route::post('update-announce', [V1GroupController::class, 'updateAnnounce'])
+            ->name('api.groups.update-announce');
+
+        Route::get('invite-link', [V1GroupController::class, 'inviteLink'])
+            ->name('api.groups.invite-link');
+
+        Route::post('invite-info', [V1GroupController::class, 'inviteInfo'])
+            ->name('api.groups.invite-info');
+
+        Route::post('reset-invite', [V1GroupController::class, 'resetInvite'])
+            ->name('api.groups.reset-invite');
+
+        Route::post('join', [V1GroupController::class, 'join'])
+            ->name('api.groups.join');
+
+        Route::post('leave', [V1GroupController::class, 'leave'])
+            ->name('api.groups.leave');
+
+    });
+
+
+    Route::prefix('communities')->group(function () {
+      
+        Route::post('create', [V1CommunityController::class, 'create'])
+            ->name('api.communities.create');
+
+        Route::post('edit-groups', [V1CommunityController::class, 'editGroups'])
+            ->name('api.communities.edit-groups');
+
+
+    });
+
+    Route::prefix('quick-replies')->group(function () {
+      
+        Route::post('create', [V1QuickreplyController::class, 'create'])
+            ->name('api.quick-replies.create');
+
+        Route::get('list', [V1QuickreplyController::class, 'list'])
+            ->name('api.quick-replies.list');
+
+        Route::post('edit', [V1QuickreplyController::class, 'edit'])
+            ->name('api.quick-replies.edit');
+
+        Route::post('delete', [V1QuickreplyController::class, 'delete'])
+            ->name('api.quick-replies.delete');
+
+
+    });
+
+    Route::prefix('campaigns')->group(function () {
+      
+        Route::post('create-simple', [V1CampaignController::class, 'createSimple'])
+            ->name('api.campaigns.create-simple');
+            
+        Route::post('create-advanced', [V1CampaignController::class, 'createAdvanced'])
+            ->name('api.campaigns.create-advanced');
+
+        Route::get('list-folders', [V1CampaignController::class, 'listFolders'])
+            ->name('api.campaigns.list-folders');
+
+        Route::post('list-messages', [V1CampaignController::class, 'listMessages'])
+            ->name('api.campaigns.list-messages');
+
+        Route::post('control', [V1CampaignController::class, 'control'])
+            ->name('api.campaigns.control');
+
+        Route::post('cleanup', [V1CampaignController::class, 'cleanup'])
+            ->name('api.campaigns.cleanup');
+
+        Route::delete('clear-all', [V1CampaignController::class, 'clearAll'])
+            ->name('api.campaigns.clear-all');
+
+
+    });
+
+    Route::prefix('profile')->group(function () {
+      
+        Route::post('update-name', [V1ProfileController::class, 'updateName'])
+            ->name('api.profile.update-name');
+            
+        Route::post('update-image', [V1ProfileController::class, 'updateImage'])
+            ->name('api.profile.update-image');
+            
     });
 
     // Rotas de conexão/instância
