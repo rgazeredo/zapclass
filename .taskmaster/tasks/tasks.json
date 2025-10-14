@@ -1,0 +1,413 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Adicionar botão de dados da API na tela do WhatsApp",
+        "description": "Implementar um botão ao lado do botão de QR code na interface do WhatsApp para exibir os dados de conexão da API (URL e TOKEN).",
+        "details": "1. Localizar o componente da tela do WhatsApp onde está o botão de QR code\n2. Adicionar um novo botão com ícone apropriado (ex: ícone de informações ou API)\n3. Criar um modal ou popup para exibir os dados da API:\n   - URL da API\n   - TOKEN de acesso\n   - Incluir funcionalidade de copiar para clipboard\n4. Estilizar o botão seguindo o padrão visual existente\n5. Implementar handlers para abrir/fechar o modal\n6. Adicionar validações para verificar se os dados da API estão disponíveis\n7. Considerar adicionar uma opção para regenerar o token se necessário\n8. Garantir que informações sensíveis sejam tratadas adequadamente (mascaramento parcial do token)",
+        "testStrategy": "1. Verificar se o botão aparece corretamente ao lado do botão de QR code\n2. Testar se o clique no botão abre o modal com os dados corretos\n3. Validar se a URL e TOKEN são exibidos corretamente\n4. Testar a funcionalidade de copiar para clipboard\n5. Verificar se o modal fecha adequadamente\n6. Testar responsividade em diferentes tamanhos de tela\n7. Validar que não há vazamento de informações sensíveis\n8. Testar cenários onde os dados da API não estão disponíveis",
+        "status": "done",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implementar sistema de gestão de webhooks na interface do WhatsApp",
+        "description": "Criar um botão ao lado do QR code que direciona para uma tela de gestão de webhooks, permitindo listar webhooks existentes e cadastrar novos webhooks tanto no banco local quanto na API.",
+        "details": "1. Adicionar botão de webhooks ao lado do botão de QR code na tela do WhatsApp\n2. Criar nova tela/modal para gestão de webhooks com:\n   - Listagem de webhooks cadastrados em formato de tabela\n   - Botão para adicionar novo webhook\n   - Formulário de cadastro com campos necessários (URL, eventos, etc.)\n3. Implementar tabela no banco de dados para armazenar webhooks:\n   - Campos: id, url, events, status, created_at, updated_at\n   - Relacionamento com instância do WhatsApp\n4. Integrar com API usando endpoint POST /webhook conforme documentação https://docs.uazapi.com/endpoint/post/webhook\n5. Implementar funcionalidades:\n   - Salvar webhook no banco local\n   - Cadastrar webhook na API externa\n   - Listar webhooks com status de sincronização\n   - Editar/deletar webhooks (local e API)\n   - Validação de URLs e tratamento de erros\n6. Adicionar indicadores visuais de status (ativo/inativo, sincronizado/não sincronizado)\n7. Implementar tratamento de erros para falhas na API\n8. Seguir padrões de UI/UX existentes no projeto",
+        "testStrategy": "1. Verificar se o botão de webhooks aparece corretamente ao lado do QR code\n2. Testar navegação para a tela de gestão de webhooks\n3. Validar criação da tabela de webhooks no banco de dados\n4. Testar cadastro de novo webhook:\n   - Validação de campos obrigatórios\n   - Salvamento no banco local\n   - Chamada para API externa\n   - Tratamento de erros de conectividade\n5. Verificar listagem de webhooks cadastrados\n6. Testar edição e exclusão de webhooks\n7. Validar sincronização entre banco local e API\n8. Testar cenários de erro (API indisponível, dados inválidos)\n9. Verificar responsividade da interface\n10. Validar se os webhooks funcionam corretamente após cadastro\n11. Testar persistência dos dados após reinicialização da aplicação",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Adicionar botão de acesso à gestão de webhooks na interface do WhatsApp",
+            "description": "Implementar um botão ao lado do QR code na tela do WhatsApp que, ao ser clicado, direciona o usuário para a tela de gestão de webhooks.",
+            "dependencies": [],
+            "details": "Localizar o componente da tela do WhatsApp onde está o botão do QR code e adicionar um novo botão com ícone apropriado para webhooks, seguindo o padrão visual existente do projeto.",
+            "status": "done",
+            "testStrategy": "Verificar se o botão aparece corretamente ao lado do QR code e se o clique nele abre a tela/modal de gestão de webhooks."
+          },
+          {
+            "id": 2,
+            "title": "Criar tela/modal para gestão de webhooks",
+            "description": "Desenvolver uma nova tela ou modal que permita listar os webhooks cadastrados, adicionar novos webhooks e editar ou deletar os existentes.",
+            "dependencies": [],
+            "details": "Implementar uma tabela para exibir os webhooks cadastrados com colunas para URL, eventos, status e ações. Incluir botão para adicionar novo webhook que abre um formulário com campos necessários (URL, eventos, etc.).",
+            "status": "done",
+            "testStrategy": "Testar a listagem correta dos webhooks, a abertura do formulário de cadastro, e a navegação entre as funcionalidades da tela."
+          },
+          {
+            "id": 3,
+            "title": "Implementar tabela no banco de dados para armazenar webhooks",
+            "description": "Criar a estrutura de banco de dados para armazenar os webhooks com os campos necessários e relacionar com a instância do WhatsApp.",
+            "dependencies": [],
+            "details": "Criar tabela com campos: id, url, events, status, created_at, updated_at, e relacionamento com a instância do WhatsApp para garantir integridade dos dados.",
+            "status": "done",
+            "testStrategy": "Validar a criação da tabela no banco e a integridade dos dados inseridos, atualizados e deletados."
+          },
+          {
+            "id": 4,
+            "title": "Integrar cadastro e sincronização de webhooks com API externa",
+            "description": "Implementar a integração com a API externa usando o endpoint POST /webhook para cadastrar webhooks e sincronizar o status entre o banco local e a API.",
+            "dependencies": [],
+            "details": "Desenvolver funcionalidades para salvar webhooks no banco local e cadastrar simultaneamente na API externa, além de listar webhooks com status de sincronização e permitir edição e exclusão sincronizadas.",
+            "status": "done",
+            "testStrategy": "Testar o cadastro, edição, exclusão e listagem de webhooks, validando a comunicação correta com a API externa e o tratamento de erros."
+          },
+          {
+            "id": 5,
+            "title": "Implementar validações, tratamento de erros e indicadores visuais de status",
+            "description": "Adicionar validação de URLs, tratamento de erros na comunicação com a API e indicadores visuais para status dos webhooks (ativo/inativo, sincronizado/não sincronizado).",
+            "dependencies": [],
+            "details": "Garantir que URLs sejam válidas antes do cadastro, tratar falhas na API com mensagens claras para o usuário, e exibir indicadores visuais na tabela para facilitar o entendimento do status de cada webhook.",
+            "status": "done",
+            "testStrategy": "Testar validações de formulário, simular falhas na API para verificar tratamento de erros, e conferir a exibição correta dos indicadores visuais."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Criar página de documentação da API com exemplo do endpoint de mensagens",
+        "description": "Desenvolver uma página no estilo documentação de API que apresente de forma clara e organizada o endpoint de envio de mensagens, incluindo exemplos práticos e especificações técnicas.",
+        "details": "1. Criar nova rota e controller para a página de documentação da API\n2. Desenvolver layout responsivo seguindo padrões de documentação de API (similar ao Swagger/Postman)\n3. Analisar o controller MessagingController.php para extrair:\n   - Métodos disponíveis para envio de mensagens\n   - Parâmetros obrigatórios e opcionais\n   - Estrutura de request e response\n   - Códigos de status HTTP retornados\n4. Criar seções organizadas:\n   - Visão geral da API\n   - Endpoint de envio de mensagens com método HTTP, URL e descrição\n   - Parâmetros de entrada com tipos e validações\n   - Exemplos de requisições em diferentes formatos (cURL, JavaScript, PHP)\n   - Exemplos de respostas de sucesso e erro\n   - Códigos de status e suas descrições\n5. Implementar funcionalidades interativas:\n   - Botões para copiar exemplos de código\n   - Syntax highlighting para código\n   - Possibilidade de testar o endpoint diretamente na documentação\n6. Adicionar link de acesso à documentação na interface principal\n7. Incluir informações sobre autenticação e headers necessários\n8. Documentar rate limits e boas práticas de uso",
+        "testStrategy": "1. Verificar se a página de documentação carrega corretamente e é responsiva\n2. Validar se todas as informações do MessagingController.php estão documentadas adequadamente\n3. Testar os exemplos de código fornecidos para garantir que funcionam\n4. Verificar se os botões de copiar código funcionam em diferentes navegadores\n5. Testar a funcionalidade de teste de endpoint integrada (se implementada)\n6. Validar se o syntax highlighting está funcionando corretamente\n7. Verificar se o link de acesso à documentação está visível e funcional\n8. Testar a documentação com diferentes tipos de usuários para garantir clareza\n9. Verificar se as informações de autenticação e headers estão corretas\n10. Validar se a página mantém consistência visual com o resto da aplicação",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Criar rota e controller para página de documentação da API",
+            "description": "Implementar uma nova rota no sistema e desenvolver o controller responsável por servir a página de documentação da API.",
+            "dependencies": [],
+            "details": "Configurar a rota HTTP adequada para acessar a documentação da API e criar o controller que irá processar as requisições e retornar a página de documentação.",
+            "status": "done",
+            "testStrategy": "Verificar se a rota está acessível e se o controller retorna a página corretamente sem erros."
+          },
+          {
+            "id": 2,
+            "title": "Analisar MessagingController.php para extrair informações do endpoint de mensagens",
+            "description": "Estudar o controller MessagingController.php para identificar métodos, parâmetros, estrutura de request/response e códigos HTTP relacionados ao envio de mensagens.",
+            "dependencies": [],
+            "details": "Mapear os métodos disponíveis para envio de mensagens, listar parâmetros obrigatórios e opcionais, definir a estrutura das requisições e respostas, e catalogar os códigos de status HTTP retornados.",
+            "status": "done",
+            "testStrategy": "Confirmar que todas as informações extraídas correspondem ao funcionamento real do endpoint, validando com testes manuais ou automáticos."
+          },
+          {
+            "id": 3,
+            "title": "Desenvolver layout responsivo da página de documentação seguindo padrões Swagger/Postman",
+            "description": "Criar o design da página de documentação da API com layout responsivo e organizado, inspirado em ferramentas como Swagger e Postman.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Implementar seções claras e organizadas, garantindo boa usabilidade em diferentes dispositivos, e aplicar estilos para destacar exemplos, parâmetros e descrições técnicas.",
+            "status": "done",
+            "testStrategy": "Testar a responsividade da página em múltiplos dispositivos e navegadores, garantindo que o layout se mantenha funcional e legível."
+          },
+          {
+            "id": 4,
+            "title": "Criar conteúdo detalhado da documentação do endpoint de mensagens",
+            "description": "Documentar o endpoint de envio de mensagens com visão geral, método HTTP, URL, parâmetros, exemplos de requisição e resposta, códigos de status, autenticação e boas práticas.",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "Organizar a documentação em seções: visão geral da API, detalhes do endpoint, parâmetros com tipos e validações, exemplos em cURL, JavaScript e PHP, respostas de sucesso e erro, códigos HTTP, autenticação e rate limits.",
+            "status": "done",
+            "testStrategy": "Validar se todas as informações estão corretas e completas, e se os exemplos funcionam conforme esperado."
+          },
+          {
+            "id": 5,
+            "title": "Implementar funcionalidades interativas na página de documentação",
+            "description": "Adicionar recursos interativos como botões para copiar código, syntax highlighting e possibilidade de testar o endpoint diretamente na documentação.",
+            "dependencies": [
+              "3.3",
+              "3.4"
+            ],
+            "details": "Incluir botões para copiar exemplos de código para a área de transferência, aplicar realce de sintaxe nos blocos de código e integrar ferramenta para testar o endpoint via interface da documentação.",
+            "status": "done",
+            "testStrategy": "Testar a funcionalidade dos botões de copiar, verificar o syntax highlighting e validar o teste do endpoint pela página."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Substituir alert de confirmação de exclusão por modal shadcn/ui na tela do WhatsApp",
+        "description": "Substituir o alert padrão de confirmação de exclusão na tela http://localhost/whatsapp por um modal ou dialog no estilo shadcn/ui para melhorar a experiência do usuário.",
+        "details": "1. Analisar a tela atual em /whatsapp para localizar onde está sendo usado o alert de confirmação de exclusão\n2. Instalar ou configurar shadcn/ui se não estiver disponível no projeto:\n   - Verificar se já existe shadcn/ui instalado\n   - Caso não exista, instalar e configurar os componentes necessários\n3. Criar componente de dialog/modal customizado usando shadcn/ui:\n   - Dialog container com overlay\n   - Cabeçalho com título de confirmação\n   - Corpo com mensagem de confirmação clara\n   - Botões de ação (Cancelar e Confirmar exclusão)\n4. Substituir todas as ocorrências de alert() por chamadas ao novo modal:\n   - Localizar função de exclusão que usa alert\n   - Refatorar para usar o novo componente de modal\n   - Manter a lógica de confirmação existente\n5. Aplicar estilização consistente com o design system shadcn/ui:\n   - Cores apropriadas (vermelho para ação destrutiva)\n   - Tipografia consistente\n   - Espaçamento adequado\n   - Responsividade\n6. Implementar estado de loading durante a exclusão se necessário\n7. Adicionar animações de entrada e saída do modal\n8. Garantir acessibilidade (focus trap, ESC para fechar, ARIA labels)",
+        "testStrategy": "1. Verificar se o alert padrão não aparece mais ao tentar excluir\n2. Confirmar que o novo modal shadcn/ui é exibido corretamente\n3. Testar funcionalidade de confirmação:\n   - Botão 'Cancelar' deve fechar o modal sem executar exclusão\n   - Botão 'Confirmar' deve executar a exclusão normalmente\n4. Validar design e responsividade do modal em diferentes tamanhos de tela\n5. Testar acessibilidade:\n   - Navegação por teclado (Tab, Enter, ESC)\n   - Foco adequado nos elementos\n   - Leitores de tela\n6. Verificar se as animações funcionam suavemente\n7. Testar em diferentes navegadores para garantir compatibilidade\n8. Confirmar que não há regressões em outras funcionalidades da página\n9. Validar se o estado de loading (se implementado) funciona adequadamente durante exclusões lentas",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implementar opção avançada para seleção de eventos no cadastro de webhooks",
+        "description": "Ocultar a seção de eventos do webhook por padrão e exibi-la apenas quando o usuário marcar a opção 'Avançado', mantendo todos os eventos selecionados por padrão tanto no cadastro quanto na edição.",
+        "details": "1. Localizar o formulário de cadastro de webhooks na interface do WhatsApp\n2. Adicionar checkbox 'Avançado' no formulário de webhook:\n   - Posicionar acima da seção de eventos\n   - Inicialmente desmarcado\n3. Implementar lógica de visibilidade:\n   - Por padrão, ocultar toda a seção de eventos ('Escutar eventos')\n   - Mostrar seção apenas quando checkbox 'Avançado' estiver marcado\n   - Usar CSS display: none/block ou conditional rendering\n4. Configurar seleção padrão de eventos:\n   - No cadastro: todos os eventos marcados por padrão (mesmo com seção oculta)\n   - Na edição: carregar eventos previamente cadastrados no banco\n5. Implementar lógica de submissão:\n   - Se checkbox 'Avançado' não estiver marcado: enviar todos os eventos para API/banco\n   - Se checkbox 'Avançado' estiver marcado: enviar apenas eventos selecionados pelo usuário\n6. Atualizar validação do formulário para considerar a nova lógica\n7. Testar comportamento tanto para novo cadastro quanto para edição de webhook existente",
+        "testStrategy": "1. Verificar se a seção de eventos está oculta por padrão no formulário\n2. Testar se o checkbox 'Avançado' exibe/oculta corretamente a seção de eventos\n3. Validar cadastro de novo webhook sem marcar 'Avançado':\n   - Confirmar que todos os eventos são enviados para API/banco\n   - Verificar se webhook funciona corretamente recebendo todos os eventos\n4. Testar cadastro com checkbox 'Avançado' marcado:\n   - Verificar se todos os eventos aparecem selecionados inicialmente\n   - Testar desmarcação de alguns eventos e confirmar que apenas os selecionados são salvos\n5. Validar edição de webhook existente:\n   - Verificar se eventos previamente cadastrados aparecem selecionados quando 'Avançado' é marcado\n   - Testar modificação de eventos e salvamento\n6. Confirmar que a funcionalidade não quebra a integração existente com a API de webhooks\n7. Testar responsividade da interface em diferentes dispositivos",
+        "status": "done",
+        "dependencies": [
+          2
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Adicionar checkbox 'Avançado' no formulário de cadastro de webhooks",
+            "description": "Localizar o formulário de cadastro de webhooks na interface do WhatsApp e adicionar um checkbox 'Avançado' posicionado acima da seção de eventos, inicialmente desmarcado.",
+            "dependencies": [],
+            "details": "Identificar o componente do formulário de webhook na interface do WhatsApp. Inserir o checkbox com atributo type='checkbox' e nome apropriado para identificação. Posicionar o checkbox acima da seção de eventos para controle de visibilidade.",
+            "status": "done",
+            "testStrategy": "Verificar se o checkbox 'Avançado' aparece corretamente no formulário, está desmarcado por padrão e está posicionado acima da seção de eventos."
+          },
+          {
+            "id": 2,
+            "title": "Implementar lógica de visibilidade da seção de eventos",
+            "description": "Ocultar a seção de eventos do webhook por padrão e exibi-la somente quando o checkbox 'Avançado' estiver marcado, utilizando CSS ou renderização condicional.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Aplicar CSS display:none para ocultar a seção de eventos inicialmente. Implementar listener para o checkbox 'Avançado' que altera a visibilidade da seção para display:block quando marcado e oculta novamente quando desmarcado.",
+            "status": "done",
+            "testStrategy": "Testar se a seção de eventos está oculta por padrão e se aparece corretamente ao marcar o checkbox 'Avançado', revertendo a visibilidade ao desmarcar."
+          },
+          {
+            "id": 3,
+            "title": "Configurar seleção padrão dos eventos no cadastro e edição",
+            "description": "Garantir que todos os eventos estejam selecionados por padrão no cadastro, mesmo com a seção oculta, e que na edição sejam carregados os eventos previamente cadastrados no banco.",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "No formulário de cadastro, marcar todos os checkboxes de eventos por padrão, mesmo que a seção esteja oculta. Na edição, carregar do banco os eventos selecionados anteriormente e refletir essa seleção no formulário.",
+            "status": "done",
+            "testStrategy": "Validar que no cadastro todos os eventos estão selecionados por padrão e que na edição os eventos previamente salvos são corretamente exibidos selecionados."
+          },
+          {
+            "id": 4,
+            "title": "Implementar lógica de submissão do formulário considerando o checkbox 'Avançado'",
+            "description": "Enviar todos os eventos para a API/banco quando o checkbox 'Avançado' não estiver marcado e enviar apenas os eventos selecionados pelo usuário quando estiver marcado.",
+            "dependencies": [
+              "5.3"
+            ],
+            "details": "Na submissão do formulário, verificar o estado do checkbox 'Avançado'. Se desmarcado, enviar todos os eventos como selecionados. Se marcado, enviar somente os eventos selecionados pelo usuário. Ajustar payload para API e banco conforme essa lógica.",
+            "status": "done",
+            "testStrategy": "Testar submissão com checkbox 'Avançado' desmarcado e confirmar envio de todos os eventos. Testar com checkbox marcado e confirmar envio apenas dos eventos selecionados."
+          },
+          {
+            "id": 5,
+            "title": "Atualizar validação e testar comportamento do formulário",
+            "description": "Atualizar a validação do formulário para considerar a nova lógica de visibilidade e seleção de eventos, e testar o comportamento tanto para novo cadastro quanto para edição de webhook existente.",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "Adaptar regras de validação para aceitar seleção implícita de eventos quando a seção estiver oculta. Realizar testes funcionais para garantir que o formulário funciona corretamente em ambos os modos (avançado e padrão) e em cadastro e edição.",
+            "status": "done",
+            "testStrategy": "Verificar validação do formulário em ambos os estados do checkbox 'Avançado'. Testar fluxo completo de cadastro e edição, confirmando comportamento esperado da seleção e submissão dos eventos."
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Instalar Scramble e documentar API de mensagens",
+        "description": "Instalar a biblioteca Scramble (https://scramble.dedoc.co/) e atualizar o MessagingController.php para gerar documentação automática da API REST, começando com o endpoint de mensagens.",
+        "details": "1. Instalar o pacote Scramble via Composer:\n   - Executar: composer require dedoc/scramble\n   - Publicar configurações se necessário\n2. Configurar Scramble no projeto Laravel:\n   - Adicionar provider se necessário\n   - Configurar rota para acessar a documentação (geralmente /docs/api)\n   - Definir configurações de segurança e autenticação\n3. Atualizar app/Http/Controllers/Api/MessagingController.php:\n   - Adicionar docblocks PHP com anotações para Scramble\n   - Documentar parâmetros de entrada usando @param\n   - Documentar responses usando @return e códigos HTTP\n   - Adicionar exemplos de request/response usando @example\n   - Documentar possíveis erros e exceções\n4. Configurar middleware e autenticação na documentação:\n   - Definir esquemas de autenticação (Bearer token, API key)\n   - Configurar grupos de endpoints\n5. Testar a geração automática da documentação:\n   - Acessar /docs/api para ver a documentação gerada\n   - Verificar se todos os endpoints estão listados corretamente\n6. Personalizar aparência se necessário:\n   - Configurar título, descrição e informações da API\n   - Adicionar logo e customizações visuais\n7. Criar padrão para futuros controllers seguirem o mesmo formato de documentação",
+        "testStrategy": "1. Verificar se o Scramble foi instalado corretamente:\n   - Confirmar presença no composer.json\n   - Testar acesso à rota de documentação\n2. Validar documentação do MessagingController:\n   - Acessar /docs/api e localizar endpoints de mensagem\n   - Verificar se parâmetros estão documentados corretamente\n   - Confirmar se examples de request/response aparecem\n   - Testar se códigos de status HTTP estão listados\n3. Testar funcionalidade da documentação interativa:\n   - Usar a interface para fazer requests de teste\n   - Verificar se autenticação funciona na documentação\n   - Confirmar se responses são exibidos corretamente\n4. Validar que a documentação reflete o código atual:\n   - Comparar documentação com implementação real\n   - Verificar se mudanças no código atualizam a documentação\n5. Testar acesso e permissões:\n   - Verificar se documentação está acessível apenas para usuários autorizados\n   - Confirmar configurações de segurança",
+        "status": "done",
+        "dependencies": [
+          3
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Instalar o pacote Scramble via Composer",
+            "description": "Executar a instalação do pacote dedoc/scramble usando o Composer e publicar as configurações padrão se necessário.",
+            "dependencies": [],
+            "details": "Rodar o comando 'composer require dedoc/scramble' no terminal do projeto Laravel. Após a instalação, publicar o arquivo de configuração do Scramble para permitir customizações futuras.",
+            "status": "done",
+            "testStrategy": "Confirmar a presença do pacote no arquivo composer.json e verificar se os arquivos de configuração foram publicados corretamente."
+          },
+          {
+            "id": 2,
+            "title": "Configurar Scramble no projeto Laravel",
+            "description": "Adicionar o provider do Scramble se necessário, configurar a rota para acessar a documentação (/docs/api) e definir as configurações de segurança e autenticação para acesso à documentação.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Verificar se o provider do Scramble está registrado no Laravel. Configurar as rotas padrão adicionadas pelo Scramble para visualização da documentação. Ajustar as permissões de acesso, definindo gates ou middleware para proteger a rota de documentação conforme o ambiente e requisitos de segurança.",
+            "status": "done",
+            "testStrategy": "Testar o acesso à rota /docs/api para garantir que a documentação está acessível e protegida conforme configurado."
+          },
+          {
+            "id": 3,
+            "title": "Atualizar MessagingController.php com anotações para Scramble",
+            "description": "Adicionar docblocks PHP no controller app/Http/Controllers/Api/MessagingController.php para documentar parâmetros, respostas, exemplos e possíveis erros usando as anotações compatíveis com Scramble.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "Incluir comentários estruturados com @param para parâmetros de entrada, @return para respostas HTTP, @example para exemplos de request/response e documentação de erros e exceções para o endpoint de mensagens.",
+            "status": "done",
+            "testStrategy": "Verificar se as anotações aparecem corretamente na documentação gerada e se refletem os detalhes do endpoint de mensagens."
+          },
+          {
+            "id": 4,
+            "title": "Configurar middleware e autenticação na documentação da API",
+            "description": "Definir os esquemas de autenticação (como Bearer token ou API key) para a documentação e organizar os endpoints em grupos para melhor navegação.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "Configurar no arquivo de configuração do Scramble os métodos de autenticação usados pela API para que a documentação reflita as necessidades de segurança. Agrupar endpoints relacionados para facilitar a leitura e uso da documentação.",
+            "status": "done",
+            "testStrategy": "Testar se a documentação exige autenticação conforme configurado e se os grupos de endpoints estão organizados corretamente."
+          },
+          {
+            "id": 5,
+            "title": "Testar e validar a geração automática da documentação",
+            "description": "Acessar a rota /docs/api para verificar se a documentação da API está sendo gerada automaticamente, incluindo o endpoint de mensagens, e personalizar a aparência se necessário.",
+            "dependencies": [
+              "6.3",
+              "6.4"
+            ],
+            "details": "Verificar se todos os endpoints documentados aparecem corretamente, se os parâmetros, respostas e exemplos estão visíveis e corretos. Ajustar título, descrição, logo e outras customizações visuais para adequar a documentação ao padrão do projeto.",
+            "status": "done",
+            "testStrategy": "Navegar pela documentação gerada, validar a presença e correção das informações do MessagingController e confirmar que as customizações visuais foram aplicadas."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Criar páginas de Termo de Uso e Política de Privacidade e link elas na landing page",
+        "description": "Desenvolver páginas estáticas para Termo de Uso e Política de Privacidade e adicionar links para essas páginas no rodapé da landing page principal.",
+        "details": "1. Criar estrutura de páginas estáticas:\n   - Criar rota para /termos-de-uso\n   - Criar rota para /politica-de-privacidade\n   - Implementar controllers ou views estáticas conforme arquitetura do projeto\n2. Desenvolver conteúdo das páginas:\n   - Página de Termos de Uso com seções sobre uso do serviço, responsabilidades, limitações\n   - Página de Política de Privacidade com informações sobre coleta, uso e proteção de dados\n   - Usar layout consistente com o design da aplicação\n3. Integrar com a landing page:\n   - Adicionar links no rodapé da página principal\n   - Garantir que os links abram em nova aba ou na mesma janela conforme UX definida\n   - Aplicar estilos adequados aos links (hover, active states)\n4. Implementar SEO básico:\n   - Meta tags apropriadas para cada página\n   - Títulos descritivos\n   - Estrutura HTML semântica\n5. Garantir responsividade das páginas em dispositivos móveis e desktop",
+        "testStrategy": "1. Verificar se as rotas /termos-de-uso e /politica-de-privacidade carregam corretamente\n2. Testar se o conteúdo das páginas está sendo exibido adequadamente\n3. Validar se os links no rodapé da landing page direcionam corretamente para as novas páginas\n4. Testar responsividade das páginas em diferentes tamanhos de tela\n5. Verificar se as meta tags e títulos estão sendo aplicados corretamente\n6. Confirmar que a navegação entre páginas funciona sem erros\n7. Testar acessibilidade básica (contraste, navegação por teclado)\n8. Validar se o estilo visual está consistente com o resto da aplicação",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Criar estrutura técnica das páginas estáticas",
+            "description": "Configurar rotas para /termos-de-uso e /politica-de-privacidade e implementar controllers ou views estáticas conforme a arquitetura do projeto.",
+            "dependencies": [],
+            "details": "Definir rotas no sistema, criar arquivos de views ou controllers para as páginas estáticas, garantir que as páginas carreguem corretamente sem lógica dinâmica.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Desenvolver conteúdo legal para as páginas",
+            "description": "Elaborar o texto do Termo de Uso e da Política de Privacidade com base em orientações legais, garantindo linguagem clara e conteúdo completo sobre uso do serviço e proteção de dados.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Incluir seções sobre uso do serviço, responsabilidades, limitações no Termo de Uso; e informações sobre coleta, uso, proteção e compartilhamento de dados na Política de Privacidade, seguindo boas práticas e legislação vigente.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Aplicar layout e design consistente",
+            "description": "Formatar as páginas de Termo de Uso e Política de Privacidade para manter o padrão visual da aplicação, garantindo boa usabilidade e leitura.",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Utilizar o mesmo template, cores, fontes e estilos da landing page principal, aplicar estilos para textos, títulos e links, e garantir que o conteúdo seja acessível e legível.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Integrar links das páginas no rodapé da landing page",
+            "description": "Adicionar links para as páginas de Termo de Uso e Política de Privacidade no rodapé da landing page principal, com comportamento e estilos adequados.",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Inserir links no rodapé, definir se abrem em nova aba ou mesma janela conforme UX, aplicar estilos para estados hover e active, e testar navegação correta.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implementar SEO básico nas páginas estáticas",
+            "description": "Adicionar meta tags, títulos descritivos e estrutura HTML semântica para otimizar o SEO das páginas de Termo de Uso e Política de Privacidade.",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Configurar tags meta description, keywords, títulos (title tags) claros e relevantes, usar tags HTML5 semânticas como <article>, <section> e <header> para melhorar indexação e acessibilidade.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Garantir responsividade e acessibilidade das páginas",
+            "description": "Testar e ajustar as páginas para que funcionem corretamente em dispositivos móveis e desktop, além de garantir acessibilidade conforme padrões web.",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Aplicar media queries para responsividade, verificar legibilidade em diferentes tamanhos de tela, testar navegação por teclado, contraste de cores e uso de leitores de tela.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Adicionar campo de aceite no cadastro de register-with-plan para Termo de Uso e Política de Privacidade",
+        "description": "Implementar checkbox obrigatório no formulário de cadastro register-with-plan para que o usuário aceite os Termos de Uso e Política de Privacidade antes de finalizar o registro.",
+        "details": "1. Localizar o componente/formulário de register-with-plan na aplicação\n2. Adicionar checkbox de aceite dos termos:\n   - Texto: 'Li e aceito os [Termos de Uso](/termos-de-uso) e [Política de Privacidade](/politica-de-privacidade)'\n   - Links para as páginas criadas na Task 7\n   - Campo obrigatório (required)\n   - Estilização consistente com o design existente\n3. Implementar validação do lado cliente:\n   - Impedir submissão do formulário se checkbox não estiver marcado\n   - Exibir mensagem de erro apropriada\n4. Implementar validação do lado servidor:\n   - Validar campo de aceite no controller/request\n   - Retornar erro se aceite não foi fornecido\n5. Atualizar banco de dados se necessário:\n   - Adicionar coluna 'terms_accepted' na tabela de usuários\n   - Incluir timestamp do aceite\n6. Posicionar o checkbox antes do botão de submissão\n7. Garantir que os links abram as páginas de termos corretamente\n8. Implementar tratamento de erro para casos onde as páginas de termos não estão disponíveis",
+        "testStrategy": "1. Verificar se o checkbox de aceite aparece corretamente no formulário register-with-plan\n2. Testar validação obrigatória:\n   - Tentar submeter formulário sem marcar checkbox\n   - Verificar se mensagem de erro é exibida\n   - Confirmar que formulário não é enviado\n3. Testar submissão válida:\n   - Marcar checkbox e preencher demais campos\n   - Verificar se cadastro é realizado com sucesso\n   - Confirmar que aceite foi salvo no banco de dados\n4. Testar links para Termos de Uso e Política de Privacidade:\n   - Verificar se links direcionam corretamente\n   - Testar abertura em nova aba/janela\n5. Validar responsividade do formulário em diferentes dispositivos\n6. Testar validação do lado servidor enviando requests sem o campo de aceite\n7. Verificar se styling está consistente com resto da aplicação",
+        "status": "pending",
+        "dependencies": [
+          7
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Criar sistema de templates de e-mail para comunicações transacionais",
+        "description": "Implementar sistema de templates de e-mail para envio de mensagens transacionais como boas-vindas, recuperação de senha, confirmação de cadastro e outras notificações do sistema.",
+        "details": "1. Criar estrutura de templates de e-mail:\n   - Criar diretório resources/views/emails/ para organizar templates\n   - Desenvolver template base (layout.blade.php) com header, footer e estilos consistentes\n   - Criar templates específicos: welcome.blade.php, password-reset.blade.php, email-verification.blade.php\n\n2. Configurar sistema de envio de e-mail:\n   - Verificar configuração do Laravel Mail no config/mail.php\n   - Criar Mailable classes para cada tipo de e-mail (WelcomeMail, PasswordResetMail, etc.)\n   - Implementar variáveis dinâmicas nos templates (nome do usuário, links, dados específicos)\n\n3. Integrar templates com fluxos existentes:\n   - Conectar template de boas-vindas ao processo de registro\n   - Integrar template de reset de senha ao sistema de recuperação\n   - Adicionar template de verificação de e-mail se necessário\n\n4. Implementar personalização:\n   - Adicionar logo da empresa nos templates\n   - Configurar cores e fonts consistentes com a identidade visual\n   - Criar versões responsivas para diferentes dispositivos\n\n5. Configurar queue para envio assíncrono:\n   - Configurar filas para evitar bloqueio da aplicação\n   - Implementar retry policies para falhas de envio",
+        "testStrategy": "1. Testar renderização dos templates:\n   - Verificar se todos os templates carregam corretamente\n   - Validar variáveis dinâmicas são substituídas adequadamente\n   - Testar responsividade em diferentes clientes de e-mail\n\n2. Testar envio de e-mails:\n   - Configurar ambiente de teste (Mailtrap ou similar)\n   - Testar envio de boas-vindas após novo cadastro\n   - Validar envio de e-mail de reset de senha\n   - Verificar outros fluxos transacionais\n\n3. Testar integração com sistema:\n   - Confirmar que e-mails são disparados nos momentos corretos\n   - Verificar se dados do usuário chegam corretamente nos templates\n   - Testar links e redirecionamentos nos e-mails\n\n4. Testar performance:\n   - Verificar se envios estão sendo processados via queue\n   - Testar comportamento com volume de e-mails\n   - Validar logs de envio e tratamento de erros",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implementar sistema de tickets de suporte na área administrativa",
+        "description": "Criar um sistema completo de tickets de suporte na área administrativa onde clientes podem abrir tickets com dúvidas e administradores podem gerenciá-los, utilizando pacotes Laravel existentes quando possível.",
+        "details": "1. Pesquisar e avaliar pacotes Laravel para sistema de tickets:\n   - Investigar pacotes como Laravel Ticketit, Simple Helpdesk, ou similares\n   - Avaliar compatibilidade com a versão atual do Laravel\n   - Verificar se mantém o padrão visual da plataforma\n\n2. Instalar e configurar o pacote selecionado:\n   - Executar instalação via Composer\n   - Publicar migrações e configurações necessárias\n   - Executar migrações para criar tabelas de tickets, categorias, status\n\n3. Criar área de tickets no painel administrativo:\n   - Adicionar seção 'Suporte' no menu lateral do admin\n   - Implementar dashboard com estatísticas de tickets\n   - Criar listagem de tickets com filtros (status, prioridade, categoria)\n   - Implementar visualização detalhada de tickets individuais\n\n4. Desenvolver interface para clientes:\n   - Criar área no dashboard do cliente para abrir tickets\n   - Implementar formulário de criação com campos: assunto, categoria, prioridade, descrição\n   - Adicionar sistema de anexos para screenshots/arquivos\n   - Criar histórico de tickets do cliente\n\n5. Implementar sistema de notificações:\n   - Configurar envio de e-mails automáticos quando ticket é criado/atualizado\n   - Integrar com sistema de templates de e-mail existente\n   - Adicionar notificações no painel para novos tickets\n\n6. Personalizar interface seguindo padrão visual:\n   - Adaptar views do pacote para usar o tema atual da plataforma\n   - Garantir consistência com componentes UI existentes\n   - Implementar responsividade para dispositivos móveis\n\n7. Configurar permissões e roles:\n   - Definir permissões para admins gerenciarem tickets\n   - Restringir acesso de clientes apenas aos próprios tickets\n   - Implementar diferentes níveis de acesso administrativo se necessário",
+        "testStrategy": "1. Testar criação de tickets pelo cliente:\n   - Verificar se formulário de criação funciona corretamente\n   - Validar campos obrigatórios e opcionais\n   - Testar upload de anexos\n   - Confirmar se ticket aparece na listagem do cliente\n\n2. Testar área administrativa:\n   - Verificar se novos tickets aparecem na listagem administrativa\n   - Testar filtros e busca de tickets\n   - Validar abertura e visualização de tickets individuais\n   - Testar alteração de status e prioridade\n   - Verificar sistema de respostas/comentários\n\n3. Testar sistema de notificações:\n   - Confirmar envio de e-mail quando ticket é criado\n   - Validar notificações quando admin responde ticket\n   - Testar templates de e-mail seguem padrão da plataforma\n\n4. Testar permissões e segurança:\n   - Verificar se cliente só acessa próprios tickets\n   - Confirmar que apenas admins podem gerenciar todos os tickets\n   - Testar tentativas de acesso não autorizado\n\n5. Testar interface e responsividade:\n   - Validar consistência visual com resto da plataforma\n   - Testar em diferentes dispositivos e resoluções\n   - Verificar usabilidade do sistema de tickets\n\n6. Testar performance:\n   - Verificar carregamento com grande volume de tickets\n   - Testar paginação e filtros com muitos registros",
+        "status": "pending",
+        "dependencies": [
+          1,
+          9
+        ],
+        "priority": "medium",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-22T23:39:15.029Z",
+      "description": "Default tasks context",
+      "updated": "2025-10-13T00:22:19.145Z"
+    }
+  }
+}
