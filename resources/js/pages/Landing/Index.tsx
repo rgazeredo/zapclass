@@ -469,12 +469,12 @@ export default function LandingPage() {
                                 <h4 className="mb-4 text-lg font-semibold">{t('footer.legal')}</h4>
                                 <ul className="space-y-2">
                                     <li>
-                                        <a href="#" className="text-gray-400 hover:text-white">
+                                        <a href="/politica-de-privacidade" className="text-gray-400 hover:text-white">
                                             {t('footer.privacyPolicy')}
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" className="text-gray-400 hover:text-white">
+                                        <a href="/termos-de-uso" className="text-gray-400 hover:text-white">
                                             {t('footer.termsOfService')}
                                         </a>
                                     </li>

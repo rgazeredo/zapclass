@@ -111,7 +111,7 @@ class WhatsAppConnectionController extends Controller
                 'status' => 'creating',
             ]);
 
-            // Criar instância na API
+            // Criar instância na API (retorna ['data' => resposta, 'account' => UazApiAccount])
             $apiResponse = $this->uazApiService->createInstance([
                 'name' => $connection->name,
                 'system_name' => 'ZapClass',
@@ -121,12 +121,16 @@ class WhatsAppConnectionController extends Controller
 
             Log::debug('apiResponse', $apiResponse);
 
-            // Atualizar conexão com dados da API
+            // Atualizar conexão com dados da API e vincular à conta
             $connection->update([
                 'status' => 'created',
-                'token' => $apiResponse['instance']['token'] ?? null,
-                'instance_id' => $apiResponse['instance']['id'] ?? null,
+                'token' => $apiResponse['data']['instance']['token'] ?? null,
+                'instance_id' => $apiResponse['data']['instance']['id'] ?? null,
+                'uaz_api_account_id' => $apiResponse['account']->id,
             ]);
+
+            // Incrementar contador de conexões da conta
+            $apiResponse['account']->incrementConnections();
 
             $connection->enableApi();
 
@@ -229,12 +233,12 @@ class WhatsAppConnectionController extends Controller
 
             if ($whatsapp->name !== $request->name) {
                 // Atualiza o nome da instância na API
-                $this->uazApiService->updateInstance($whatsapp->token, $request->name);
+                $this->uazApiService->updateInstance($whatsapp, $request->name);
             }
 
             if ($whatsapp->admin_field_1 !== $request->admin_field_1 || $whatsapp->admin_field_2 !== $request->admin_field_2) {
                 // Atualiza os campos admin_field_1 e admin_field_2 na instância na API
-                $this->uazApiService->updateAdminFields($whatsapp->instance_id, $request->admin_field_1, $request->admin_field_2);
+                $this->uazApiService->updateAdminFields($whatsapp, $whatsapp->instance_id, $request->admin_field_1, $request->admin_field_2);
             }
 
             $whatsapp->update([
@@ -251,8 +255,16 @@ class WhatsAppConnectionController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            $this->uazApiService->updateInstance($whatsapp->token, $whatsapp->name);
-            $this->uazApiService->updateAdminFields($whatsapp->instance_id, $whatsapp->admin_field_1, $whatsapp->admin_field_2);
+            // Reverter alterações na API em caso de erro
+            try {
+                $this->uazApiService->updateInstance($whatsapp, $whatsapp->name);
+                $this->uazApiService->updateAdminFields($whatsapp, $whatsapp->instance_id, $whatsapp->admin_field_1, $whatsapp->admin_field_2);
+            } catch (Exception $revertException) {
+                Log::warning('Failed to revert changes on API', [
+                    'connection_id' => $whatsapp->id,
+                    'error' => $revertException->getMessage()
+                ]);
+            }
 
             return redirect()->route('whatsapp.index')
                 ->with('error', 'Failed to update WhatsApp connection: ' . $e->getMessage());
@@ -555,11 +567,19 @@ class WhatsAppConnectionController extends Controller
         DB::beginTransaction();
 
         try {
+            // Guardar referência da conta antes de deletar
+            $account = $whatsapp->uazApiAccount;
+
             // Deletar instância na API primeiro
             $this->uazApiService->deleteInstance($whatsapp->token);
 
             // Deletar conexão do banco de dados
             $whatsapp->delete();
+
+            // Decrementar contador de conexões da conta (libera slot)
+            if ($account) {
+                $account->decrementConnections();
+            }
 
             DB::commit();
 
@@ -575,7 +595,15 @@ class WhatsAppConnectionController extends Controller
                 'error' => $e->getMessage()
             ]);
 
+            // Guardar referência da conta antes de deletar
+            $account = $whatsapp->uazApiAccount;
+
             $whatsapp->delete();
+
+            // Decrementar contador de conexões da conta (libera slot)
+            if ($account) {
+                $account->decrementConnections();
+            }
 
             return redirect()->route('whatsapp.index')
                 ->with('warning', 'WhatsApp connection deleted, but there was an issue with the external API.');

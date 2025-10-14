@@ -33,6 +33,14 @@ Route::get('/', function () {
     return Inertia::render('Landing/Index');
 })->name('home');
 
+// Terms and Privacy routes
+Route::get('/termos-de-uso', function () {
+    return Inertia::render('Legal/TermsOfService');
+})->name('terms');
+
+Route::get('/politica-de-privacidade', function () {
+    return Inertia::render('Legal/PrivacyPolicy');
+})->name('privacy');
 
 // Test route
 Route::get('/test-route', function () {
