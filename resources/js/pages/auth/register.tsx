@@ -9,25 +9,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useHookForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useState } from 'react';
-
-const registerSchema = z.object({
-    name: z.string().min(1, 'Name is required').min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    password_confirmation: z.string(),
-}).refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match",
-    path: ["password_confirmation"],
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { post, processing } = useForm();
 
-    const form = useHookForm({
+    const registerSchema = z.object({
+        name: z.string().min(1, t('auth.register.nameRequired')).min(2, t('auth.register.nameMinLength')),
+        email: z.string().email(t('auth.register.emailInvalid')),
+        password: z.string().min(8, t('auth.register.passwordMinLength')),
+        password_confirmation: z.string(),
+    }).refine((data) => data.password === data.password_confirmation, {
+        message: t('auth.register.passwordsDontMatch'),
+        path: ["password_confirmation"],
+    });
+
+    type RegisterFormValues = z.infer<typeof registerSchema>;
+
+    const form = useHookForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: '',
@@ -37,13 +39,13 @@ export default function Register() {
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: RegisterFormValues) => {
         post('/register', data);
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
-            <Head title="Register" />
+        <AuthLayout title={t('auth.register.title')} description={t('auth.register.description')}>
+            <Head title={t('auth.register.pageTitle')} />
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -53,11 +55,11 @@ export default function Register() {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>{t('auth.register.nameLabel')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="text"
-                                            placeholder="Full name"
+                                            placeholder={t('auth.register.namePlaceholder')}
                                             autoFocus
                                             autoComplete="name"
                                             {...field}
@@ -73,11 +75,11 @@ export default function Register() {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email address</FormLabel>
+                                    <FormLabel>{t('auth.register.emailLabel')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
-                                            placeholder="email@example.com"
+                                            placeholder={t('auth.register.emailPlaceholder')}
                                             autoComplete="email"
                                             {...field}
                                         />
@@ -92,12 +94,12 @@ export default function Register() {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel>{t('auth.register.passwordLabel')}</FormLabel>
                                     <FormControl>
                                         <div className="relative">
                                             <Input
                                                 type={showPassword ? 'text' : 'password'}
-                                                placeholder="Password"
+                                                placeholder={t('auth.register.passwordPlaceholder')}
                                                 autoComplete="new-password"
                                                 {...field}
                                             />
@@ -126,12 +128,12 @@ export default function Register() {
                             name="password_confirmation"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Confirm password</FormLabel>
+                                    <FormLabel>{t('auth.register.confirmPasswordLabel')}</FormLabel>
                                     <FormControl>
                                         <div className="relative">
                                             <Input
                                                 type={showConfirmPassword ? 'text' : 'password'}
-                                                placeholder="Confirm password"
+                                                placeholder={t('auth.register.confirmPasswordPlaceholder')}
                                                 autoComplete="new-password"
                                                 {...field}
                                             />
@@ -157,17 +159,17 @@ export default function Register() {
 
                         <Button type="submit" className="w-full" disabled={processing}>
                             {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Create account
+                            {t('auth.register.createAccountButton')}
                         </Button>
                     </div>
 
                     <div className="text-center text-sm text-muted-foreground">
-                        Already have an account?{' '}
+                        {t('auth.register.haveAccount')}{' '}
                         <Link
                             href={login()}
                             className="text-primary underline-offset-4 hover:underline"
                         >
-                            Log in
+                            {t('auth.register.logIn')}
                         </Link>
                     </div>
                 </form>

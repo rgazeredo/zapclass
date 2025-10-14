@@ -1,9 +1,18 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useTranslation } from 'react-i18next';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
@@ -11,10 +20,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{t('navigation.platform', 'Platform')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('navigation.menu', 'Menu')}</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
-                    <Collapsible key={item.title} asChild defaultOpen={item.items && page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}>
+                    <Collapsible
+                        key={item.title}
+                        asChild
+                        defaultOpen={item.items && page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
+                    >
                         <SidebarMenuItem>
                             {item.items ? (
                                 <>
@@ -30,19 +43,35 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {item.items.map((subItem) => (
-                                                <SidebarMenuSubItem key={subItem.title}>
-                                                    <SidebarMenuSubButton
-                                                        asChild
-                                                        isActive={page.url === (typeof subItem.href === 'string' ? subItem.href : subItem.href.url)}
-                                                    >
-                                                        <Link href={subItem.href} prefetch>
-                                                            {subItem.icon && <subItem.icon />}
-                                                            <span>{subItem.title}</span>
-                                                        </Link>
-                                                    </SidebarMenuSubButton>
-                                                </SidebarMenuSubItem>
-                                            ))}
+                                            {item.items.map((subItem) => {
+                                                const subHref = typeof subItem.href === 'string' ? subItem.href : subItem.href.url;
+                                                const subIsExternal = subItem.target === '_blank' || /^https?:\/\//.test(subHref);
+
+                                                return (
+                                                    <SidebarMenuSubItem key={subItem.title}>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            isActive={page.url === subHref}
+                                                        >
+                                                            {subIsExternal ? (
+                                                                <a
+                                                                    href={subHref}
+                                                                    target={subItem.target}
+                                                                    rel={subItem.target === '_blank' ? 'noopener noreferrer' : undefined}
+                                                                >
+                                                                    {subItem.icon && <subItem.icon />}
+                                                                    <span>{subItem.title}</span>
+                                                                </a>
+                                                            ) : (
+                                                                <Link href={subItem.href} prefetch>
+                                                                    {subItem.icon && <subItem.icon />}
+                                                                    <span>{subItem.title}</span>
+                                                                </Link>
+                                                            )}
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                );
+                                            })}
                                         </SidebarMenuSub>
                                     </CollapsibleContent>
                                 </>
@@ -52,10 +81,23 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     isActive={page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
                                     tooltip={{ children: item.title }}
                                 >
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
+                                    {
+                                        (item.target === '_blank' || /^https?:\/\//.test(typeof item.href === 'string' ? item.href : item.href.url)) ? (
+                                            <a
+                                                href={typeof item.href === 'string' ? item.href : item.href.url}
+                                                target={item.target}
+                                                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                                            >
+                                                {item.icon && <item.icon />}
+                                                <span>{item.title}</span>
+                                            </a>
+                                        ) : (
+                                            <Link href={item.href} prefetch>
+                                                {item.icon && <item.icon />}
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        )
+                                    }
                                 </SidebarMenuButton>
                             )}
                         </SidebarMenuItem>

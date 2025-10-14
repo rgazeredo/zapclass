@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../../components/ui/input';
 import { IconLoader2, IconEye, IconEyeOff, IconArrowLeft } from '@tabler/icons-react';
 import PlanSummary from '../../components/PlanSummary';
+import { toast } from 'sonner';
 
 interface Plan {
     id: string;
@@ -56,7 +57,6 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { post } = useForm();
 
     const form = useHookForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
@@ -106,7 +106,7 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
                 // Tratar erros de validação
                 if (result.errors) {
                     Object.keys(result.errors).forEach((field) => {
-                        form.setError(field as any, {
+                        form.setError(field as keyof RegisterFormValues, {
                             type: 'server',
                             message: result.errors[field][0],
                         });
@@ -115,9 +115,12 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
                     throw new Error(result.error || 'Erro interno do servidor');
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Erro ao enviar formulário:', error);
-            alert('Erro ao processar cadastro. Tente novamente.');
+            toast.error('Erro ao processar cadastro. Tente novamente.', {
+                duration: 5000,
+                description: error instanceof Error ? error.message : 'Erro desconhecido',
+            });
         } finally {
             setIsSubmitting(false);
         }

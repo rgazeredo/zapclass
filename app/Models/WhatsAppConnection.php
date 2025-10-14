@@ -16,6 +16,7 @@ class WhatsAppConnection extends Model
 
     protected $fillable = [
         'tenant_id',
+        'uaz_api_account_id',
         'name',
         'system_name',
         'admin_field_1',
@@ -41,6 +42,11 @@ class WhatsAppConnection extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function uazApiAccount(): BelongsTo
+    {
+        return $this->belongsTo(UazApiAccount::class, 'uaz_api_account_id');
     }
 
     public function webhooks(): HasMany

@@ -4,8 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid } from 'lucide-react';
-import { IconBrandWhatsapp, IconApi, IconMessage2, IconInfoCircle } from '@tabler/icons-react';
+import { IconApi, IconBrandWhatsapp, IconCreditCard, IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from './app-logo';
 
@@ -16,7 +15,7 @@ export function AppSidebar() {
         {
             title: t('dashboard.title'),
             href: dashboard(),
-            icon: LayoutGrid,
+            icon: IconLayoutGrid,
         },
         {
             title: t('whatsapp.title'),
@@ -24,26 +23,15 @@ export function AppSidebar() {
             icon: IconBrandWhatsapp,
         },
         {
-            title: 'Documentação da API',
-            href: '/api-docs',
+            title: t('billing.title'),
+            href: '/billing',
+            icon: IconCreditCard,
+        },
+        {
+            title: t('api.title'),
+            href: 'https://docs.zapclass.com.br',
             icon: IconApi,
-            items: [
-                {
-                    title: 'Enviar Mensagem',
-                    href: '/api-docs/send-message',
-                    icon: IconMessage2,
-                },
-                {
-                    title: 'Status da Mensagem',
-                    href: '/api-docs/message-status',
-                    icon: IconInfoCircle,
-                },
-                {
-                    title: 'Informações da Conexão',
-                    href: '/api-docs/connection-info',
-                    icon: IconApi,
-                },
-            ],
+            target: '_blank',
         },
     ];
 

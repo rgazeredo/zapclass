@@ -19,7 +19,7 @@ export function ApiDataModal({ open, onClose, connection }: ApiDataModalProps) {
     const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
 
     // Dados da API (estes valores devem vir de configurações do sistema)
-    const API_URL = 'https://api.zapclass.com.br/v1';
+    const API_URL = 'https://zapclass.com.br/api/v1';
 
     const handleOpenChange = (newOpen: boolean) => {
         if (!newOpen) {
@@ -71,31 +71,13 @@ export function ApiDataModal({ open, onClose, connection }: ApiDataModalProps) {
                         </div>
                     </div>
 
-                    {/* ID da Instância */}
-                    {connection.client_instance_id && (
-                        <div className="space-y-2">
-                            <Label htmlFor="instance-id">{t('whatsapp.instanceId')}</Label>
-                            <div className="flex gap-2">
-                                <Input id="instance-id" value={connection.client_instance_id} readOnly className="flex-1 font-mono text-sm" />
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(connection.client_instance_id || '', 'ID')}
-                                    title={t('whatsapp.copyId')}
-                                >
-                                    <IconCopy className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Token da Instância */}
+                    {/* Chave da API */}
                     <div className="space-y-2">
-                        <Label htmlFor="instance-token">{t('whatsapp.instanceToken')}</Label>
+                        <Label htmlFor="instance-token">{t('whatsapp.apiKey')}</Label>
                         <div className="flex gap-2">
                             <Input
                                 id="instance-token"
-                                value={showToken ? connection.client_token || 'Token não disponível' : maskToken(connection.client_token || '')}
+                                value={showToken ? connection.api_key || 'Token não disponível' : maskToken(connection.api_key || '')}
                                 readOnly
                                 className="flex-1 font-mono text-sm"
                                 type={showToken ? 'text' : 'password'}
@@ -111,14 +93,14 @@ export function ApiDataModal({ open, onClose, connection }: ApiDataModalProps) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => copyToClipboard(connection.client_token || '', t('whatsapp.token'))}
+                                onClick={() => copyToClipboard(connection.api_key || '', t('whatsapp.token'))}
                                 title={t('whatsapp.copyToken')}
-                                disabled={!connection.client_token}
+                                disabled={!connection.api_key}
                             >
                                 <IconCopy className="h-4 w-4" />
                             </Button>
                         </div>
-                        {!connection.client_token && <p className="text-sm text-red-600">{t('whatsapp.tokenNotAvailable')}</p>}
+                        {!connection.api_key && <p className="text-sm text-red-600">{t('whatsapp.apiKeyNotAvailable')}</p>}
                     </div>
 
                     {/* Informações Adicionais */}

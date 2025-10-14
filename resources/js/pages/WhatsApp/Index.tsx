@@ -14,6 +14,7 @@ import { IconApi, IconBrandWhatsapp, IconEdit, IconLoader2, IconPlus, IconQrcode
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 interface WhatsAppIndexProps {
     connections: WhatsAppConnection[];
@@ -121,11 +122,7 @@ export default function WhatsAppIndex({
     };
 
     const handleShowWebhooks = (connectionId: number) => {
-        const connection = connections.find((c) => c.id === connectionId);
-        if (connection) {
-            setSelectedWebhookConnection(connection);
-            setWebhookModalOpen(true);
-        }
+        router.visit(`/whatsapp/${connectionId}/webhooks-page`);
     };
 
     const handleCloseWebhookModal = () => {
@@ -229,11 +226,17 @@ export default function WhatsAppIndex({
                 console.log(`QR Code generated for connection ${connectionId}. Starting status polling...`);
                 startStatusPolling(connectionId);
             } else {
-                alert(data.message || 'Erro ao gerar QR code');
+                toast.error(data.message || t('whatsapp.errorGeneratingQR'), {
+                    duration: 5000,
+                    description: data.attempts ? t('whatsapp.attemptsRealized', { attempts: data.attempts }) : undefined,
+                });
             }
         } catch (error) {
             console.error('Erro ao gerar QR code:', error);
-            alert('Erro ao gerar QR code');
+            toast.error(t('whatsapp.errorGeneratingQR'), {
+                duration: 5000,
+                description: error instanceof Error ? error.message : t('whatsapp.unknownError'),
+            });
         } finally {
             setIsGeneratingQR(false);
         }
@@ -267,11 +270,16 @@ export default function WhatsAppIndex({
                     router.reload();
                 }, 1000);
             } else {
-                alert(data.message || 'Erro ao desconectar instância');
+                toast.error(data.message || t('whatsapp.errorDisconnecting'), {
+                    duration: 5000,
+                });
             }
         } catch (error) {
             console.error('Erro ao desconectar instância:', error);
-            alert('Erro ao desconectar instância');
+            toast.error(t('whatsapp.errorDisconnecting'), {
+                duration: 5000,
+                description: error instanceof Error ? error.message : t('whatsapp.unknownError'),
+            });
         }
     };
 

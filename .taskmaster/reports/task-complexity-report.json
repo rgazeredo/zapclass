@@ -1,0 +1,45 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-12T19:42:45.842Z",
+		"tasksAnalyzed": 4,
+		"totalTasks": 10,
+		"analysisCount": 4,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 7,
+			"taskTitle": "Criar páginas de Termo de Uso e Política de Privacidade e link elas na landing page",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Detalhe as etapas para criação das páginas estáticas, desenvolvimento do conteúdo legal, integração com a landing page, implementação de SEO básico, garantia de responsividade e testes de acessibilidade.",
+			"reasoning": "Tarefa de complexidade moderada por envolver criação de páginas estáticas com conteúdo legal, integração visual e funcional com a landing page, além de cuidados com SEO e responsividade. Não envolve lógica complexa, mas requer atenção a detalhes legais e UX."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Adicionar campo de aceite no cadastro de register-with-plan para Termo de Uso e Política de Privacidade",
+			"complexityScore": 5,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Descreva a localização do formulário, adição do checkbox com links, validações cliente e servidor, atualização do banco de dados, posicionamento visual, tratamento de erros e testes de usabilidade e responsividade.",
+			"reasoning": "Complexidade moderada devido à necessidade de alterações no front-end e back-end, validações em múltiplas camadas, atualização do banco de dados e garantia de consistência visual e funcional, incluindo tratamento de erros."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Criar sistema de templates de e-mail para comunicações transacionais",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Detalhe a criação da estrutura de templates, configuração do sistema de envio, integração com fluxos existentes, personalização visual, implementação de responsividade, configuração de filas para envio assíncrono e testes de renderização, envio e performance.",
+			"reasoning": "Tarefa de complexidade alta por envolver múltiplos templates dinâmicos, integração com processos do sistema, configuração de filas para envio assíncrono, personalização visual e testes extensivos em diferentes clientes de e-mail."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Implementar sistema de tickets de suporte na área administrativa",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Explique a pesquisa e avaliação de pacotes Laravel, instalação e configuração, criação da área administrativa e cliente, implementação de notificações, personalização visual, configuração de permissões, testes de funcionalidade, segurança, usabilidade e performance.",
+			"reasoning": "Alta complexidade devido à abrangência do sistema, integração com pacotes externos, múltiplas interfaces (admin e cliente), sistema de notificações, controle de permissões, personalização visual e necessidade de testes rigorosos em várias frentes."
+		}
+	]
+}

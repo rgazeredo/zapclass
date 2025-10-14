@@ -18,7 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust Cloudflare proxies
+        $middleware->trustProxies(at: '*');
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        // Exclude webhook routes from CSRF verification (external APIs call these endpoints)
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
+        ]);
 
         $middleware->web(append: [
             HandleAppearance::class,

@@ -16,12 +16,16 @@ RUN apt-get update && apt-get install -y \
     npm \
     supervisor \
     cron \
-    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd opcache
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+
+# Copiar configurações do PHP-FPM e PHP
+COPY php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY php-fpm/php.ini /usr/local/etc/php/conf.d/custom.ini
 
 COPY . .
 

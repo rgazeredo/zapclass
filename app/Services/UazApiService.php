@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\UazApiAccount;
 use App\Models\WhatsAppConnection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -9,10 +10,6 @@ use Exception;
 
 class UazApiService
 {
-    // private const BASE_URL = 'https://api.uazapi.com';
-    private const BASE_URL = 'https://w4digital.uazapi.com';
-    private const TOKEN = 'X6qJRwJZ9UGQcvIcw5bvFrojp52YCtabXZBg2P4hajIJq97a30';
-
     protected ApiLogger $logger;
 
     public function __construct(ApiLogger $logger)
@@ -26,17 +23,46 @@ class UazApiService
     }
 
     /**
+     * Busca uma conta UazAPI disponível ou retorna erro
+     */
+    protected function getAvailableAccount(): UazApiAccount
+    {
+        $account = UazApiAccount::findAvailableAccount();
+
+        if (!$account) {
+            throw new Exception('Nenhuma conta UazAPI disponível. Todos os planos atingiram o limite de conexões.');
+        }
+
+        return $account;
+    }
+
+    /**
+     * Retorna a conta UazAPI de uma conexão específica
+     */
+    protected function getConnectionAccount(WhatsAppConnection $connection): UazApiAccount
+    {
+        if (!$connection->uaz_api_account_id || !$connection->uazApiAccount) {
+            throw new Exception('Conexão não possui conta UazAPI vinculada');
+        }
+
+        return $connection->uazApiAccount;
+    }
+
+    /**
      * Criar uma nova instância
      *
      * @param array $options Opções adicionais para a instância
-     * @return array
+     * @return array Retorna ['data' => resposta da API, 'account' => UazApiAccount usada]
      * @throws Exception
      */
     public function createInstance(array $options = []): array
     {
-        $url = self::BASE_URL . '/instance/init';
+        // Busca conta disponível
+        $account = $this->getAvailableAccount();
+
+        $url = $account->base_url . '/instance/init';
         $headers = [
-            'admintoken' => self::TOKEN,
+            'admintoken' => $account->admin_token,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];
@@ -65,6 +91,8 @@ class UazApiService
                 metadata: [
                     'instance_name' => $options['name'],
                     'system_name' => $options['system_name'],
+                    'uaz_api_account_id' => $account->id,
+                    'uaz_api_account_name' => $account->name,
                 ]
             );
 
@@ -72,7 +100,13 @@ class UazApiService
                 throw new Exception('Falha ao criar instância: ' . $response->body());
             }
 
-            return $response->json();
+            $responseData = $response->json();
+
+            // Retorna dados da resposta + a conta usada
+            return [
+                'data' => $responseData,
+                'account' => $account,
+            ];
         } catch (Exception $e) {
             // Log da exception
             $this->logger->logException(
@@ -84,7 +118,10 @@ class UazApiService
                 exception: $e,
                 action: 'create_instance',
                 connection: null,
-                metadata: ['instance_name' => $options['name']]
+                metadata: [
+                    'instance_name' => $options['name'],
+                    'uaz_api_account_id' => $account->id,
+                ]
             );
 
             throw $e;
@@ -94,22 +131,26 @@ class UazApiService
     /**
      * Atualizar uma instância
      *
+     * @param WhatsAppConnection $connection
      * @param string $instanceName
      * @return array
      * @throws Exception
      */
-    public function updateInstance(string $token, string $instanceName): array
+    public function updateInstance(WhatsAppConnection $connection, string $instanceName): array
     {
+        $account = $this->getConnectionAccount($connection);
+
         try {
             Log::error('API Error: updateInstance', [
-                'instanceName' => $instanceName
+                'instanceName' => $instanceName,
+                'uaz_api_account_id' => $account->id,
             ]);
 
             $response = Http::withHeaders([
-                'token' => $token,
+                'token' => $connection->token,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/instance/updateInstanceName', [
+            ])->post($account->base_url . '/instance/updateInstanceName', [
                 'name' => $instanceName
             ]);
 
@@ -141,26 +182,30 @@ class UazApiService
     /**
      * Atualizar os campos admin_field_1 e admin_field_2 de uma instância
      *
+     * @param WhatsAppConnection $connection
      * @param string $instanceId
      * @param string $adminField01
      * @param string $adminField02
      * @return array
      * @throws Exception
      */
-    public function updateAdminFields(string $instanceId, ?string $adminField01 = null, ?string $adminField02 = null): array
+    public function updateAdminFields(WhatsAppConnection $connection, string $instanceId, ?string $adminField01 = null, ?string $adminField02 = null): array
     {
+        $account = $this->getConnectionAccount($connection);
+
         try {
             Log::error('API: updateAdminFields', [
                 'instanceId' => $instanceId,
                 'adminField01' => $adminField01,
-                'adminField02' => $adminField02
+                'adminField02' => $adminField02,
+                'uaz_api_account_id' => $account->id,
             ]);
 
             $response = Http::withHeaders([
-                'admintoken' => self::TOKEN,
+                'admintoken' => $account->admin_token,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/instance/updateAdminFields', [
+            ])->post($account->base_url . '/instance/updateAdminFields', [
                 'id' => $instanceId,
                 'adminField01' => $adminField01,
                 'adminField02' => $adminField02
@@ -200,7 +245,15 @@ class UazApiService
      */
     public function getInstanceStatus(string $token): array
     {
-        $url = self::BASE_URL . '/instance/status';
+        $connection = WhatsAppConnection::where('token', $token)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/instance/status';
         $headers = [
             'token' => $token,
             'Accept' => 'application/json',
@@ -211,8 +264,6 @@ class UazApiService
         try {
             $response = Http::withHeaders($headers)->get($url);
 
-            $connection = WhatsAppConnection::where('token', $token)->first();
-
             // Log da requisição
             $this->logger->logOutbound(
                 method: 'GET',
@@ -222,7 +273,7 @@ class UazApiService
                 response: $response,
                 action: 'get_instance_status',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             if (!$response->successful()) {
@@ -231,8 +282,6 @@ class UazApiService
 
             return $response->json();
         } catch (Exception $e) {
-            $connection = WhatsAppConnection::where('token', $token)->first();
-
             // Log da exception
             $this->logger->logException(
                 direction: 'outbound',
@@ -243,7 +292,7 @@ class UazApiService
                 exception: $e,
                 action: 'get_instance_status',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             throw $e;
@@ -260,15 +309,28 @@ class UazApiService
     public function deleteInstance(string $token): bool
     {
         try {
+            $connection = WhatsAppConnection::where('token', $token)->first();
+
+            if (!$connection || !$connection->uazApiAccount) {
+                Log::warning('API: deleteInstance - conexão ou conta não encontrada', [
+                    'token' => $token
+                ]);
+                // Tenta deletar mesmo sem ter a conta (fallback)
+                $url = 'https://w4digital.uazapi.com/instance'; // URL padrão como fallback
+            } else {
+                $account = $connection->uazApiAccount;
+                $url = $account->base_url . '/instance';
+            }
 
             Log::error('API Error: deleteInstance', [
-                'token' => $token
+                'token' => $token,
+                'url' => $url
             ]);
 
             $response = Http::withHeaders([
                 'token' => $token,
                 'Accept' => 'application/json',
-            ])->delete(self::BASE_URL . '/instance');
+            ])->delete($url);
 
             if (!$response->successful()) {
                 Log::error('API Error: deleteInstance', [
@@ -306,7 +368,15 @@ class UazApiService
      */
     public function disconnectInstance(string $instanceToken): array
     {
-        $url = self::BASE_URL . '/instance/disconnect';
+        $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/instance/disconnect';
         $headers = [
             'token' => $instanceToken,
             'Content-Type' => 'application/json',
@@ -318,8 +388,6 @@ class UazApiService
         try {
             $response = Http::withHeaders($headers)->post($url, new \stdClass());
 
-            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
-
             // Log da requisição
             $this->logger->logOutbound(
                 method: 'POST',
@@ -329,7 +397,7 @@ class UazApiService
                 response: $response,
                 action: 'disconnect_instance',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             if (!$response->successful()) {
@@ -338,8 +406,6 @@ class UazApiService
 
             return $response->json();
         } catch (Exception $e) {
-            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
-
             // Log da exception
             $this->logger->logException(
                 direction: 'outbound',
@@ -350,7 +416,7 @@ class UazApiService
                 exception: $e,
                 action: 'disconnect_instance',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             throw $e;
@@ -359,7 +425,9 @@ class UazApiService
 
     public function messagesText(WhatsAppConnection $connection, array $payload): array
     {
-        $url = self::BASE_URL . '/send/text';
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/text';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -474,7 +542,9 @@ class UazApiService
      */
     public function messagesMedia(WhatsAppConnection $connection, array $payload): array
     {
-        $url = self::BASE_URL . '/send/media';
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/media';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -587,7 +657,15 @@ class UazApiService
      */
     public function getQrCode(string $instanceToken): array
     {
-        $url = self::BASE_URL . '/instance/connect';
+        $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/instance/connect';
         $headers = [
             'token' => $instanceToken,
             'Content-Type' => 'application/json',
@@ -599,8 +677,6 @@ class UazApiService
         try {
             $response = Http::withHeaders($headers)->post($url, new \stdClass());
 
-            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
-
             // Log da requisição
             $this->logger->logOutbound(
                 method: 'POST',
@@ -610,7 +686,7 @@ class UazApiService
                 response: $response,
                 action: 'get_qr_code',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             $json = $response->json();
@@ -621,8 +697,6 @@ class UazApiService
 
             return $json;
         } catch (Exception $e) {
-            $connection = WhatsAppConnection::where('token', $instanceToken)->first();
-
             // Log da exception
             $this->logger->logException(
                 direction: 'outbound',
@@ -633,7 +707,7 @@ class UazApiService
                 exception: $e,
                 action: 'get_qr_code',
                 connection: $connection,
-                metadata: null
+                metadata: ['uaz_api_account_id' => $account->id]
             );
 
             throw $e;
@@ -651,12 +725,26 @@ class UazApiService
      */
     public function createWebhook(string $instanceToken, string $instanceId, array $webhookData): array
     {
+        $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
         try {
             // Preparar dados conforme documentação API
             $payload = [
+                'id' => $webhookData['id'],
                 'action' => 'add',
                 'url' => $webhookData['url']
             ];
+
+            // Adicionar campo enabled (boolean)
+            if (isset($webhookData['enabled'])) {
+                $payload['enabled'] = (bool) $webhookData['enabled'];
+            }
 
             // Adicionar eventos se especificados (API espera array, não string)
             if (isset($webhookData['events'])) {
@@ -665,25 +753,25 @@ class UazApiService
                     : $webhookData['events'];
             }
 
-            // TODO: Reativar quando API corrigir o excludeMessages
             // Adicionar eventos de exclusão se especificados (API espera array, não string)
-            // if (isset($webhookData['excludeMessages'])) {
-            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
-            //         ? explode(',', $webhookData['excludeMessages'])
-            //         : $webhookData['excludeMessages'];
-            // }
+            if (isset($webhookData['excludeMessages'])) {
+                $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+                    ? explode(',', $webhookData['excludeMessages'])
+                    : $webhookData['excludeMessages'];
+            }
 
             Log::info('API: Criando webhook via', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'instance_id' => $instanceId,
-                'payload' => $payload
+                'payload' => $payload,
+                'uaz_api_account_id' => $account->id,
             ]);
 
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/webhook', $payload);
+            ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
                 Log::error('API Error: createWebhook', [
@@ -717,30 +805,40 @@ class UazApiService
      *
      * @param string $instanceToken Token específico da instância
      * @param string $instanceId ID da instância
-     * @param string $webhookUrl URL do webhook para remover
+     * @param string $externalWebhookId ID externo do webhook para remover
      * @return array
      * @throws Exception
      */
-    public function deleteWebhook(string $instanceToken, string $instanceId, string $webhookUrl): array
+    public function deleteWebhook(string $instanceToken, string $instanceId, string $externalWebhookId): array
     {
+        $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
         try {
             // Preparar dados conforme documentação API
             $payload = [
-                'action' => 'remove',
-                'url' => $webhookUrl
+                'action' => 'delete',
+                'id' => $externalWebhookId
             ];
 
-            Log::info('API: Deletando webhook via', [
+            Log::info('API: Deletando webhook via ID externo', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'instance_id' => $instanceId,
-                'payload' => $payload
+                'external_webhook_id' => $externalWebhookId,
+                'payload' => $payload,
+                'uaz_api_account_id' => $account->id,
             ]);
 
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/webhook', $payload);
+            ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
                 Log::error('API Error: deleteWebhook', [
@@ -755,6 +853,7 @@ class UazApiService
             $data = $response->json();
 
             Log::info('Webhook Deleted: deleteWebhook', [
+                'external_webhook_id' => $externalWebhookId,
                 'response' => $data
             ]);
 
@@ -762,6 +861,7 @@ class UazApiService
         } catch (Exception $e) {
             Log::error('API Delete Webhook Exception', [
                 'message' => $e->getMessage(),
+                'external_webhook_id' => $externalWebhookId,
                 'instance_token' => substr($instanceToken, 0, 10) . '...'
             ]);
 
@@ -774,18 +874,32 @@ class UazApiService
      *
      * @param string $instanceToken Token específico da instância
      * @param string $instanceId ID da instância
-     * @param array $webhookData Dados do webhook
+     * @param array $webhookData Dados do webhook (deve incluir 'id' como external_webhook_id)
      * @return array
      * @throws Exception
      */
     public function updateWebhook(string $instanceToken, string $instanceId, array $webhookData): array
     {
+        $connection = WhatsAppConnection::where('token', $instanceToken)->first();
+
+        if (!$connection) {
+            throw new Exception('Conexão não encontrada para o token fornecido');
+        }
+
+        $account = $this->getConnectionAccount($connection);
+
         try {
             // Preparar dados conforme documentação API
             $payload = [
-                'action' => 'edit',
+                'action' => 'update',
+                'id' => $webhookData['id'], // Usar external_webhook_id
                 'url' => $webhookData['url']
             ];
+
+            // Adicionar campo enabled (boolean)
+            if (isset($webhookData['enabled'])) {
+                $payload['enabled'] = (bool) $webhookData['enabled'];
+            }
 
             // Adicionar eventos se especificados (API espera array, não string)
             if (isset($webhookData['events'])) {
@@ -794,25 +908,26 @@ class UazApiService
                     : $webhookData['events'];
             }
 
-            // TODO: Reativar quando API corrigir o excludeMessages
             // Adicionar eventos de exclusão se especificados (API espera array, não string)
-            // if (isset($webhookData['excludeMessages'])) {
-            //     $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
-            //         ? explode(',', $webhookData['excludeMessages'])
-            //         : $webhookData['excludeMessages'];
-            // }
+            if (isset($webhookData['excludeMessages'])) {
+                $payload['excludeMessages'] = is_string($webhookData['excludeMessages'])
+                    ? explode(',', $webhookData['excludeMessages'])
+                    : $webhookData['excludeMessages'];
+            }
 
-            Log::info('API: Editando webhook via', [
+            Log::info('API: Editando webhook via ID externo', [
                 'instance_token' => substr($instanceToken, 0, 10) . '...',
                 'instance_id' => $instanceId,
-                'payload' => $payload
+                'external_webhook_id' => $webhookData['id'],
+                'payload' => $payload,
+                'uaz_api_account_id' => $account->id,
             ]);
 
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post(self::BASE_URL . '/webhook', $payload);
+            ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
                 Log::error('API Error: updateWebhook', [
@@ -827,6 +942,7 @@ class UazApiService
             $data = $response->json();
 
             Log::info('Webhook Updated: updateWebhook', [
+                'external_webhook_id' => $webhookData['id'],
                 'response' => $data
             ]);
 
@@ -834,6 +950,7 @@ class UazApiService
         } catch (Exception $e) {
             Log::error('API Update Webhook Exception', [
                 'message' => $e->getMessage(),
+                'external_webhook_id' => $webhookData['id'] ?? null,
                 'instance_token' => substr($instanceToken, 0, 10) . '...'
             ]);
 

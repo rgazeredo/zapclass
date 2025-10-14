@@ -1,4 +1,3 @@
-import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -11,30 +10,32 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { IconCheck, IconLoader2 } from '@tabler/icons-react';
+import { useState } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Profile settings',
-        href: edit().url,
-    },
-];
-
-const profileSchema = z.object({
-    name: z.string().min(1, 'Name is required').min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email address'),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
-
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+    const { t } = useTranslation();
     const { auth } = usePage<SharedData>().props;
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const { post, processing } = useForm();
 
-    const form = useHookForm({
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.profile.title'),
+            href: edit().url,
+        },
+    ];
+
+    const profileSchema = z.object({
+        name: z.string().min(1, t('settings.profile.nameRequired')).min(2, t('settings.profile.nameMinLength')),
+        email: z.string().email(t('settings.profile.emailInvalid')),
+    });
+
+    type ProfileFormValues = z.infer<typeof profileSchema>;
+
+    const form = useHookForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             name: auth.user.name || '',
@@ -42,7 +43,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: ProfileFormValues) => {
         post(edit().url, {
             ...data,
             preserveScroll: true,
@@ -55,11 +56,11 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title={t('settings.profile.pageTitle')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title={t('settings.profile.heading')} description={t('settings.profile.description')} />
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -68,13 +69,9 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Name</FormLabel>
+                                        <FormLabel>{t('settings.profile.nameLabel')}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Full name"
-                                                autoComplete="name"
-                                                {...field}
-                                            />
+                                            <Input placeholder={t('settings.profile.namePlaceholder')} autoComplete="name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -86,11 +83,11 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email address</FormLabel>
+                                        <FormLabel>{t('settings.profile.emailLabel')}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="email"
-                                                placeholder="Email address"
+                                                placeholder={t('settings.profile.emailPlaceholder')}
                                                 autoComplete="username"
                                                 {...field}
                                             />
@@ -103,20 +100,18 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             {mustVerifyEmail && auth.user.email_verified_at === null && (
                                 <div>
                                     <p className="-mt-4 text-sm text-muted-foreground">
-                                        Your email address is unverified.{' '}
+                                        {t('settings.profile.emailUnverified')}{' '}
                                         <Link
                                             href={send()}
                                             as="button"
                                             className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                         >
-                                            Click here to resend the verification email.
+                                            {t('settings.profile.resendVerification')}
                                         </Link>
                                     </p>
 
                                     {status === 'verification-link-sent' && (
-                                        <div className="mt-2 text-sm font-medium text-green-600">
-                                            A new verification link has been sent to your email address.
-                                        </div>
+                                        <div className="mt-2 text-sm font-medium text-green-600">{t('settings.profile.verificationSent')}</div>
                                     )}
                                 </div>
                             )}
@@ -124,21 +119,19 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing} data-test="update-profile-button">
                                     {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Save
+                                    {t('settings.profile.saveButton')}
                                 </Button>
 
                                 {recentlySuccessful && (
                                     <div className="flex items-center gap-2 text-sm text-green-600">
                                         <IconCheck className="h-4 w-4" />
-                                        Saved
+                                        {t('settings.profile.saved')}
                                     </div>
                                 )}
                             </div>
                         </form>
                     </Form>
                 </div>
-
-                <DeleteUser />
             </SettingsLayout>
         </AppLayout>
     );

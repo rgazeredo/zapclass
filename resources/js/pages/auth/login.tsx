@@ -3,37 +3,33 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { IconLoader2, IconEye, IconEyeOff } from '@tabler/icons-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm as useHookForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Head, Link, router } from '@inertiajs/react';
+import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useForm as useHookForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
 }
 
-const loginSchema = z.object({
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(1, 'Password is required'),
-    remember: z.boolean().optional().default(false),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const { data, setData, post, processing, errors } = useForm({
-        email: '',
-        password: '',
-        remember: false,
+
+    const loginSchema = z.object({
+        email: z.string().email(t('auth.login.emailRequired')),
+        password: z.string().min(1, t('auth.login.passwordRequired')),
+        remember: z.boolean(),
     });
 
-    const form = useHookForm({
+    type LoginFormValues = z.infer<typeof loginSchema>;
+
+    const form = useHookForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
             email: '',
@@ -42,19 +38,15 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         },
     });
 
-    const onSubmit = (formData: LoginFormValues) => {
-        post('/login');
+    const onSubmit = (data: LoginFormValues) => {
+        router.post('/login', data);
     };
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in" />
+        <AuthLayout title={t('auth.login.title')} description={t('auth.login.description')}>
+            <Head title={t('auth.login.pageTitle')} />
 
-            {status && (
-                <div className="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            {status && <div className="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-600">{status}</div>}
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -64,22 +56,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email address</FormLabel>
+                                    <FormLabel>{t('auth.login.emailLabel')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
-                                            placeholder="email@example.com"
+                                            placeholder={t('auth.login.emailPlaceholder')}
                                             autoFocus
                                             autoComplete="email"
                                             {...field}
-                                            onChange={(e) => {
-                                                field.onChange(e);
-                                                setData('email', e.target.value);
-                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />
-                                    {errors.email && <div className="text-sm text-red-600">{errors.email}</div>}
                                 </FormItem>
                             )}
                         />
@@ -90,13 +77,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             render={({ field }) => (
                                 <FormItem>
                                     <div className="flex items-center">
-                                        <FormLabel>Password</FormLabel>
+                                        <FormLabel>{t('auth.login.passwordLabel')}</FormLabel>
                                         {canResetPassword && (
-                                            <Link
-                                                href={request()}
-                                                className="ml-auto text-sm text-primary underline-offset-4 hover:underline"
-                                            >
-                                                Forgot password?
+                                            <Link href={request()} className="ml-auto text-sm text-primary underline-offset-4 hover:underline">
+                                                {t('auth.login.forgotPassword')}
                                             </Link>
                                         )}
                                     </div>
@@ -104,31 +88,22 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         <div className="relative">
                                             <Input
                                                 type={showPassword ? 'text' : 'password'}
-                                                placeholder="Password"
+                                                placeholder={t('auth.login.passwordPlaceholder')}
                                                 autoComplete="current-password"
                                                 {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                    setData('password', e.target.value);
-                                                }}
                                             />
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
                                                 onClick={() => setShowPassword(!showPassword)}
                                             >
-                                                {showPassword ? (
-                                                    <IconEyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <IconEye className="h-4 w-4" />
-                                                )}
+                                                {showPassword ? <IconEyeOff className="h-4 w-4" /> : <IconEye className="h-4 w-4" />}
                                             </Button>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
-                                    {errors.password && <div className="text-sm text-red-600">{errors.password}</div>}
                                 </FormItem>
                             )}
                         />
@@ -137,37 +112,24 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             control={form.control}
                             name="remember"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
-                                            onCheckedChange={(checked) => {
-                                                field.onChange(checked);
-                                                setData('remember', !!checked);
-                                            }}
+                                            onCheckedChange={field.onChange}
                                         />
                                     </FormControl>
                                     <div className="space-y-1 leading-none">
-                                        <FormLabel>Remember me</FormLabel>
+                                        <FormLabel>{t('auth.login.rememberMe')}</FormLabel>
                                     </div>
                                 </FormItem>
                             )}
                         />
 
-                        <Button type="submit" className="w-full" disabled={processing}>
-                            {processing && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Log in
+                        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                            {form.formState.isSubmitting && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t('auth.login.loginButton')}
                         </Button>
-                    </div>
-
-                    <div className="text-center text-sm text-muted-foreground">
-                        Don't have an account?{' '}
-                        <Link
-                            href={register()}
-                            className="text-primary underline-offset-4 hover:underline"
-                        >
-                            Sign up
-                        </Link>
                     </div>
                 </form>
             </Form>
