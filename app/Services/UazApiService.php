@@ -27,34 +27,15 @@ class UazApiService
      */
     protected function getAvailableAccount(): UazApiAccount
     {
-        Log::info('=== UAZ API: Buscando conta disponível ===');
-
         $account = UazApiAccount::findAvailableAccount();
 
         if (!$account) {
-            Log::error('=== UAZ API: Nenhuma conta disponível ===', [
+            Log::error('No UazAPI account available', [
                 'total_accounts' => UazApiAccount::count(),
-                'all_accounts' => UazApiAccount::all()->map(function($acc) {
-                    return [
-                        'id' => $acc->id,
-                        'name' => $acc->name,
-                        'active_connections' => $acc->active_connections,
-                        'max_connections' => $acc->max_connections,
-                        'available' => $acc->active_connections < $acc->max_connections,
-                    ];
-                }),
             ]);
 
-            throw new Exception('Nenhuma conta UazAPI disponível. Todos os planos atingiram o limite de conexões.');
+            throw new Exception('Server configuration error. Please contact support.');
         }
-
-        Log::info('=== UAZ API: Conta disponível encontrada ===', [
-            'account_id' => $account->id,
-            'account_name' => $account->name,
-            'base_url' => $account->base_url,
-            'active_connections' => $account->active_connections,
-            'max_connections' => $account->max_connections,
-        ]);
 
         return $account;
     }
@@ -80,10 +61,6 @@ class UazApiService
      */
     public function createInstance(array $options = []): array
     {
-        Log::info('=== UAZ API: Iniciando criação de instância ===', [
-            'options' => $options,
-        ]);
-
         // Busca conta disponível
         $account = $this->getAvailableAccount();
 
@@ -101,22 +78,10 @@ class UazApiService
             'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
         ];
 
-        Log::info('=== UAZ API: Fazendo requisição para criar instância ===', [
-            'url' => $url,
-            'payload' => $payload,
-            'headers' => array_merge($headers, ['admintoken' => substr($account->admin_token, 0, 10) . '...']),
-        ]);
-
         $this->logger->startTimer();
 
         try {
             $response = Http::withHeaders($headers)->post($url, $payload);
-
-            Log::info('=== UAZ API: Resposta recebida ===', [
-                'status_code' => $response->status(),
-                'successful' => $response->successful(),
-                'body_preview' => substr($response->body(), 0, 500),
-            ]);
 
             // Log da requisição
             $this->logger->logOutbound(
@@ -136,19 +101,10 @@ class UazApiService
             );
 
             if (!$response->successful()) {
-                Log::error('=== UAZ API: Falha na criação da instância ===', [
-                    'status_code' => $response->status(),
-                    'response_body' => $response->body(),
-                ]);
-
-                throw new Exception('Falha ao criar instância: ' . $response->body());
+                throw new Exception('Failed to create instance: ' . $response->body());
             }
 
             $responseData = $response->json();
-
-            Log::info('=== UAZ API: Instância criada com sucesso ===', [
-                'response_data' => $responseData,
-            ]);
 
             // Retorna dados da resposta + a conta usada
             return [
@@ -156,12 +112,6 @@ class UazApiService
                 'account' => $account,
             ];
         } catch (Exception $e) {
-            Log::error('=== UAZ API: Exceção ao criar instância ===', [
-                'error_message' => $e->getMessage(),
-                'error_file' => $e->getFile(),
-                'error_line' => $e->getLine(),
-            ]);
-
             // Log da exception
             $this->logger->logException(
                 direction: 'outbound',
@@ -174,7 +124,7 @@ class UazApiService
                 connection: null,
                 metadata: [
                     'instance_name' => $options['name'],
-                    'uaz_api_account_id' => $account->id,
+                    'uaz_api_account_id' => $account->id ?? null,
                 ]
             );
 
@@ -195,11 +145,6 @@ class UazApiService
         $account = $this->getConnectionAccount($connection);
 
         try {
-            Log::error('API Error: updateInstance', [
-                'instanceName' => $instanceName,
-                'uaz_api_account_id' => $account->id,
-            ]);
-
             $response = Http::withHeaders([
                 'token' => $connection->token,
                 'Content-Type' => 'application/json',
@@ -209,26 +154,11 @@ class UazApiService
             ]);
 
             if (!$response->successful()) {
-                Log::error('API Error: updateInstance', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
-                throw new Exception('Falha ao atualizar instância: ' . $response->body());
+                throw new Exception('Failed to update instance: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Instance Updated: updateInstance', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Exception: updateInstance', [
-                'message' => $e->getMessage()
-            ]);
-
             throw $e;
         }
     }
@@ -248,13 +178,6 @@ class UazApiService
         $account = $this->getConnectionAccount($connection);
 
         try {
-            Log::error('API: updateAdminFields', [
-                'instanceId' => $instanceId,
-                'adminField01' => $adminField01,
-                'adminField02' => $adminField02,
-                'uaz_api_account_id' => $account->id,
-            ]);
-
             $response = Http::withHeaders([
                 'admintoken' => $account->admin_token,
                 'Content-Type' => 'application/json',
@@ -266,26 +189,11 @@ class UazApiService
             ]);
 
             if (!$response->successful()) {
-                Log::error('API Error: updateAdminFields', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
-                throw new Exception('Falha ao atualizar campos admin_field_1 e admin_field_2: ' . $response->body());
+                throw new Exception('Failed to update admin fields: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Instance Updated: updateAdminFields', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Exception: updateAdminFields', [
-                'message' => $e->getMessage()
-            ]);
-
             throw $e;
         }
     }
@@ -366,9 +274,6 @@ class UazApiService
             $connection = WhatsAppConnection::where('token', $token)->first();
 
             if (!$connection || !$connection->uazApiAccount) {
-                Log::warning('API: deleteInstance - conexão ou conta não encontrada', [
-                    'token' => $token
-                ]);
                 // Tenta deletar mesmo sem ter a conta (fallback)
                 $url = 'https://w4digital.uazapi.com/instance'; // URL padrão como fallback
             } else {
@@ -376,38 +281,18 @@ class UazApiService
                 $url = $account->base_url . '/instance';
             }
 
-            Log::error('API Error: deleteInstance', [
-                'token' => $token,
-                'url' => $url
-            ]);
-
             $response = Http::withHeaders([
                 'token' => $token,
                 'Accept' => 'application/json',
             ])->delete($url);
 
             if (!$response->successful()) {
-                Log::error('API Error: deleteInstance', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'token' => $token
-                ]);
-
                 // Não lançar exception para delete, pois pode já ter sido deletada
                 return false;
             }
 
-            Log::info('API Instance Deleted: deleteInstance', [
-                'token' => $token
-            ]);
-
             return true;
         } catch (Exception $e) {
-            Log::error('API Delete Exception: deleteInstance', [
-                'message' => $e->getMessage(),
-                'token' => $token
-            ]);
-
             // Não lançar exception para delete
             return false;
         }
@@ -814,13 +699,6 @@ class UazApiService
                     : $webhookData['excludeMessages'];
             }
 
-            Log::info('API: Criando webhook via', [
-                'instance_token' => substr($instanceToken, 0, 10) . '...',
-                'instance_id' => $instanceId,
-                'payload' => $payload,
-                'uaz_api_account_id' => $account->id,
-            ]);
-
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
@@ -828,28 +706,11 @@ class UazApiService
             ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
-                Log::error('API Error: createWebhook', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'payload' => $payload
-                ]);
-
-                throw new Exception('Falha ao criar webhook: ' . $response->body());
+                throw new Exception('Failed to create webhook: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Webhook Created: createWebhook', [
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Create Webhook Exception', [
-                'message' => $e->getMessage(),
-                'instance_token' => substr($instanceToken, 0, 10) . '...'
-            ]);
-
             throw $e;
         }
     }
@@ -880,14 +741,6 @@ class UazApiService
                 'id' => $externalWebhookId
             ];
 
-            Log::info('API: Deletando webhook via ID externo', [
-                'instance_token' => substr($instanceToken, 0, 10) . '...',
-                'instance_id' => $instanceId,
-                'external_webhook_id' => $externalWebhookId,
-                'payload' => $payload,
-                'uaz_api_account_id' => $account->id,
-            ]);
-
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
@@ -895,30 +748,11 @@ class UazApiService
             ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
-                Log::error('API Error: deleteWebhook', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'payload' => $payload
-                ]);
-
-                throw new Exception('Falha ao deletar webhook: ' . $response->body());
+                throw new Exception('Failed to delete webhook: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Webhook Deleted: deleteWebhook', [
-                'external_webhook_id' => $externalWebhookId,
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Delete Webhook Exception', [
-                'message' => $e->getMessage(),
-                'external_webhook_id' => $externalWebhookId,
-                'instance_token' => substr($instanceToken, 0, 10) . '...'
-            ]);
-
             throw $e;
         }
     }
@@ -969,14 +803,6 @@ class UazApiService
                     : $webhookData['excludeMessages'];
             }
 
-            Log::info('API: Editando webhook via ID externo', [
-                'instance_token' => substr($instanceToken, 0, 10) . '...',
-                'instance_id' => $instanceId,
-                'external_webhook_id' => $webhookData['id'],
-                'payload' => $payload,
-                'uaz_api_account_id' => $account->id,
-            ]);
-
             $response = Http::withHeaders([
                 'token' => $instanceToken,
                 'Content-Type' => 'application/json',
@@ -984,30 +810,11 @@ class UazApiService
             ])->post($account->base_url . '/webhook', $payload);
 
             if (!$response->successful()) {
-                Log::error('API Error: updateWebhook', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'payload' => $payload
-                ]);
-
-                throw new Exception('Falha ao editar webhook: ' . $response->body());
+                throw new Exception('Failed to update webhook: ' . $response->body());
             }
 
-            $data = $response->json();
-
-            Log::info('Webhook Updated: updateWebhook', [
-                'external_webhook_id' => $webhookData['id'],
-                'response' => $data
-            ]);
-
-            return $data;
+            return $response->json();
         } catch (Exception $e) {
-            Log::error('API Update Webhook Exception', [
-                'message' => $e->getMessage(),
-                'external_webhook_id' => $webhookData['id'] ?? null,
-                'instance_token' => substr($instanceToken, 0, 10) . '...'
-            ]);
-
             throw $e;
         }
     }
