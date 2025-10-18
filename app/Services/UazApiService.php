@@ -27,11 +27,34 @@ class UazApiService
      */
     protected function getAvailableAccount(): UazApiAccount
     {
+        Log::info('=== UAZ API: Buscando conta disponível ===');
+
         $account = UazApiAccount::findAvailableAccount();
 
         if (!$account) {
+            Log::error('=== UAZ API: Nenhuma conta disponível ===', [
+                'total_accounts' => UazApiAccount::count(),
+                'all_accounts' => UazApiAccount::all()->map(function($acc) {
+                    return [
+                        'id' => $acc->id,
+                        'name' => $acc->name,
+                        'active_connections' => $acc->active_connections,
+                        'max_connections' => $acc->max_connections,
+                        'available' => $acc->active_connections < $acc->max_connections,
+                    ];
+                }),
+            ]);
+
             throw new Exception('Nenhuma conta UazAPI disponível. Todos os planos atingiram o limite de conexões.');
         }
+
+        Log::info('=== UAZ API: Conta disponível encontrada ===', [
+            'account_id' => $account->id,
+            'account_name' => $account->name,
+            'base_url' => $account->base_url,
+            'active_connections' => $account->active_connections,
+            'max_connections' => $account->max_connections,
+        ]);
 
         return $account;
     }
@@ -57,6 +80,10 @@ class UazApiService
      */
     public function createInstance(array $options = []): array
     {
+        Log::info('=== UAZ API: Iniciando criação de instância ===', [
+            'options' => $options,
+        ]);
+
         // Busca conta disponível
         $account = $this->getAvailableAccount();
 
@@ -74,10 +101,22 @@ class UazApiService
             'webhook_url' => config('app.url') . '/api/whatsapp/webhook',
         ];
 
+        Log::info('=== UAZ API: Fazendo requisição para criar instância ===', [
+            'url' => $url,
+            'payload' => $payload,
+            'headers' => array_merge($headers, ['admintoken' => substr($account->admin_token, 0, 10) . '...']),
+        ]);
+
         $this->logger->startTimer();
 
         try {
             $response = Http::withHeaders($headers)->post($url, $payload);
+
+            Log::info('=== UAZ API: Resposta recebida ===', [
+                'status_code' => $response->status(),
+                'successful' => $response->successful(),
+                'body_preview' => substr($response->body(), 0, 500),
+            ]);
 
             // Log da requisição
             $this->logger->logOutbound(
@@ -97,10 +136,19 @@ class UazApiService
             );
 
             if (!$response->successful()) {
+                Log::error('=== UAZ API: Falha na criação da instância ===', [
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body(),
+                ]);
+
                 throw new Exception('Falha ao criar instância: ' . $response->body());
             }
 
             $responseData = $response->json();
+
+            Log::info('=== UAZ API: Instância criada com sucesso ===', [
+                'response_data' => $responseData,
+            ]);
 
             // Retorna dados da resposta + a conta usada
             return [
@@ -108,6 +156,12 @@ class UazApiService
                 'account' => $account,
             ];
         } catch (Exception $e) {
+            Log::error('=== UAZ API: Exceção ao criar instância ===', [
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+            ]);
+
             // Log da exception
             $this->logger->logException(
                 direction: 'outbound',

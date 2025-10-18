@@ -83,24 +83,60 @@ class WhatsAppConnectionController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('=== INÍCIO: Criação de nova conexão WhatsApp ===', [
+            'user_id' => Auth::id(),
+            'request_data' => $request->all(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+
         $tenant = Auth::user()->tenant;
         $currentConnections = WhatsAppConnection::where('tenant_id', $tenant->id)->count();
         $maxConnections = $tenant->whatsapp_connections;
 
+        Log::info('Verificando limites de conexão', [
+            'tenant_id' => $tenant->id,
+            'tenant_name' => $tenant->name,
+            'current_connections' => $currentConnections,
+            'max_connections' => $maxConnections,
+        ]);
+
         if ($currentConnections >= $maxConnections) {
+            Log::warning('Limite de conexões atingido', [
+                'tenant_id' => $tenant->id,
+                'current' => $currentConnections,
+                'max' => $maxConnections,
+            ]);
+
             return redirect()->route('whatsapp.index')
                 ->with('error', 'You have reached the maximum number of WhatsApp connections for your plan.');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'admin_field_1' => 'nullable|string|max:255',
-            'admin_field_2' => 'nullable|string|max:255',
-        ]);
+        Log::info('Validando dados do formulário');
 
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'admin_field_1' => 'nullable|string|max:255',
+                'admin_field_2' => 'nullable|string|max:255',
+            ]);
+
+            Log::info('Validação passou com sucesso');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Erro de validação', [
+                'errors' => $e->errors(),
+            ]);
+            throw $e;
+        }
+
+        Log::info('Iniciando transação do banco de dados');
         DB::beginTransaction();
 
         try {
+            Log::info('Criando registro da conexão no banco de dados', [
+                'name' => $request->name,
+                'tenant_id' => $tenant->id,
+            ]);
+
             // Criar conexão no banco de dados
             $connection = WhatsAppConnection::create([
                 'tenant_id' => $tenant->id,
@@ -111,6 +147,14 @@ class WhatsAppConnectionController extends Controller
                 'status' => 'creating',
             ]);
 
+            Log::info('Conexão criada no banco com sucesso', [
+                'connection_id' => $connection->id,
+            ]);
+
+            Log::info('Chamando API UAZ para criar instância', [
+                'connection_name' => $connection->name,
+            ]);
+
             // Criar instância na API (retorna ['data' => resposta, 'account' => UazApiAccount])
             $apiResponse = $this->uazApiService->createInstance([
                 'name' => $connection->name,
@@ -119,7 +163,9 @@ class WhatsAppConnectionController extends Controller
                 'admin_field_2' => $connection->admin_field_2,
             ]);
 
-            Log::debug('apiResponse', $apiResponse);
+            Log::info('Resposta da API UAZ recebida', [
+                'api_response' => $apiResponse,
+            ]);
 
             // Atualizar conexão com dados da API e vincular à conta
             $connection->update([
@@ -129,26 +175,52 @@ class WhatsAppConnectionController extends Controller
                 'uaz_api_account_id' => $apiResponse['account']->id,
             ]);
 
+            Log::info('Conexão atualizada com dados da API', [
+                'connection_id' => $connection->id,
+                'token' => $apiResponse['data']['instance']['token'] ?? null,
+                'instance_id' => $apiResponse['data']['instance']['id'] ?? null,
+            ]);
+
             // Incrementar contador de conexões da conta
             $apiResponse['account']->incrementConnections();
 
+            Log::info('Habilitando API da conexão');
             $connection->enableApi();
 
+            Log::info('Commitando transação do banco de dados');
             DB::commit();
+
+            Log::info('=== SUCESSO: Conexão WhatsApp criada com sucesso ===', [
+                'connection_id' => $connection->id,
+                'connection_name' => $connection->name,
+            ]);
 
             return redirect()->route('whatsapp.index')
                 ->with('success', 'WhatsApp connection created successfully.');
         } catch (Exception $e) {
+            Log::error('=== ERRO: Falha ao criar conexão WhatsApp ===', [
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+            ]);
+
             DB::rollBack();
+            Log::info('Rollback da transação executado');
 
             // Se houve erro, tentar deletar a instância criada na API (se existir)
-            if (isset($instanceName)) {
+            if (isset($connection) && isset($connection->token)) {
+                Log::info('Tentando limpar instância criada na API', [
+                    'token' => $connection->token,
+                ]);
+
                 try {
-                    $this->uazApiService->deleteInstance($instanceName);
+                    $this->uazApiService->deleteInstance($connection->token);
+                    Log::info('Instância deletada com sucesso da API');
                 } catch (Exception $deleteException) {
                     // Log do erro de delete, mas não falhar por isso
-                    Log::warning('Failed to cleanup instance after error', [
-                        'instance' => $instanceName,
+                    Log::warning('Falha ao deletar instância após erro', [
+                        'token' => $connection->token,
                         'error' => $deleteException->getMessage()
                     ]);
                 }

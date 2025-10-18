@@ -55,6 +55,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                 },
                 onError: (errors) => {
                     console.error('Form errors:', errors);
+                    console.log('Full error object:', JSON.stringify(errors, null, 2));
                 },
                 onFinish: () => {
                     setIsSubmitting(false);
@@ -63,14 +64,17 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
         } else {
             // Criar nova conexão
             router.post('/whatsapp', formData, {
-                onSuccess: () => {
+                onSuccess: (page) => {
+                    console.log('Success response:', page);
                     onClose();
                 },
                 onError: (errors) => {
                     console.error('Form errors:', errors);
+                    console.log('Full error object:', JSON.stringify(errors, null, 2));
                 },
                 onFinish: () => {
                     setIsSubmitting(false);
+                    console.log('Request finished');
                 },
             });
         }
