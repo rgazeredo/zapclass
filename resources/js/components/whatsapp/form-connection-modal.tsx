@@ -103,7 +103,9 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                             {isEditing ? t('whatsapp.editConnection') : t('whatsapp.createConnection')}
                         </DialogTitle>
                         <DialogDescription>
-                            {isEditing ? t('whatsapp.editConnectionDescription', { name: connection.name }) : t('whatsapp.createConnectionDescription')}
+                            {isEditing
+                                ? t('whatsapp.editConnectionDescription', { name: connection.name })
+                                : t('whatsapp.createConnectionDescription')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -161,9 +163,7 @@ export function FormConnectionModal({ open, onClose, connection }: FormConnectio
                 <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-6 shadow-lg">
                         <IconLoader2 className="h-8 w-8 animate-spin text-blue-600" />
-                        <p className="font-medium text-gray-700">
-                            {isEditing ? t('whatsapp.updatingConnection', 'Atualizando conexão...') : t('whatsapp.creatingConnection', 'Criando conexão...')}
-                        </p>
+                        <p className="font-medium text-gray-700">{isEditing ? t('whatsapp.updatingConnection') : t('whatsapp.creatingConnection')}</p>
                     </div>
                 </div>
             )}
