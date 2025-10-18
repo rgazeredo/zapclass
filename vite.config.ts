@@ -15,16 +15,17 @@ export default defineConfig({
         tailwindcss(),
         wayfinder({
             formVariants: true,
-            // Não gerar tipos automaticamente durante o build
-            // Os tipos devem ser gerados antes do build com: php artisan wayfinder:generate --with-form
-            generate: false,
         }),
     ],
-    server: {
-        host: 'localhost',
-        port: 5173,
-    },
     esbuild: {
         jsx: 'automatic',
+    },
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: 'localhost',
+        },
     },
 });
