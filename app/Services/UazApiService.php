@@ -362,231 +362,6 @@ class UazApiService
         }
     }
 
-    public function messagesText(WhatsAppConnection $connection, array $payload): array
-    {
-        $account = $this->getConnectionAccount($connection);
-
-        $url = $account->base_url . '/send/text';
-        $headers = [
-            'token' => $connection->token,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
-
-        // Tradução dos campos da sua API para a API do UazAPI
-        $requestData = [
-            'number' => $payload['number'], // Obrigatório
-            'text' => $payload['message'], // message → text (Obrigatório)
-        ];
-
-        // Campos opcionais - Link Preview
-        if (isset($payload['link_preview'])) {
-            $requestData['linkPreview'] = $payload['link_preview']; // link_preview → linkPreview
-        }
-        if (isset($payload['link_preview_title'])) {
-            $requestData['linkPreviewTitle'] = $payload['link_preview_title']; // link_preview_title → linkPreviewTitle
-        }
-        if (isset($payload['link_preview_description'])) {
-            $requestData['linkPreviewDescription'] = $payload['link_preview_description']; // link_preview_description → linkPreviewDescription
-        }
-        if (isset($payload['link_preview_image'])) {
-            $requestData['linkPreviewImage'] = $payload['link_preview_image']; // link_preview_image → linkPreviewImage
-        }
-        if (isset($payload['link_preview_large'])) {
-            $requestData['linkPreviewLarge'] = $payload['link_preview_large']; // link_preview_large → linkPreviewLarge
-        }
-
-        // Campos opcionais - Resposta e menções
-        if (isset($payload['message_repy_id'])) {
-            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
-        }
-        if (isset($payload['mentions'])) {
-            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
-        }
-
-        // Campos opcionais - Leitura
-        if (isset($payload['read'])) {
-            $requestData['readchat'] = $payload['read']; // read → readchat
-        }
-        if (isset($payload['read_messages'])) {
-            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
-        }
-
-        // Campos opcionais - Comportamento
-        if (isset($payload['delay'])) {
-            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
-        }
-        if (isset($payload['forward'])) {
-            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
-        }
-
-        // Campos opcionais - Rastreamento
-        if (isset($payload['message_source'])) {
-            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
-        }
-        if (isset($payload['message_id'])) {
-            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
-        }
-
-        $this->logger->startTimer();
-
-        try {
-            $response = Http::withHeaders($headers)->post($url, $requestData);
-
-            // Log da requisição
-            $this->logger->logOutbound(
-                method: 'POST',
-                url: $url,
-                requestHeaders: $headers,
-                requestBody: $requestData,
-                response: $response,
-                action: 'send_text_message',
-                connection: $connection,
-                metadata: [
-                    'recipient' => $payload['number'],
-                    'message_preview' => substr($payload['message'], 0, 100),
-                ]
-            );
-
-            if (!$response->successful()) {
-                throw new Exception('Falha ao enviar mensagem: ' . $response->body());
-            }
-
-            return $response->json();
-        } catch (Exception $e) {
-            // Log da exception
-            $this->logger->logException(
-                direction: 'outbound',
-                method: 'POST',
-                url: $url,
-                requestHeaders: $headers,
-                requestBody: $requestData,
-                exception: $e,
-                action: 'send_text_message',
-                connection: $connection,
-                metadata: ['recipient' => $payload['number']]
-            );
-
-            throw $e;
-        }
-    }
-
-    /**
-     * Enviar mensagem de mídia (imagem, vídeo, documento, áudio)
-     *
-     * @param WhatsAppConnection $connection
-     * @param array $payload
-     * @return array
-     * @throws Exception
-     */
-    public function messagesMedia(WhatsAppConnection $connection, array $payload): array
-    {
-        $account = $this->getConnectionAccount($connection);
-
-        $url = $account->base_url . '/send/media';
-        $headers = [
-            'token' => $connection->token,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
-
-        // Tradução dos campos da sua API para a API do UazAPI
-        $requestData = [
-            'number' => $payload['number'], // Obrigatório
-            'type' => $payload['type'], // Obrigatório (image, video, document, audio, myaudio, ptt, sticker)
-            'file' => $payload['file'], // Obrigatório (URL ou base64)
-        ];
-
-        // Campos opcionais - Caption/Texto
-        if (isset($payload['message'])) {
-            $requestData['text'] = $payload['message']; // message → text (caption/legenda)
-        }
-
-        // Campo opcional - Nome do documento
-        if (isset($payload['doc_name'])) {
-            $requestData['docName'] = $payload['doc_name']; // doc_name → docName
-        } elseif (isset($payload['document_name'])) {
-            $requestData['docName'] = $payload['document_name']; // document_name → docName (alternativa)
-        }
-
-        // Campos opcionais - Resposta e menções
-        if (isset($payload['message_repy_id'])) {
-            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
-        }
-        if (isset($payload['mentions'])) {
-            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
-        }
-
-        // Campos opcionais - Leitura
-        if (isset($payload['read'])) {
-            $requestData['readchat'] = $payload['read']; // read → readchat
-        }
-        if (isset($payload['read_messages'])) {
-            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
-        }
-
-        // Campos opcionais - Comportamento
-        if (isset($payload['delay'])) {
-            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
-        }
-        if (isset($payload['forward'])) {
-            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
-        }
-
-        // Campos opcionais - Rastreamento
-        if (isset($payload['message_source'])) {
-            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
-        }
-        if (isset($payload['message_id'])) {
-            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
-        }
-
-        $this->logger->startTimer();
-
-        try {
-            $response = Http::withHeaders($headers)->post($url, $requestData);
-
-            // Log da requisição
-            $this->logger->logOutbound(
-                method: 'POST',
-                url: $url,
-                requestHeaders: $headers,
-                requestBody: $requestData,
-                response: $response,
-                action: 'send_media_message',
-                connection: $connection,
-                metadata: [
-                    'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
-                ]
-            );
-
-            if (!$response->successful()) {
-                throw new Exception('Falha ao enviar mídia: ' . $response->body());
-            }
-
-            return $response->json();
-        } catch (Exception $e) {
-            // Log da exception
-            $this->logger->logException(
-                direction: 'outbound',
-                method: 'POST',
-                url: $url,
-                requestHeaders: $headers,
-                requestBody: $requestData,
-                exception: $e,
-                action: 'send_media_message',
-                connection: $connection,
-                metadata: [
-                    'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
-                ]
-            );
-
-            throw $e;
-        }
-    }
-
     /**
      * Obter QR Code para conectar WhatsApp
      *
@@ -815,6 +590,321 @@ class UazApiService
 
             return $response->json();
         } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function messagesText(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/text';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'], // Obrigatório
+            'text' => $payload['message'], // message → text (Obrigatório)
+        ];
+
+        // Campos opcionais - Link Preview
+        if (isset($payload['link_preview'])) {
+            $requestData['linkPreview'] = $payload['link_preview']; // link_preview → linkPreview
+        }
+        if (isset($payload['link_preview_title'])) {
+            $requestData['linkPreviewTitle'] = $payload['link_preview_title']; // link_preview_title → linkPreviewTitle
+        }
+        if (isset($payload['link_preview_description'])) {
+            $requestData['linkPreviewDescription'] = $payload['link_preview_description']; // link_preview_description → linkPreviewDescription
+        }
+        if (isset($payload['link_preview_image'])) {
+            $requestData['linkPreviewImage'] = $payload['link_preview_image']; // link_preview_image → linkPreviewImage
+        }
+        if (isset($payload['link_preview_large'])) {
+            $requestData['linkPreviewLarge'] = $payload['link_preview_large']; // link_preview_large → linkPreviewLarge
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_text_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'message_preview' => substr($payload['message'], 0, 100),
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar mensagem: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_text_message',
+                connection: $connection,
+                metadata: ['recipient' => $payload['number']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesMedia(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/media';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'], // Obrigatório
+            'type' => $payload['type'], // Obrigatório (image, video, document, audio, myaudio, ptt, sticker)
+            'file' => $payload['file'], // Obrigatório (URL ou base64)
+        ];
+
+        // Campos opcionais - Caption/Texto
+        if (isset($payload['message'])) {
+            $requestData['text'] = $payload['message']; // message → text (caption/legenda)
+        }
+
+        // Campo opcional - Nome do documento
+        if (isset($payload['doc_name'])) {
+            $requestData['docName'] = $payload['doc_name']; // doc_name → docName
+        } elseif (isset($payload['document_name'])) {
+            $requestData['docName'] = $payload['document_name']; // document_name → docName (alternativa)
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar mídia: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'] ?? null,
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesMenuList(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/menu';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'type' => 'list',
+            'number' => $payload['number'],
+            'text' => $payload['title'],
+            'choices' => $payload['choices'],
+            'listButton' => $payload['button_text'],
+        ];
+
+        if (isset($payload['description'])) {
+            $requestData['footerText'] = $payload['description']; // button_text → listButton
+        }
+
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar mídia: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_media_message',
+                connection: $connection,
+                metadata: [
+                    'recipient' => $payload['number'],
+                    'media_type' => $payload['type'] ?? null,
+                ]
+            );
+
             throw $e;
         }
     }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CommunityController as V1CommunityController;
 use App\Http\Controllers\Api\V1\QuickreplyController as V1QuickreplyController;
 use App\Http\Controllers\Api\V1\CampaignController as V1CampaignController;
 use App\Http\Controllers\Api\V1\ProfileController as V1ProfileController;
+use App\Http\Controllers\Api\V1\CheckController as V1CheckController;
 use App\Http\Middleware\ApiAuthentication;
 use Illuminate\Support\Facades\Route;
 
@@ -24,12 +25,16 @@ use Illuminate\Support\Facades\Route;
 // Grupo de rotas da API v1 com middleware de autenticação
 Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
+    // Validação de API Key
+    Route::get('check', [V1CheckController::class, 'check'])
+        ->name('api.check');
+
     // Rotas de mensagens
     Route::prefix('messages')->group(function () {
         // Enviar mensagem de texto
         Route::post('text', [V1MessageController::class, 'text'])
             ->name('api.messages.text');
-        
+
         Route::post('media', [V1MessageController::class, 'media'])
             ->name('api.messages.media');
 
@@ -42,14 +47,14 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('status', [V1MessageController::class, 'status'])
             ->name('api.messages.status');
 
-        Route::post('menu-buttons', [V1MessageController::class, 'menuButtons'])
-            ->name('api.messages.menu-buttons');
+        Route::post('menu-button', [V1MessageController::class, 'menuButton'])
+            ->name('api.messages.menu-button');
 
-        Route::post('menu-lists', [V1MessageController::class, 'menuLists'])
-            ->name('api.messages.menu-lists');
+        Route::post('menu-list', [V1MessageController::class, 'menuList'])
+            ->name('api.messages.menu-list');
 
-        Route::post('menu-polls', [V1MessageController::class, 'menuPolls'])
-            ->name('api.messages.menu-polls');
+        Route::post('menu-poll', [V1MessageController::class, 'menuPoll'])
+            ->name('api.messages.menu-poll');
 
         Route::post('menu-carousel', [V1MessageController::class, 'menuCarousel'])
             ->name('api.messages.menu-carousel');
@@ -62,7 +67,7 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('delete', [V1MessageController::class, 'delete'])
             ->name('api.messages.delete');
-            
+
         Route::post('download', [V1MessageController::class, 'download'])
             ->name('api.messages.download');
 
@@ -71,15 +76,15 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('mark-read', [V1MessageController::class, 'markRead'])
             ->name('api.messages.mark-read');
-            
+
 
         // Consultar status de mensagem
         // Route::get('status/{messageId}', [MessagingController::class, 'getMessageStatus'])
         //     ->name('api.messages.status');
     });
-        
+
     Route::prefix('contacts')->group(function () {
-      
+
         Route::post('add', [V1ContactController::class, 'add'])
             ->name('api.contacts.add');
 
@@ -97,13 +102,10 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::get('blocklist', [V1ContactController::class, 'blocklist'])
             ->name('api.contacts.blocklist');
-
-
-
     });
 
     Route::prefix('labels')->group(function () {
-      
+
         Route::post('manage', [V1LabelController::class, 'manage'])
             ->name('api.labels.manage');
 
@@ -112,11 +114,10 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('edit', [V1LabelController::class, 'edit'])
             ->name('api.labels.edit');
-
     });
-        
+
     Route::prefix('groups')->group(function () {
-      
+
         Route::post('create', [V1GroupController::class, 'create'])
             ->name('api.groups.create');
 
@@ -125,10 +126,10 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('info', [V1GroupController::class, 'info'])
             ->name('api.groups.info');
-            
+
         Route::post('update-participants', [V1GroupController::class, 'updateParticipants'])
             ->name('api.groups.update-participants');
-            
+
         Route::post('update-name', [V1GroupController::class, 'updateName'])
             ->name('api.groups.update-name');
 
@@ -158,23 +159,20 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('leave', [V1GroupController::class, 'leave'])
             ->name('api.groups.leave');
-
     });
 
 
     Route::prefix('communities')->group(function () {
-      
+
         Route::post('create', [V1CommunityController::class, 'create'])
             ->name('api.communities.create');
 
         Route::post('edit-groups', [V1CommunityController::class, 'editGroups'])
             ->name('api.communities.edit-groups');
-
-
     });
 
     Route::prefix('quick-replies')->group(function () {
-      
+
         Route::post('create', [V1QuickreplyController::class, 'create'])
             ->name('api.quick-replies.create');
 
@@ -186,15 +184,13 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('delete', [V1QuickreplyController::class, 'delete'])
             ->name('api.quick-replies.delete');
-
-
     });
 
     Route::prefix('campaigns')->group(function () {
-      
+
         Route::post('create-simple', [V1CampaignController::class, 'createSimple'])
             ->name('api.campaigns.create-simple');
-            
+
         Route::post('create-advanced', [V1CampaignController::class, 'createAdvanced'])
             ->name('api.campaigns.create-advanced');
 
@@ -212,18 +208,15 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::delete('clear-all', [V1CampaignController::class, 'clearAll'])
             ->name('api.campaigns.clear-all');
-
-
     });
 
     Route::prefix('profile')->group(function () {
-      
+
         Route::post('update-name', [V1ProfileController::class, 'updateName'])
             ->name('api.profile.update-name');
-            
+
         Route::post('update-image', [V1ProfileController::class, 'updateImage'])
             ->name('api.profile.update-image');
-            
     });
 
     // Rotas de conexão/instância
