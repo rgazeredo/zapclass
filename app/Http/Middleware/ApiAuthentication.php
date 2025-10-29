@@ -63,6 +63,18 @@ class ApiAuthentication
             return $this->errorResponse('Instância não está conectada ao WhatsApp', 400);
         }
 
+        // Verificar se o tenant tem assinatura ativa
+        $tenant = $connection->tenant;
+        if ($tenant && !$tenant->isOnTrial() && !$tenant->hasActiveSubscription()) {
+            Log::warning('API: Tentativa de uso com assinatura vencida', [
+                'tenant_id' => $tenant->id,
+                'tenant_name' => $tenant->name,
+                'connection_id' => $connection->id
+            ]);
+
+            return $this->errorResponse('Assinatura vencida. Renove sua assinatura para continuar usando a API.', 402);
+        }
+
         // Rate limiting (simples por minuto)
         // $rateLimitKey = "api_rate_limit_{$connection->id}";
         // $currentRequests = Cache::get($rateLimitKey, 0);
