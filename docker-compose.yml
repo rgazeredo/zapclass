@@ -8,6 +8,8 @@ services:
         image: zapclass-app
         container_name: zapclass-app
         restart: unless-stopped
+        ports:
+            - "5173:5173"
         volumes:
             - .:/var/www
         depends_on:

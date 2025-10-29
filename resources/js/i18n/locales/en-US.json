@@ -589,6 +589,15 @@
             "logoutButton": "Log out"
         }
     },
+    "support": {
+        "title": "Support",
+        "tickets": {
+            "title": "Tickets",
+            "myTickets": "My Tickets",
+            "newTicket": "New Ticket",
+            "allTickets": "All Tickets"
+        }
+    },
     "settings": {
         "title": "Settings",
         "pageTitle": "Settings",
