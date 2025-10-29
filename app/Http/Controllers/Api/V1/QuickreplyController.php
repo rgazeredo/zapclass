@@ -43,11 +43,11 @@ class QuickreplyController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'shortCut' => 'required|string',
+                'short_cut' => 'required|string',
                 'type' => 'required|string',
                 'text' => 'nullable|string',
                 'file' => 'nullable|string',
-                'docName' => 'nullable|string',
+                'doc_name' => 'nullable|string',
             ]);
 
 
@@ -99,9 +99,9 @@ class QuickreplyController extends Controller
             );
         }
     }
-        
-    
-public function edit(Request $request): JsonResponse
+
+
+    public function edit(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -119,11 +119,11 @@ public function edit(Request $request): JsonResponse
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'id' => 'required|string',
-                'shortCut' => 'nullable|string',
+                'short_cut' => 'nullable|string',
                 'type' => 'nullable|string',
                 'text' => 'nullable|string',
                 'file' => 'nullable|string',
-                'docName' => 'nullable|string',
+                'doc_name' => 'nullable|string',
             ]);
 
 
@@ -164,7 +164,7 @@ public function edit(Request $request): JsonResponse
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'id' => 'required|string',
-                
+
             ]);
 
 
@@ -186,9 +186,9 @@ public function edit(Request $request): JsonResponse
             );
         }
     }
-    
 
-    
+
+
 
     /**
      * Consultar status de uma mensagem enviada

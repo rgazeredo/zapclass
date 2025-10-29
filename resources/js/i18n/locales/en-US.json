@@ -312,6 +312,8 @@
         "unknownError": "Unknown error",
         "errorDisconnecting": "Error disconnecting instance",
         "errorDeletingWebhook": "Error deleting webhook. Please try again.",
+        "creatingConnection": "Creating connection...",
+        "updatingConnection": "Updating connection...",
         "webhookDelete": {
             "confirmTitle": "Confirm Deletion",
             "confirmDescription": "Are you sure you want to delete this webhook?",

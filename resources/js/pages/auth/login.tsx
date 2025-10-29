@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
 import { request } from '@/routes/password';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -20,6 +20,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
+    const { errors } = usePage().props;
 
     const loginSchema = z.object({
         email: z.string().email(t('auth.login.emailRequired')),
@@ -37,6 +38,18 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             remember: false,
         },
     });
+
+    // Sync Inertia errors with react-hook-form
+    useEffect(() => {
+        if (errors) {
+            Object.keys(errors).forEach((key) => {
+                form.setError(key as keyof LoginFormValues, {
+                    type: 'server',
+                    message: errors[key],
+                });
+            });
+        }
+    }, [errors, form]);
 
     const onSubmit = (data: LoginFormValues) => {
         router.post('/login', data);

@@ -312,6 +312,8 @@
         "unknownError": "Erro desconhecido",
         "errorDisconnecting": "Erro ao desconectar instância",
         "errorDeletingWebhook": "Erro ao deletar webhook. Tente novamente.",
+        "creatingConnection": "Criando conexão...",
+        "updatingConnection": "Atualizando conexão...",
         "webhookDelete": {
             "confirmTitle": "Confirmar Exclusão",
             "confirmDescription": "Tem certeza que deseja excluir este webhook?",

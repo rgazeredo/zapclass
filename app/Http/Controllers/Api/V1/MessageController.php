@@ -124,6 +124,57 @@ class MessageController extends Controller
         }
     }
 
+    public function menuList(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'number' => 'required|string',
+                'title' => 'required|string',
+                'choices' => 'required|array',
+                'button_text' => 'required|string',
+                'description' => 'nullable|string',
+                'delay' => 'nullable|integer',
+                'message_repy_id' => 'nullable|string',
+                'message_source' => 'nullable|string',
+                'message_id' => 'nullable|string',
+                'mentions' => 'nullable|string',
+                'read' => 'nullable|boolean',
+                'read_messages' => 'nullable|boolean',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            // Gerar ID único para rastreamento
+            $messageId = Str::random(20);
+
+            // Chamar API
+            $response = $this->uazApiService->messagesMenuList($connection, $request->all());
+
+            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+
     public function contact(Request $request): JsonResponse
     {
         try {
@@ -305,57 +356,6 @@ class MessageController extends Controller
                 'mentions' => 'nullable|string',
                 'read' => 'nullable|boolean',
                 'read_messages' => 'nullable|boolean',
-            ]);
-
-
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
-            }
-
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
-        } catch (Exception $e) {
-            return $this->errorResponse(
-                'Erro interno do servidor. Tente novamente em alguns instantes.',
-                500
-            );
-        }
-    }
-
-    public function menuLists(Request $request): JsonResponse
-    {
-        try {
-            $connection = $request->attributes->get('api_connection');
-
-            // Exemplos de respostas que o Scramble pode detectar
-            if (!$connection) {
-                abort(400, 'Token de autorização não fornecido');
-            }
-
-            // Validar se temos os dados necessários para chamar a API
-            if (!$connection->token || !$connection->instance_id) {
-                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-            }
-
-            // Valida se recebeu os campos obrigatórios da requisição
-            $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'text' => 'required|string',
-                'choices' => 'required|array',
-                'button_text' => 'required|string',
-                'footer_text' => 'nullable|string',
-                'delay' => 'nullable|integer',
-                'replyid' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'readchat' => 'nullable|boolean',
-                'readmessages' => 'nullable|boolean',
-                'track_source' => 'nullable|string',
-                'track_id' => 'nullable|string',
             ]);
 
 

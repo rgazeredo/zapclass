@@ -119,8 +119,6 @@ class WhatsAppConnectionController extends Controller
                 'admin_field_2' => $connection->admin_field_2,
             ]);
 
-            Log::debug('apiResponse', $apiResponse);
-
             // Atualizar conexão com dados da API e vincular à conta
             $connection->update([
                 'status' => 'created',
@@ -139,23 +137,30 @@ class WhatsAppConnectionController extends Controller
             return redirect()->route('whatsapp.index')
                 ->with('success', 'WhatsApp connection created successfully.');
         } catch (Exception $e) {
+            Log::error('Failed to create WhatsApp connection', [
+                'error_message' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'tenant_id' => $tenant->id,
+            ]);
+
             DB::rollBack();
 
             // Se houve erro, tentar deletar a instância criada na API (se existir)
-            if (isset($instanceName)) {
+            if (isset($connection) && isset($connection->token)) {
                 try {
-                    $this->uazApiService->deleteInstance($instanceName);
+                    $this->uazApiService->deleteInstance($connection->token);
                 } catch (Exception $deleteException) {
                     // Log do erro de delete, mas não falhar por isso
-                    Log::warning('Failed to cleanup instance after error', [
-                        'instance' => $instanceName,
+                    Log::warning('Failed to delete instance after error', [
+                        'token' => $connection->token,
                         'error' => $deleteException->getMessage()
                     ]);
                 }
             }
 
+            // Mensagem amigável para o usuário
             return redirect()->route('whatsapp.index')
-                ->with('error', 'Failed to create WhatsApp connection: ' . $e->getMessage());
+                ->with('error', 'The server is experiencing temporary instability. Please try again later.');
         }
     }
 
@@ -221,16 +226,6 @@ class WhatsAppConnectionController extends Controller
         DB::beginTransaction();
 
         try {
-            Log::info('WhatsApp Connection Updated', [
-                'connection_id' => $whatsapp->id,
-                'name1' => $request->name,
-                'name2' => $whatsapp->name,
-                'admin_field_11' => $whatsapp->admin_field_1,
-                'admin_field_12' => $request->admin_field_1,
-                'admin_field_21' => $whatsapp->admin_field_2,
-                'admin_field_22' => $request->admin_field_2,
-            ]);
-
             if ($whatsapp->name !== $request->name) {
                 // Atualiza o nome da instância na API
                 $this->uazApiService->updateInstance($whatsapp, $request->name);
@@ -299,11 +294,6 @@ class WhatsAppConnectionController extends Controller
                 'phone' => null
             ]);
 
-            Log::info('WhatsApp instance disconnected', [
-                'connection_id' => $whatsapp->id,
-                'connection_name' => $whatsapp->name
-            ]);
-
             // Tentar gerar novo QR code com retry logic
             $maxAttempts = 3;
             $attempt = 0;
@@ -325,10 +315,7 @@ class WhatsAppConnectionController extends Controller
                         break;
                     }
                 } catch (Exception $e) {
-                    Log::warning('Failed to get QR code after disconnect on attempt ' . $attempt, [
-                        'connection_id' => $whatsapp->id,
-                        'error' => $e->getMessage()
-                    ]);
+                    // Ignorar erros ao tentar obter QR code
                 }
             }
 
@@ -380,21 +367,10 @@ class WhatsAppConnectionController extends Controller
                 $attempt++;
 
                 try {
-                    Log::info('Attempting to get QR code', [
-                        'connection_id' => $whatsapp->id,
-                        'attempt' => $attempt,
-                        'max_attempts' => $maxAttempts
-                    ]);
-
                     $qrData = $this->uazApiService->getQrCode($whatsapp->token);
 
                     // Verificar se o QR code foi gerado
                     if (!empty($qrData['instance']['qrcode'])) {
-                        Log::info('QR code generated successfully', [
-                            'connection_id' => $whatsapp->id,
-                            'attempt' => $attempt
-                        ]);
-
                         return response()->json([
                             'success' => true,
                             'qrcode' => $qrData
@@ -404,12 +380,6 @@ class WhatsAppConnectionController extends Controller
                     // Se não tem QR code mas a instância está "connecting", aguardar
                     if ($qrData['instance']['status'] === 'connecting') {
                         $lastError = 'Instance is still initializing, waiting...';
-
-                        Log::info('Instance still connecting, waiting before retry', [
-                            'connection_id' => $whatsapp->id,
-                            'attempt' => $attempt,
-                            'wait_time' => $attempt * 2
-                        ]);
 
                         // Aguardar progressivamente: 2s, 4s, 6s, 8s, 10s
                         if ($attempt < $maxAttempts) {
@@ -425,12 +395,6 @@ class WhatsAppConnectionController extends Controller
                 } catch (Exception $e) {
                     $lastError = $e->getMessage();
 
-                    Log::warning('Failed to get QR code on attempt', [
-                        'connection_id' => $whatsapp->id,
-                        'attempt' => $attempt,
-                        'error' => $lastError
-                    ]);
-
                     // Aguardar antes de tentar novamente
                     if ($attempt < $maxAttempts) {
                         sleep($attempt * 2);
@@ -439,12 +403,6 @@ class WhatsAppConnectionController extends Controller
             }
 
             // Se chegou aqui, todas as tentativas falharam
-            Log::error('Failed to generate QR code after all attempts', [
-                'connection_id' => $whatsapp->id,
-                'attempts' => $maxAttempts,
-                'last_error' => $lastError
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate QR code after ' . $maxAttempts . ' attempts. Last error: ' . $lastError,
@@ -452,11 +410,6 @@ class WhatsAppConnectionController extends Controller
             ], 500);
 
         } catch (Exception $e) {
-            Log::error('Unexpected error generating QR code', [
-                'connection_id' => $whatsapp->id,
-                'error' => $e->getMessage()
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate QR code: ' . $e->getMessage()
@@ -528,12 +481,6 @@ class WhatsAppConnectionController extends Controller
         try {
             $whatsapp->update([
                 'status' => $request->status
-            ]);
-
-            Log::info('WhatsApp connection status updated', [
-                'connection_id' => $whatsapp->id,
-                'old_status' => $whatsapp->getOriginal('status'),
-                'new_status' => $request->status
             ]);
 
             return response()->json([
@@ -617,31 +564,13 @@ class WhatsAppConnectionController extends Controller
     {
         // Só verificar se a conexão tem token
         if (!$connection->token) {
-            Log::info('Skipping status check for connection without token', [
-                'connection_id' => $connection->id,
-                'connection_name' => $connection->name
-            ]);
             return;
         }
 
         try {
-            Log::info('Checking status for connection on page load', [
-                'connection_id' => $connection->id,
-                'connection_name' => $connection->name,
-                'current_status' => $connection->status
-            ]);
-
             $statusData = $this->uazApiService->getInstanceStatus($connection->token);
             $newStatus = $statusData['instance']['status'] ?? 'unknown';
             $owner = $statusData['instance']['owner'] ?? null;
-
-            Log::info('Status check result', [
-                'connection_id' => $connection->id,
-                'old_status' => $connection->status,
-                'new_status' => $newStatus,
-                'owner' => $owner,
-                'api_response' => $statusData
-            ]);
 
             // Atualizar status se mudou
             if ($connection->status !== $newStatus) {
@@ -653,20 +582,10 @@ class WhatsAppConnectionController extends Controller
                 }
 
                 $connection->update($updateData);
-
-                Log::info('Connection status updated on page load', [
-                    'connection_id' => $connection->id,
-                    'connection_name' => $connection->name,
-                    'old_status' => $connection->getOriginal('status'),
-                    'new_status' => $newStatus,
-                    'phone' => $owner
-                ]);
             }
         } catch (Exception $e) {
-            Log::error('Failed to check connection status on page load', [
+            Log::error('Failed to check connection status', [
                 'connection_id' => $connection->id,
-                'connection_name' => $connection->name,
-                'token' => $connection->token,
                 'error' => $e->getMessage()
             ]);
 

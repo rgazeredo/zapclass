@@ -67,7 +67,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function list(Request $request): JsonResponse
     {
         try {
@@ -128,8 +128,8 @@ class GroupController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
-                'getInviteLink' => 'nullable|boolean',
-                'getRequestsParticipants' => 'nullable|boolean',
+                'get_invite_link' => 'nullable|boolean',
+                'get_requests_participants' => 'nullable|boolean',
                 'force' => 'nullable|boolean',
 
             ]);
@@ -153,7 +153,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateParticipants(Request $request): JsonResponse
     {
         try {
@@ -174,7 +174,7 @@ class GroupController extends Controller
                 'groupjid' => 'required|string',
                 'action' => 'required|string',
                 'participants' => 'required|array',
-               
+
             ]);
 
 
@@ -196,7 +196,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateName(Request $request): JsonResponse
     {
         try {
@@ -216,7 +216,7 @@ class GroupController extends Controller
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
                 'name' => 'required|string',
-               
+
             ]);
 
 
@@ -238,7 +238,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateDescription(Request $request): JsonResponse
     {
         try {
@@ -258,7 +258,7 @@ class GroupController extends Controller
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
                 'description' => 'required|string',
-               
+
             ]);
 
 
@@ -280,7 +280,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateImage(Request $request): JsonResponse
     {
         try {
@@ -300,7 +300,7 @@ class GroupController extends Controller
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
                 'image' => 'required|string',
-               
+
             ]);
 
 
@@ -322,7 +322,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateLocked(Request $request): JsonResponse
     {
         try {
@@ -342,7 +342,7 @@ class GroupController extends Controller
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
                 'locked' => 'required|boolean',
-               
+
             ]);
 
 
@@ -364,7 +364,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function updateAnnounce(Request $request): JsonResponse
     {
         try {
@@ -384,7 +384,7 @@ class GroupController extends Controller
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
                 'announce' => 'required|boolean',
-               
+
             ]);
 
 
@@ -465,8 +465,8 @@ class GroupController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'inviteCode' => 'required|string',
-               
+                'invite_code' => 'required|string',
+
             ]);
 
 
@@ -488,7 +488,7 @@ class GroupController extends Controller
             );
         }
     }
-        
+
     public function resetInvite(Request $request): JsonResponse
     {
         try {
@@ -507,7 +507,7 @@ class GroupController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
-               
+
             ]);
 
 
@@ -547,8 +547,8 @@ class GroupController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'inviteCode' => 'required|string',
-               
+                'invite_code' => 'required|string',
+
             ]);
 
 
@@ -589,7 +589,7 @@ class GroupController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'groupjid' => 'required|string',
-               
+
             ]);
 
 
@@ -612,7 +612,7 @@ class GroupController extends Controller
         }
     }
 
-    
+
 
     /**
      * Consultar status de uma mensagem enviada

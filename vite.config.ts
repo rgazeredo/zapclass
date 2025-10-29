@@ -15,11 +15,11 @@ export default defineConfig({
         tailwindcss(),
         wayfinder({
             formVariants: true,
-            generate: {
-                command: './php-wrapper.sh artisan wayfinder:generate --with-form',
-            },
         }),
     ],
+    esbuild: {
+        jsx: 'automatic',
+    },
     server: {
         host: '0.0.0.0',
         port: 5173,
@@ -27,8 +27,5 @@ export default defineConfig({
         hmr: {
             host: 'localhost',
         },
-    },
-    esbuild: {
-        jsx: 'automatic',
     },
 });

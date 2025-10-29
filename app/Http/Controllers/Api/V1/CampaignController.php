@@ -45,20 +45,20 @@ class CampaignController extends Controller
             $validator = Validator::make($request->all(), [
                 'numbers' => 'required|array',
                 'type' => 'required|string',
-                'delayMin' => 'required|integer',
-                'delayMax' => 'required|integer',
+                'delay_min' => 'required|integer',
+                'delay_max' => 'required|integer',
                 'scheduled_for' => 'required|integer',
                 'info' => 'nullable|string',
                 'text' => 'nullable|string',
-                'linkPreview' => 'nullable|boolean',
-                'linkPreviewTitle' => 'nullable|string',
-                'linkPreviewDescription' => 'nullable|string',
-                'linkPreviewImage' => 'nullable|string',
-                'linkPreviewLarge' => 'nullable|boolean',
+                'link_preview' => 'nullable|boolean',
+                'link_preview_title' => 'nullable|string',
+                'link_preview_description' => 'nullable|string',
+                'link_preview_image' => 'nullable|string',
+                'link_preview_large' => 'nullable|boolean',
                 'file' => 'nullable|string',
-                'docName' => 'nullable|string',
-                'fullName' => 'nullable|string',
-                'phoneNumber' => 'nullable|string',
+                'doc_name' => 'nullable|string',
+                'full_name' => 'nullable|string',
+                'phone_number' => 'nullable|string',
                 'organization' => 'nullable|string',
                 'email' => 'nullable|string',
                 'url' => 'nullable|string',
@@ -66,12 +66,12 @@ class CampaignController extends Controller
                 'longitude' => 'nullable|number',
                 'name' => 'nullable|string',
                 'address' => 'nullable|string',
-                'footerText' => 'nullable|string',
-                'buttonText' => 'nullable|string',
-                'listButton' => 'nullable|string',
-                'selectableCount' => 'nullable|integer',
+                'footer_text' => 'nullable|string',
+                'button_text' => 'nullable|string',
+                'list_button' => 'nullable|string',
+                'selectable_count' => 'nullable|integer',
                 'choices' => 'nullable|array',
-                'imageButton' => 'nullable|string',
+                'image_button' => 'nullable|string',
             ]);
 
 
@@ -112,8 +112,8 @@ class CampaignController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'messages' => 'required|array',
-                'delayMin' => 'nullable|integer',
-                'delayMax' => 'nullable|integer',
+                'delay_min' => 'nullable|integer',
+                'delay_max' => 'nullable|integer',
                 'info' => 'nullable|string',
                 'scheduled_for' => 'nullable|integer',
             ]);
@@ -137,7 +137,7 @@ class CampaignController extends Controller
             );
         }
     }
-        
+
     public function listFolders(Request $request): JsonResponse
     {
         try {
@@ -197,10 +197,10 @@ class CampaignController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required|string',
-                'messageStatus' => 'nullable|string',
+                'message_status' => 'nullable|string',
                 'page' => 'nullable|integer',
-                'pageSize' => 'nullable|integer',
-                
+                'page_size' => 'nullable|integer',
+
             ]);
 
 
@@ -222,7 +222,7 @@ class CampaignController extends Controller
             );
         }
     }
-        
+
     public function control(Request $request): JsonResponse
     {
         try {
@@ -264,7 +264,7 @@ class CampaignController extends Controller
             );
         }
     }
-        
+
     public function cleanup(Request $request): JsonResponse
     {
         try {
@@ -305,7 +305,7 @@ class CampaignController extends Controller
             );
         }
     }
-        
+
     public function clearAll(Request $request): JsonResponse
     {
         try {
