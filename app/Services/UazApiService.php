@@ -882,7 +882,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -904,7 +904,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -983,7 +983,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1005,7 +1005,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1084,7 +1084,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1106,7 +1106,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1185,7 +1185,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1207,7 +1207,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1290,7 +1290,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1312,7 +1312,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1373,7 +1373,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1395,7 +1395,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1474,7 +1474,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1496,7 +1496,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1575,7 +1575,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1597,7 +1597,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1672,7 +1672,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1694,7 +1694,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
@@ -1765,7 +1765,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'],
+                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1787,7 +1787,7 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'recipient' => $payload['number'],
-                    'media_type' => $payload['type'] ?? null,
+                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
