@@ -69,6 +69,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de texto: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -163,6 +164,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de imagem: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -209,6 +211,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de áudio: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -255,6 +258,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de áudio gravado: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -301,6 +305,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de vídeo: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -348,6 +353,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de documento: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -395,6 +401,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'url' => $url, 'base64' => $response['base64Data'], 'mimetype' => $response['mimetype'], 'transcription' => $response['transcription']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao baixar arquivo: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -443,6 +450,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de menu: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -491,6 +499,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de menu botão: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -538,6 +547,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de menu poll: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -584,6 +594,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true, 'message_id' => $response['id']], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de menu carousel: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
