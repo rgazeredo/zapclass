@@ -112,20 +112,10 @@ class LabelController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'type' => 'required|string|in:image,video,document,audio,myaudio,ptt,sticker',
-                'file' => 'required|string',
-                'message' => 'nullable|string',
-                'doc_name' => 'nullable|string',
-                'document_name' => 'nullable|string',
-                'delay' => 'nullable|string',
-                'forward' => 'nullable|string',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
+                'labelid' => 'required|string',
+                'name' => 'nullable|string',
+                'color' => 'nullable|integer',
+                'delete' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {

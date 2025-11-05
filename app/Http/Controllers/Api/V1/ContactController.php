@@ -66,7 +66,7 @@ class ContactController extends Controller
             );
         }
     }
-    
+
     public function contacts(Request $request): JsonResponse
     {
         try {
@@ -137,7 +137,7 @@ class ContactController extends Controller
             );
         }
     }
-        
+
     public function remove(Request $request): JsonResponse
     {
         try {
@@ -177,7 +177,7 @@ class ContactController extends Controller
             );
         }
     }
-        
+
     public function block(Request $request): JsonResponse
     {
         try {
@@ -248,8 +248,8 @@ class ContactController extends Controller
             );
         }
     }
-        
-    
+
+
 
     /**
      * Consultar status de uma mensagem enviada

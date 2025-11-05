@@ -190,6 +190,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return back();
     })->name('settings.theme');
+
+    // Support Ticket routes
+    Route::prefix('support')->name('support.')->group(function () {
+        Route::resource('tickets', \App\Http\Controllers\SupportTicketController::class)
+            ->names([
+                'index' => 'tickets.index',
+                'create' => 'tickets.create',
+                'store' => 'tickets.store',
+                'show' => 'tickets.show',
+                'update' => 'tickets.update',
+                'destroy' => 'tickets.destroy',
+            ]);
+
+        // Ticket assignment (admin only)
+        Route::post('tickets/{ticket}/assign', [\App\Http\Controllers\SupportTicketController::class, 'assign'])
+            ->name('tickets.assign');
+
+        // Ticket messages
+        Route::post('tickets/{ticket}/messages', [\App\Http\Controllers\TicketMessageController::class, 'store'])
+            ->name('tickets.messages.store');
+        Route::put('messages/{message}', [\App\Http\Controllers\TicketMessageController::class, 'update'])
+            ->name('messages.update');
+        Route::delete('messages/{message}', [\App\Http\Controllers\TicketMessageController::class, 'destroy'])
+            ->name('messages.destroy');
+        Route::get('messages/{message}/attachments/{index}', [\App\Http\Controllers\TicketMessageController::class, 'downloadAttachment'])
+            ->name('messages.attachments.download');
+    });
 });
 
 require __DIR__ . '/settings.php';

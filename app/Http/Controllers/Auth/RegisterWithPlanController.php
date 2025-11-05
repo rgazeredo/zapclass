@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Stripe\Stripe;
@@ -16,6 +17,7 @@ use Stripe\Price;
 use Stripe\Product;
 use Stripe\Customer;
 use Stripe\Checkout\Session;
+use App\Mail\WelcomeMail;
 
 class RegisterWithPlanController extends Controller
 {
@@ -119,6 +121,9 @@ class RegisterWithPlanController extends Controller
 
             // Plano
             'plan_id' => 'required|string',
+
+            // Termos de uso
+            'terms_accepted' => 'required|accepted',
         ]);
 
         if ($validator->fails()) {
@@ -183,6 +188,8 @@ class RegisterWithPlanController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'client',
                 'tenant_id' => $tenant->id,
+                'terms_accepted' => true,
+                'terms_accepted_at' => now(),
             ]);
 
             // Criar customer no Stripe
@@ -206,6 +213,12 @@ class RegisterWithPlanController extends Controller
 
             // Atualizar tenant com stripe_id
             $tenant->update(['stripe_id' => $customer->id]);
+
+            // Enviar e-mail de boas-vindas
+            Mail::to($user->email)->send(new WelcomeMail(
+                name: $user->name,
+                dashboardUrl: route('dashboard')
+            ));
 
             // Criar sessão do Checkout
             $checkoutSession = Session::create([

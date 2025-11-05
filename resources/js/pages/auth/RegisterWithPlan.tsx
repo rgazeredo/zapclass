@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { Button } from '../../components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
 import { IconLoader2, IconEye, IconEyeOff, IconArrowLeft } from '@tabler/icons-react';
 import PlanSummary from '../../components/PlanSummary';
 import { toast } from 'sonner';
@@ -46,6 +47,11 @@ const registerSchema = z.object({
         city: z.string().optional(),
         state: z.string().optional(),
     }).optional(),
+
+    // Termos de uso
+    terms_accepted: z.boolean().refine((val) => val === true, {
+        message: "Você deve aceitar os Termos de Uso e Política de Privacidade",
+    }),
 }).refine((data) => data.password === data.password_confirmation, {
     message: "Senhas não coincidem",
     path: ["password_confirmation"],
@@ -77,6 +83,7 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
                 city: '',
                 state: '',
             },
+            terms_accepted: false,
         },
     });
 
@@ -461,6 +468,47 @@ export default function RegisterWithPlan({ plan }: RegisterWithPlanProps) {
                                                     )}
                                                 />
                                             </div>
+                                        </div>
+
+                                        {/* Termos de Uso */}
+                                        <div className="border-t pt-6">
+                                            <FormField
+                                                control={form.control}
+                                                name="terms_accepted"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel className="text-sm font-normal text-gray-700">
+                                                                Li e aceito os{' '}
+                                                                <a
+                                                                    href="/termos-de-uso"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="font-medium text-gray-900 underline hover:text-gray-700"
+                                                                >
+                                                                    Termos de Uso
+                                                                </a>
+                                                                {' '}e{' '}
+                                                                <a
+                                                                    href="/politica-de-privacidade"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="font-medium text-gray-900 underline hover:text-gray-700"
+                                                                >
+                                                                    Política de Privacidade
+                                                                </a>
+                                                            </FormLabel>
+                                                            <FormMessage />
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
 
                                         <div className="flex justify-end">

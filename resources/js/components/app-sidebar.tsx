@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { IconApi, IconBrandWhatsapp, IconCreditCard, IconLayoutGrid } from '@tabler/icons-react';
+import { IconApi, IconBrandWhatsapp, IconCreditCard, IconLayoutGrid, IconTicket } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from './app-logo';
 
@@ -26,6 +26,11 @@ export function AppSidebar() {
             title: t('billing.title'),
             href: '/billing',
             icon: IconCreditCard,
+        },
+        {
+            title: t('support.title'),
+            href: '/support/tickets',
+            icon: IconTicket,
         },
         {
             title: t('api.title'),

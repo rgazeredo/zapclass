@@ -65,7 +65,7 @@ class CommunityController extends Controller
             );
         }
     }
-        
+
     public function editGroups(Request $request): JsonResponse
     {
         try {
@@ -85,7 +85,7 @@ class CommunityController extends Controller
             $validator = Validator::make($request->all(), [
                 'community' => 'required|string',
                 'action' => 'required|string',
-                'groupjids' => 'array|string',
+                'groupjids' => 'required|array',
             ]);
 
 
@@ -108,9 +108,9 @@ class CommunityController extends Controller
         }
     }
 
-    
 
-    
+
+
 
     /**
      * Consultar status de uma mensagem enviada

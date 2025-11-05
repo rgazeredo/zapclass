@@ -591,6 +591,15 @@
             "logoutButton": "Sair"
         }
     },
+    "support": {
+        "title": "Suporte",
+        "tickets": {
+            "title": "Tickets",
+            "myTickets": "Meus Tickets",
+            "newTicket": "Novo Ticket",
+            "allTickets": "Todos os Tickets"
+        }
+    },
     "settings": {
         "title": "Configurações",
         "pageTitle": "Configurações",
