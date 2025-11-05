@@ -35,8 +35,38 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('text', [V1MessageController::class, 'text'])
             ->name('api.messages.text');
 
-        Route::post('media', [V1MessageController::class, 'media'])
-            ->name('api.messages.media');
+        // Route::post('media', [V1MessageController::class, 'media'])
+        //     ->name('api.messages.media');
+
+        Route::post('image', [V1MessageController::class, 'image'])
+            ->name('api.messages.image');
+
+        Route::post('audio', [V1MessageController::class, 'audio'])
+            ->name('api.messages.audio');
+
+        Route::post('record', [V1MessageController::class, 'record'])
+            ->name('api.messages.record');
+
+        Route::post('video', [V1MessageController::class, 'video'])
+            ->name('api.messages.video');
+
+        Route::post('document', [V1MessageController::class, 'document'])
+            ->name('api.messages.document');
+
+        Route::post('download', [V1MessageController::class, 'download'])
+            ->name('api.messages.download');
+
+        Route::post('menu-list', [V1MessageController::class, 'menuList'])
+            ->name('api.messages.menu-list');
+
+        Route::post('menu-button', [V1MessageController::class, 'menuButton'])
+            ->name('api.messages.menu-button');
+
+        Route::post('menu-poll', [V1MessageController::class, 'menuPoll'])
+            ->name('api.messages.menu-poll');
+
+        Route::post('menu-carousel', [V1MessageController::class, 'menuCarousel'])
+            ->name('api.messages.menu-carousel');
 
         Route::post('contact', [V1MessageController::class, 'contact'])
             ->name('api.messages.contact');
@@ -47,18 +77,6 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('status', [V1MessageController::class, 'status'])
             ->name('api.messages.status');
 
-        Route::post('menu-button', [V1MessageController::class, 'menuButton'])
-            ->name('api.messages.menu-button');
-
-        Route::post('menu-list', [V1MessageController::class, 'menuList'])
-            ->name('api.messages.menu-list');
-
-        Route::post('menu-poll', [V1MessageController::class, 'menuPoll'])
-            ->name('api.messages.menu-poll');
-
-        Route::post('menu-carousel', [V1MessageController::class, 'menuCarousel'])
-            ->name('api.messages.menu-carousel');
-
         Route::post('react', [V1MessageController::class, 'react'])
             ->name('api.messages.react');
 
@@ -67,9 +85,6 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
 
         Route::post('delete', [V1MessageController::class, 'delete'])
             ->name('api.messages.delete');
-
-        Route::post('download', [V1MessageController::class, 'download'])
-            ->name('api.messages.download');
 
         Route::post('find', [V1MessageController::class, 'find'])
             ->name('api.messages.find');
