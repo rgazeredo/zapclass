@@ -7,9 +7,11 @@ use App\Http\Requests\Api\SendTextMessageRequest;
 use App\Models\WhatsAppConnection;
 use App\Services\UazApiService;
 use Exception;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -406,6 +408,46 @@ class MessageController extends Controller
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
             );
+        }
+    }
+
+    public function downloadFile(string $fileId)
+    {
+        // Monta a URL original do arquivo no uazapi
+        $url = "https://w4digital.uazapi.com/files/{$fileId}";
+
+        try {
+            $client = new Client();
+            $response = $client->get($url, ['stream' => true]);
+
+            // Obtém headers originais
+            $contentType = $response->getHeaderLine('Content-Type') ?: 'application/octet-stream';
+
+            // Tenta extrair nome do arquivo do header, se existir
+            $disposition = $response->getHeaderLine('Content-Disposition');
+            $filename = null;
+
+            if (preg_match('/filename="?([^"]+)"?/i', $disposition, $matches)) {
+                $filename = $matches[1];
+            } else {
+                // Se não houver nome no header, cria um genérico
+                // Se o mimetype for conhecido, tenta adivinhar a extensão
+                $extension = explode('/', $contentType)[1] ?? 'bin';
+                $filename = "{$fileId}.{$extension}";
+            }
+
+            // Retorna streaming direto (sem salvar localmente)
+            return Response::stream(function () use ($response) {
+                echo $response->getBody()->getContents();
+            }, 200, [
+                'Content-Type' => $contentType,
+                'Content-Disposition' => "inline; filename=\"{$filename}\"",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Falha ao acessar o arquivo remoto',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
