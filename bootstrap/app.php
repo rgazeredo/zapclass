@@ -5,6 +5,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\TenantScope;
 use App\Http\Middleware\ApiAuthentication;
 use App\Http\Middleware\ApiLoggerMiddleware;
+use App\Http\Middleware\CheckSubscriptionActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -42,6 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant.scope' => TenantScope::class,
             'api.auth' => ApiAuthentication::class,
+            'subscription.active' => CheckSubscriptionActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
