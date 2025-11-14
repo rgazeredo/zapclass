@@ -697,6 +697,7 @@ class MessageController extends Controller
                 'message_id' => 'nullable|string',
             ]);
 
+            Log::info('Parâmetros de busca de mensagens: ' . json_encode($request->all()));
 
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);

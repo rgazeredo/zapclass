@@ -1804,6 +1804,9 @@ class UazApiService
             $requestData['track_id'] = $payload['message_id']; // message_id → track_id
         }
 
+        Log::info('Parâmetros de busca de mensagens payload: ' . json_encode($payload));
+        Log::info('Parâmetros de busca de mensagens requestData: ' . json_encode($requestData));
+
         $this->logger->startTimer();
 
         try {
