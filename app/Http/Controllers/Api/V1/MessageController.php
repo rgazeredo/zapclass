@@ -688,6 +688,8 @@ class MessageController extends Controller
                 abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
             }
 
+            Log::info('Parâmetros de busca de mensagens: request ' . json_encode($request->all()));
+
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'id' => 'nullable|string',
@@ -697,7 +699,7 @@ class MessageController extends Controller
                 'message_id' => 'nullable|string',
             ]);
 
-            Log::info('Parâmetros de busca de mensagens: ' . json_encode($request->all()));
+            Log::info('Parâmetros de busca de mensagens: validator ' . json_encode($validator));
 
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
