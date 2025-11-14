@@ -1775,7 +1775,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/find';
+        $url = $account->base_url . '/message/find';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
