@@ -665,6 +665,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de status: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -722,6 +723,7 @@ class MessageController extends Controller
                 'messages' => $messages
             ], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao buscar mensagens: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -759,6 +761,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao editar mensagem: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -795,6 +798,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao excluir mensagem: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -848,6 +852,7 @@ class MessageController extends Controller
                 'chat_id' => $response['chatid'],
             ], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de contato: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -900,6 +905,7 @@ class MessageController extends Controller
                 'chat_id' => $response['chatid'],
             ], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar mensagem de localização: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -936,6 +942,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao marcar mensagens como lidas: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -974,6 +981,7 @@ class MessageController extends Controller
 
             return response()->json(['success' => true], 200);
         } catch (Exception $e) {
+            Log::error('Erro ao enviar reação à mensagem: ' . $e->getMessage());
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
