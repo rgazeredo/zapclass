@@ -35,9 +35,6 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('text', [V1MessageController::class, 'text'])
             ->name('api.messages.text');
 
-        // Route::post('media', [V1MessageController::class, 'media'])
-        //     ->name('api.messages.media');
-
         Route::post('image', [V1MessageController::class, 'image'])
             ->name('api.messages.image');
 
@@ -71,17 +68,11 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('menu-carousel', [V1MessageController::class, 'menuCarousel'])
             ->name('api.messages.menu-carousel');
 
-        Route::post('contact', [V1MessageController::class, 'contact'])
-            ->name('api.messages.contact');
-
-        Route::post('location', [V1MessageController::class, 'location'])
-            ->name('api.messages.location');
-
         Route::post('status', [V1MessageController::class, 'status'])
             ->name('api.messages.status');
 
-        Route::post('react', [V1MessageController::class, 'react'])
-            ->name('api.messages.react');
+        Route::post('find', [V1MessageController::class, 'find'])
+            ->name('api.messages.find');
 
         Route::post('edit', [V1MessageController::class, 'edit'])
             ->name('api.messages.edit');
@@ -89,11 +80,17 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('delete', [V1MessageController::class, 'delete'])
             ->name('api.messages.delete');
 
-        Route::post('find', [V1MessageController::class, 'find'])
-            ->name('api.messages.find');
+        Route::post('contact', [V1MessageController::class, 'contact'])
+            ->name('api.messages.contact');
 
-        Route::post('mark-read', [V1MessageController::class, 'markRead'])
-            ->name('api.messages.mark-read');
+        Route::post('location', [V1MessageController::class, 'location'])
+            ->name('api.messages.location');
+
+        Route::post('read', [V1MessageController::class, 'read'])
+            ->name('api.messages.read');
+
+        Route::post('react', [V1MessageController::class, 'react'])
+            ->name('api.messages.react');
 
 
         // Consultar status de mensagem

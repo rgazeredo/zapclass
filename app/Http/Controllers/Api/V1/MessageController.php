@@ -69,7 +69,11 @@ class MessageController extends Controller
 
             $response = $this->uazApiService->messagesText($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de texto: ' . $e->getMessage());
             return $this->errorResponse(
@@ -78,54 +82,6 @@ class MessageController extends Controller
             );
         }
     }
-
-    // public function media(Request $request): JsonResponse
-    // {
-    //     try {
-    //         $connection = $request->attributes->get('api_connection');
-
-    //         // Exemplos de respostas que o Scramble pode detectar
-    //         if (!$connection) {
-    //             abort(400, 'Token de autorização não fornecido');
-    //         }
-
-    //         // Validar se temos os dados necessários para chamar a API
-    //         if (!$connection->token || !$connection->instance_id) {
-    //             abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-    //         }
-
-    //         // Valida se recebeu os campos obrigatórios da requisição
-    //         $validator = Validator::make($request->all(), [
-    //             'number' => 'required|string',
-    //             'type' => 'required|string',
-    //             'file' => 'nullable|string',
-    //             'message' => 'nullable|string',
-    //             'delay' => 'nullable|integer',
-    //             'filename' => 'nullable|string',
-    //             'forward' => 'nullable|boolean',
-    //             'message_repy_id' => 'nullable|string',
-    //             'message_source' => 'nullable|string',
-    //             'message_id' => 'nullable|string',
-    //             'mentions' => 'nullable|string',
-    //             'read' => 'nullable|boolean',
-    //             'read_messages' => 'nullable|boolean',
-    //         ]);
-
-    //         if ($validator->fails()) {
-    //             return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
-    //         }
-
-    //         // Chamar API
-    //         $response = $this->uazApiService->messagesMedia($connection, $request->all());
-
-    //         return response()->json(['success' => true, 'message_id' => $response['id']], 200);
-    //     } catch (Exception $e) {
-    //         return $this->errorResponse(
-    //             'Erro interno do servidor. Tente novamente em alguns instantes.',
-    //             500
-    //         );
-    //     }
-    // }
 
     public function image(Request $request): JsonResponse
     {
@@ -161,10 +117,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesImage($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de imagem: ' . $e->getMessage());
             return $this->errorResponse(
@@ -208,10 +167,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesAudio($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de áudio: ' . $e->getMessage());
             return $this->errorResponse(
@@ -255,10 +217,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesRecord($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de áudio gravado: ' . $e->getMessage());
             return $this->errorResponse(
@@ -302,10 +267,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesVideo($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de vídeo: ' . $e->getMessage());
             return $this->errorResponse(
@@ -350,10 +318,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesDocument($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de documento: ' . $e->getMessage());
             return $this->errorResponse(
@@ -393,15 +364,17 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
-            // Chamar API
             $response = $this->uazApiService->messagesDownload($connection, $request->all());
 
             $url = str_replace('https://w4digital.uazapi.com/files', url('/download-file'), $response['url']);
 
-            return response()->json(['success' => true, 'url' => $url, 'base64' => $response['base64Data'], 'mimetype' => $response['mimetype'], 'transcription' => $response['transcription']], 200);
+            return response()->json([
+                'success' => true,
+                'url' => $url,
+                'base64' => $response['base64Data'],
+                'mimetype' => $response['mimetype'],
+                'transcription' => $response['transcription']
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao baixar arquivo: ' . $e->getMessage());
             return $this->errorResponse(
@@ -487,10 +460,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesMenuList($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de menu: ' . $e->getMessage());
             return $this->errorResponse(
@@ -536,10 +512,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesMenuButton($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de menu botão: ' . $e->getMessage());
             return $this->errorResponse(
@@ -584,10 +563,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesMenuPoll($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de menu poll: ' . $e->getMessage());
             return $this->errorResponse(
@@ -631,117 +613,15 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Chamar API
             $response = $this->uazApiService->messagesMenuCarousel($connection, $request->all());
 
-            return response()->json(['success' => true, 'message_id' => $response['id']], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao enviar mensagem de menu carousel: ' . $e->getMessage());
-            return $this->errorResponse(
-                'Erro interno do servidor. Tente novamente em alguns instantes.',
-                500
-            );
-        }
-    }
-
-    public function contact(Request $request): JsonResponse
-    {
-        try {
-            $connection = $request->attributes->get('api_connection');
-
-            // Exemplos de respostas que o Scramble pode detectar
-            if (!$connection) {
-                abort(400, 'Token de autorização não fornecido');
-            }
-
-            // Validar se temos os dados necessários para chamar a API
-            if (!$connection->token || !$connection->instance_id) {
-                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-            }
-
-            // Valida se recebeu os campos obrigatórios da requisição
-            $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'contact_name' => 'required|string',
-                'contact_phone' => 'required|string',
-                'contact_business' => 'nullable|string',
-                'contact_email' => 'nullable|string',
-                'contact_url' => 'nullable|string',
-                'delay' => 'nullable|integer',
-                'forward' => 'nullable|boolean',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
-            ]);
-
-
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
-            }
-
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
-        } catch (Exception $e) {
-            return $this->errorResponse(
-                'Erro interno do servidor. Tente novamente em alguns instantes.',
-                500
-            );
-        }
-    }
-
-    public function location(Request $request): JsonResponse
-    {
-        try {
-            $connection = $request->attributes->get('api_connection');
-
-            // Exemplos de respostas que o Scramble pode detectar
-            if (!$connection) {
-                abort(400, 'Token de autorização não fornecido');
-            }
-
-            // Validar se temos os dados necessários para chamar a API
-            if (!$connection->token || !$connection->instance_id) {
-                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
-            }
-
-            // Valida se recebeu os campos obrigatórios da requisição
-            $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'latitude' => 'required|string',
-                'longitude' => 'required|string',
-                'location_name' => 'nullable|string',
-                'location_address' => 'nullable|string',
-                'delay' => 'nullable|integer',
-                'forward' => 'nullable|boolean',
-                'message_repy_id' => 'nullable|string',
-                'message_source' => 'nullable|string',
-                'message_id' => 'nullable|string',
-                'mentions' => 'nullable|string',
-                'read' => 'nullable|boolean',
-                'read_messages' => 'nullable|boolean',
-            ]);
-
-
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
-            }
-
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
-
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
-        } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
                 500
@@ -767,9 +647,9 @@ class MessageController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'type' => 'required|string',
-                'status_message' => 'nullable|string',
-                'status_background' => 'nullable|integer',
-                'status_font' => 'nullable|integer',
+                'message' => 'nullable|string',
+                'background' => 'nullable|integer',
+                'font' => 'nullable|integer',
                 'file' => 'nullable|string',
                 'thumbnail' => 'nullable|string',
                 'message_source' => 'nullable|string',
@@ -781,13 +661,9 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $this->uazApiService->messagesStatus($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -796,7 +672,7 @@ class MessageController extends Controller
         }
     }
 
-    public function react(Request $request): JsonResponse
+    public function find(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -813,9 +689,11 @@ class MessageController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
-                'text' => 'required|string',
-                'id' => 'required|string',
+                'id' => 'nullable|string',
+                'chat_id' => 'nullable|string',
+                'limit' => 'nullable|integer',
+                'message_source' => 'nullable|string',
+                'message_id' => 'nullable|string',
             ]);
 
 
@@ -823,13 +701,26 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesFind($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
+            $messages = [];
 
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            foreach ($response['messages'] as $message) {
+                $messages[] = [
+                    'id' => $message['id'],
+                    'chat_id' => $message['chatid'],
+                    'message' => $message['text'],
+                    'timestamp' => $message['messageTimestamp'],
+                    'from_me' => $message['fromMe'],
+                    'message_source' => $message['track_source'],
+                    'message_id' => $message['track_id']
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'messages' => $messages
+            ], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -856,7 +747,7 @@ class MessageController extends Controller
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
                 'id' => 'required|string',
-                'text' => 'required|string',
+                'message' => 'required|string',
             ]);
 
 
@@ -864,13 +755,9 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $this->uazApiService->messagesEdit($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -904,13 +791,9 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $this->uazApiService->messagesDelete($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json(['success' => true], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -919,7 +802,7 @@ class MessageController extends Controller
         }
     }
 
-    public function find(Request $request): JsonResponse
+    public function contact(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -936,11 +819,20 @@ class MessageController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'id' => 'nullable|string',
-                'chatid' => 'nullable|string',
-                'track_source' => 'nullable|string',
-                'track_id' => 'nullable|string',
-                'limit' => 'nullable|integer',
+                'number' => 'required|string',
+                'name' => 'required|string',
+                'phones' => 'required|string',
+                'company' => 'nullable|string',
+                'email' => 'nullable|string',
+                'url' => 'nullable|string',
+                'delay' => 'nullable|integer',
+                'forward' => 'nullable|boolean',
+                'message_repy_id' => 'nullable|string',
+                'message_source' => 'nullable|string',
+                'message_id' => 'nullable|string',
+                'mentions' => 'nullable|string',
+                'read' => 'nullable|boolean',
+                'read_messages' => 'nullable|boolean',
             ]);
 
 
@@ -948,13 +840,13 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesContact($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
-
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',
@@ -963,7 +855,7 @@ class MessageController extends Controller
         }
     }
 
-    public function markRead(Request $request): JsonResponse
+    public function location(Request $request): JsonResponse
     {
         try {
             $connection = $request->attributes->get('api_connection');
@@ -980,7 +872,19 @@ class MessageController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'id' => 'required|array',
+                'number' => 'required|string',
+                'latitude' => 'required|string',
+                'longitude' => 'required|string',
+                'location' => 'nullable|string',
+                'address' => 'nullable|string',
+                'delay' => 'nullable|integer',
+                'forward' => 'nullable|boolean',
+                'message_repy_id' => 'nullable|string',
+                'message_source' => 'nullable|string',
+                'message_id' => 'nullable|string',
+                'mentions' => 'nullable|string',
+                'read' => 'nullable|boolean',
+                'read_messages' => 'nullable|boolean',
             ]);
 
 
@@ -988,13 +892,87 @@ class MessageController extends Controller
                 return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
             }
 
-            // Gerar ID único para rastreamento
-            $messageId = Str::random(20);
+            $response = $this->uazApiService->messagesLocation($connection, $request->all());
 
-            // Chamar API
-            // $response = $this->uazApiService->messagesText($connection, $request->all());
+            return response()->json([
+                'success' => true,
+                'id' => $response['id'],
+                'chat_id' => $response['chatid'],
+            ], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
 
-            return response()->json(['success' => true, 'message_id' => $messageId], 200);
+    public function read(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'ids' => 'required|array',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            $this->uazApiService->messagesRead($connection, $request->all());
+
+            return response()->json(['success' => true], 200);
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                'Erro interno do servidor. Tente novamente em alguns instantes.',
+                500
+            );
+        }
+    }
+
+    public function react(Request $request): JsonResponse
+    {
+        try {
+            $connection = $request->attributes->get('api_connection');
+
+            // Exemplos de respostas que o Scramble pode detectar
+            if (!$connection) {
+                abort(400, 'Token de autorização não fornecido');
+            }
+
+            // Validar se temos os dados necessários para chamar a API
+            if (!$connection->token || !$connection->instance_id) {
+                abort(500, 'Conexão não configurada adequadamente. Entre em contato com o suporte.');
+            }
+
+            // Valida se recebeu os campos obrigatórios da requisição
+            $validator = Validator::make($request->all(), [
+                'number' => 'required|string',
+                'message' => 'required|string',
+                'id' => 'required|string',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos', 'errors' => $validator->errors()], 400);
+            }
+
+            $this->uazApiService->messagesReact($connection, $request->all());
+
+            return response()->json(['success' => true], 200);
         } catch (Exception $e) {
             return $this->errorResponse(
                 'Erro interno do servidor. Tente novamente em alguns instantes.',

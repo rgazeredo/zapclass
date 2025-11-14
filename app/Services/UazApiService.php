@@ -703,114 +703,6 @@ class UazApiService
         }
     }
 
-    // public function messagesMedia(WhatsAppConnection $connection, array $payload): array
-    // {
-    //     $account = $this->getConnectionAccount($connection);
-
-    //     $url = $account->base_url . '/send/media';
-    //     $headers = [
-    //         'token' => $connection->token,
-    //         'Content-Type' => 'application/json',
-    //         'Accept' => 'application/json',
-    //     ];
-
-    //     // Tradução dos campos da sua API para a API do UazAPI
-    //     $requestData = [
-    //         'number' => $payload['number'], // Obrigatório
-    //         'type' => $payload['type'], // Obrigatório (image, video, document, audio, myaudio, ptt, sticker)
-    //         'file' => $payload['file'], // Obrigatório (URL ou base64)
-    //     ];
-
-    //     // Campos opcionais - Caption/Texto
-    //     if (isset($payload['message'])) {
-    //         $requestData['text'] = $payload['message']; // message → text (caption/legenda)
-    //     }
-
-    //     // Campo opcional - Nome do documento
-    //     if (isset($payload['doc_name'])) {
-    //         $requestData['docName'] = $payload['doc_name']; // doc_name → docName
-    //     } elseif (isset($payload['document_name'])) {
-    //         $requestData['docName'] = $payload['document_name']; // document_name → docName (alternativa)
-    //     }
-
-    //     // Campos opcionais - Resposta e menções
-    //     if (isset($payload['message_repy_id'])) {
-    //         $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
-    //     }
-    //     if (isset($payload['mentions'])) {
-    //         $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
-    //     }
-
-    //     // Campos opcionais - Leitura
-    //     if (isset($payload['read'])) {
-    //         $requestData['readchat'] = $payload['read']; // read → readchat
-    //     }
-    //     if (isset($payload['read_messages'])) {
-    //         $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
-    //     }
-
-    //     // Campos opcionais - Comportamento
-    //     if (isset($payload['delay'])) {
-    //         $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
-    //     }
-    //     if (isset($payload['forward'])) {
-    //         $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
-    //     }
-
-    //     // Campos opcionais - Rastreamento
-    //     if (isset($payload['message_source'])) {
-    //         $requestData['track_source'] = $payload['message_source']; // message_source → track_source
-    //     }
-    //     if (isset($payload['message_id'])) {
-    //         $requestData['track_id'] = $payload['message_id']; // message_id → track_id
-    //     }
-
-    //     $this->logger->startTimer();
-
-    //     try {
-    //         $response = Http::withHeaders($headers)->post($url, $requestData);
-
-    //         // Log da requisição
-    //         $this->logger->logOutbound(
-    //             method: 'POST',
-    //             url: $url,
-    //             requestHeaders: $headers,
-    //             requestBody: $requestData,
-    //             response: $response,
-    //             action: 'send_media_message',
-    //             connection: $connection,
-    //             metadata: [
-    //                 'recipient' => $payload['number'],
-    //                 'media_type' => $payload['type'],
-    //             ]
-    //         );
-
-    //         if (!$response->successful()) {
-    //             throw new Exception('Falha ao enviar mídia: ' . $response->body());
-    //         }
-
-    //         return $response->json();
-    //     } catch (Exception $e) {
-    //         // Log da exception
-    //         $this->logger->logException(
-    //             direction: 'outbound',
-    //             method: 'POST',
-    //             url: $url,
-    //             requestHeaders: $headers,
-    //             requestBody: $requestData,
-    //             exception: $e,
-    //             action: 'send_media_message',
-    //             connection: $connection,
-    //             metadata: [
-    //                 'recipient' => $payload['number'],
-    //                 'media_type' => $payload['type'] ?? null,
-    //             ]
-    //         );
-
-    //         throw $e;
-    //     }
-    // }
-
     public function messagesImage(WhatsAppConnection $connection, array $payload): array
     {
         $account = $this->getConnectionAccount($connection);
@@ -1788,6 +1680,635 @@ class UazApiService
                 metadata: [
                     'recipient' => $payload['number'],
                     'media_type' => $requestData['type'] ?? null,
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesStatus(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/status';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'type' => $payload['type'],
+        ];
+
+        // Campos opcionais
+        if (isset($payload['message'])) {
+            $requestData['text'] = $payload['message']; // message → text
+        }
+        if (isset($payload['background'])) {
+            $requestData['background_color'] = $payload['background']; // background → background_color
+        }
+        if (isset($payload['font'])) {
+            $requestData['font'] = $payload['font'];
+        }
+        if (isset($payload['file'])) {
+            $requestData['file'] = $payload['file'];
+        }
+        if (isset($payload['thumbnail'])) {
+            $requestData['thumbnail'] = $payload['thumbnail']; // link_preview_large → linkPreviewLarge
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'send_status_message',
+                connection: $connection,
+                metadata: [
+                    'type' => $payload['type'],
+                    'message_preview' => substr($payload['message'], 0, 100),
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar status mensagem: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'send_status_message',
+                connection: $connection,
+                metadata: ['type' => $payload['type']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesFind(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/find';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [];
+
+        // Campos opcionais
+        if (isset($payload['id'])) {
+            $requestData['id'] = $payload['id'];
+        }
+        if (isset($payload['chat_id'])) {
+            $requestData['chatid'] = $payload['chat_id']; // chat_id → chatid
+        }
+        if (isset($payload['limit'])) {
+            $requestData['limit'] = $payload['limit'];
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_find',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'] ?? null,
+                    'chat_id' => $payload['chat_id'] ?? null,
+                    'limit' => $payload['limit'] ?? null,
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao buscar mensagens: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_find',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'] ?? null,
+                    'chat_id' => $payload['chat_id'] ?? null,
+                    'limit' => $payload['limit'] ?? null,
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesEdit(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/edit';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'id' => $payload['id'],
+            'text' => $payload['message'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_edit',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'],
+                    'message' => $payload['message'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao editar mensagem: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_edit',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'],
+                    'message' => $payload['message'],
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesDelete(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/delete';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'id' => $payload['id']
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_delete',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao excluir mensagem: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_delete',
+                connection: $connection,
+                metadata: [
+                    'id' => $payload['id'],
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesContact(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/contact';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'],
+            'fullName' => $payload['name'],
+            'phoneNumber' => $payload['phones'],
+        ];
+
+        // Campos opcionais
+        if (isset($payload['company'])) {
+            $requestData['organization'] = $payload['company']; // company → organization
+        }
+        if (isset($payload['email'])) {
+            $requestData['email'] = $payload['email'];
+        }
+        if (isset($payload['url'])) {
+            $requestData['url'] = $payload['url'];
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_contact',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'fullName' => $payload['name'],
+                    'phoneNumber' => $payload['phones'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar contato: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_contact',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'fullName' => $payload['name'],
+                    'phoneNumber' => $payload['phones'],
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesLocation(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/location';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'],
+            'latitude' => $payload['latitude'],
+            'longitude' => $payload['longitude'],
+        ];
+
+        // Campos opcionais
+        if (isset($payload['location'])) {
+            $requestData['name'] = $payload['location']; // location → name
+        }
+        if (isset($payload['address'])) {
+            $requestData['address'] = $payload['address'];
+        }
+
+        // Campos opcionais - Resposta e menções
+        if (isset($payload['message_repy_id'])) {
+            $requestData['replyid'] = $payload['message_repy_id']; // message_repy_id → replyid
+        }
+        if (isset($payload['mentions'])) {
+            $requestData['mentions'] = $payload['mentions']; // mentions → mentions (igual)
+        }
+
+        // Campos opcionais - Leitura
+        if (isset($payload['read'])) {
+            $requestData['readchat'] = $payload['read']; // read → readchat
+        }
+        if (isset($payload['read_messages'])) {
+            $requestData['readmessages'] = $payload['read_messages']; // read_messages → readmessages
+        }
+
+        // Campos opcionais - Comportamento
+        if (isset($payload['delay'])) {
+            $requestData['delay'] = (int) $payload['delay']; // delay → delay (converter para integer)
+        }
+        if (isset($payload['forward'])) {
+            $requestData['forward'] = (bool) $payload['forward']; // forward → forward (converter para boolean)
+        }
+
+        // Campos opcionais - Rastreamento
+        if (isset($payload['message_source'])) {
+            $requestData['track_source'] = $payload['message_source']; // message_source → track_source
+        }
+        if (isset($payload['message_id'])) {
+            $requestData['track_id'] = $payload['message_id']; // message_id → track_id
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_location',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'latitude' => $payload['latitude'],
+                    'longitude' => $payload['longitude'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao enviar localização: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_location',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'latitude' => $payload['latitude'],
+                    'longitude' => $payload['longitude'],
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesRead(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/markread';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'id' => $payload['ids'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_read',
+                connection: $connection,
+                metadata: [
+                    'ids' => $payload['ids'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao marcar mensagens como lidas: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_read',
+                connection: $connection,
+                metadata: [
+                    'ids' => $payload['ids'],
+                ]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function messagesReact(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/send/react';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        // Tradução dos campos da sua API para a API do UazAPI
+        $requestData = [
+            'number' => $payload['number'],
+            'text' => $payload['message'],
+            'id' => $payload['id'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            // Log da requisição
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'messages_react',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'message' => $payload['message'],
+                    'id' => $payload['id'],
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao reagir à mensagem: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            // Log da exception
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'messages_react',
+                connection: $connection,
+                metadata: [
+                    'number' => $payload['number'],
+                    'message' => $payload['message'],
+                    'id' => $payload['id'],
                 ]
             );
 
