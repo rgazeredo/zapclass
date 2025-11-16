@@ -707,23 +707,23 @@ class MessageController extends Controller
 
             $response = $this->uazApiService->messagesFind($connection, $request->all());
 
-            $messages = [];
+            // $messages = [];
 
-            foreach ($response['messages'] as $message) {
-                $messages[] = [
-                    'id' => $message['id'],
-                    'chat_id' => $message['chatid'],
-                    'message' => $message['text'],
-                    'timestamp' => $message['messageTimestamp'],
-                    'from_me' => $message['fromMe'],
-                    'message_source' => $message['track_source'],
-                    'message_id' => $message['track_id']
-                ];
-            }
+            // foreach ($response['messages'] as $message) {
+            //     $messages[] = [
+            //         'id' => $message['id'],
+            //         'chat_id' => $message['chatid'],
+            //         'message' => $message['text'],
+            //         'timestamp' => $message['messageTimestamp'],
+            //         'from_me' => $message['fromMe'],
+            //         'message_source' => $message['track_source'] ?? null,
+            //         'message_id' => $message['track_id'] ?? null,
+            //     ];
+            // }
 
             return response()->json([
                 'success' => true,
-                'messages' => $messages
+                'messages' => $response['messages']
             ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao buscar mensagens: ' . $e->getMessage());
