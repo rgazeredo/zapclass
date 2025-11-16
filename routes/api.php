@@ -68,8 +68,8 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('menu-carousel', [V1MessageController::class, 'menuCarousel'])
             ->name('api.messages.menu-carousel');
 
-        Route::post('status', [V1MessageController::class, 'status'])
-            ->name('api.messages.status');
+        // Route::post('status', [V1MessageController::class, 'status'])
+        //     ->name('api.messages.status');
 
         Route::post('find', [V1MessageController::class, 'find'])
             ->name('api.messages.find');

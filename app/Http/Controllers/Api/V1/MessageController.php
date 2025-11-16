@@ -707,19 +707,110 @@ class MessageController extends Controller
 
             $response = $this->uazApiService->messagesFind($connection, $request->all());
 
-            // $messages = [];
+            $messages = [];
 
-            // foreach ($response['messages'] as $message) {
-            //     $messages[] = [
-            //         'id' => $message['id'],
-            //         'chat_id' => $message['chatid'],
-            //         'message' => $message['text'],
-            //         'timestamp' => $message['messageTimestamp'],
-            //         'from_me' => $message['fromMe'],
-            //         'message_source' => $message['track_source'] ?? null,
-            //         'message_id' => $message['track_id'] ?? null,
-            //     ];
-            // }
+            $messageTypes = [
+                'ExtendedTextMessage' => 'text',
+                'ImageMessage' => 'image',
+                'AudioMessage' => 'audio',
+                'VideoMessage' => 'video',
+                'DocumentMessage' => 'document',
+                'NativeFlowMessage' => 'button',
+                'ListMessage' => 'list',
+                'InteractiveMessage' => 'carousel',
+                'PollCreationMessage' => 'poll',
+                'Conversation' => 'conversation',
+            ];
+
+            foreach ($response['messages'] as $message) {
+
+                if (!isset($messageTypes[$message['type']])) {
+                    // if($message['type'] == 'LocationMessage'){
+                    //     $type = 'location';
+                    // } else {
+                    //     $type = 'unknown';
+                    // }
+
+                    if ($message['type'] == 'AudioMessage' && !empty($message['sendPayload']['type']) && $message['sendPayload']['type'] == 'type') {
+                        $type = 'record';
+                    }
+                } else {
+                    $type = 'unknown';
+                }
+
+                $delay = 0;
+                $forward = false;
+                $mentions = [];
+                $read = false;
+                $read_messages = false;
+                $message_source = null;
+                $message_id = null;
+                $link_preview = false;
+                $link_preview_title = null;
+                $link_preview_description = null;
+                $link_preview_image = null;
+                $link_preview_image_large = false;
+                $contact_name = null;
+                $contact_email = null;
+                $contact_company = null;
+                $contact_url = null;
+                $contact_phones = null;
+                $location_latitude = null;
+                $location_longitude = null;
+                $location_address = null;
+
+                if (!empty($message['sendPayload'])) {
+                    $delay = $message['sendPayload']['delay'] ?? 0;
+                    $forward = $message['sendPayload']['forward'] ?? false;
+                    $mentions = $message['sendPayload']['mentions'] ?? [];
+                    $read = $message['sendPayload']['readchat'] ?? false;
+                    $read_messages = $message['sendPayload']['readmessages'] ?? false;
+                    $message_source = $message['sendPayload']['track_source'] ?? null;
+                    $message_id = $message['sendPayload']['track_id'] ?? null;
+                    $link_preview = $message['sendPayload']['linkPreview'] ?? false;
+                    $link_preview_title = $message['sendPayload']['linkPreviewTitle'] ?? null;
+                    $link_preview_description = $message['sendPayload']['linkPreviewDescription'] ?? null;
+                    $link_preview_image = $message['sendPayload']['linkPreviewImage'] ?? null;
+                    $link_preview_image_large = $message['sendPayload']['linkPreviewImageLarge'] ?? false;
+                    $contact_name = $message['sendPayload']['fullName'] ?? null;
+                    $contact_email = $message['sendPayload']['email'] ?? null;
+                    $contact_company = $message['sendPayload']['organization'] ?? null;
+                    $contact_url = $message['sendPayload']['url'] ?? null;
+                    $contact_phones = $message['sendPayload']['phoneNumber'] ?? null;
+                    $location_latitude = $message['sendPayload']['latitude'] ?? null;
+                    $location_longitude = $message['sendPayload']['longitude'] ?? null;
+                    $location_address = $message['sendPayload']['address'] ?? null;
+                }
+
+                $messages[] = [
+                    'id' => $message['id'],
+                    'chat_id' => $message['chatid'],
+                    'type' => $type,
+                    'from_me' => $message['fromMe'],
+                    'message' => $message['text'],
+                    'delay' => $delay,
+                    'forward' => $forward,
+                    'mentions' => $mentions,
+                    'read' => $read,
+                    'read_messages' => $read_messages,
+                    'message_source' => $message_source,
+                    'message_id' => $message_id,
+                    'link_preview' => $link_preview,
+                    'link_preview_title' => $link_preview_title,
+                    'link_preview_description' => $link_preview_description,
+                    'link_preview_image' => $link_preview_image,
+                    'link_preview_image_large' => $link_preview_image_large,
+                    'contact_name' => $contact_name,
+                    'contact_email' => $contact_email,
+                    'contact_company' => $contact_company,
+                    'contact_url' => $contact_url,
+                    'contact_phones' => $contact_phones,
+                    'location_latitude' => $location_latitude,
+                    'location_longitude' => $location_longitude,
+                    'location_address' => $location_address,
+                    'timestamp' => $message['messageTimestamp'],
+                ];
+            }
 
             return response()->json([
                 'success' => true,

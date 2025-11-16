@@ -1216,7 +1216,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/download';
+        $url = $account->base_url . '/message/download';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -1859,7 +1859,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/edit';
+        $url = $account->base_url . '/message/edit';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -1922,7 +1922,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/delete';
+        $url = $account->base_url . '/message/delete';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -2197,7 +2197,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/markread';
+        $url = $account->base_url . '/message/markread';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
@@ -2257,7 +2257,7 @@ class UazApiService
     {
         $account = $this->getConnectionAccount($connection);
 
-        $url = $account->base_url . '/send/react';
+        $url = $account->base_url . '/message/react';
         $headers = [
             'token' => $connection->token,
             'Content-Type' => 'application/json',
