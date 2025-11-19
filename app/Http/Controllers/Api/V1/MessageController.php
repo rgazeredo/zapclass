@@ -1061,7 +1061,6 @@ class MessageController extends Controller
 
             // Valida se recebeu os campos obrigatórios da requisição
             $validator = Validator::make($request->all(), [
-                'number' => 'required|string',
                 'message' => 'required|string',
                 'id' => 'required|string',
             ]);
