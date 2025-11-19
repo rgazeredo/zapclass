@@ -366,7 +366,7 @@ class MessageController extends Controller
 
             $response = $this->uazApiService->messagesDownload($connection, $request->all());
 
-            $url = str_replace('https://w4digital.uazapi.com/files', url('/download-file'), $response['fileURL']);
+            $url = str_replace('https://w4digital.uazapi.com/files', url('/api/v1/download-file'), $response['fileURL']);
 
             return response()->json([
                 'success' => true,
