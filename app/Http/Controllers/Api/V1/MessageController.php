@@ -724,14 +724,14 @@ class MessageController extends Controller
 
             foreach ($response['messages'] as $message) {
 
-                if (!isset($messageTypes[$message['type']])) {
+                if (!isset($messageTypes[$message['messageType']])) {
                     // if($message['type'] == 'LocationMessage'){
                     //     $type = 'location';
                     // } else {
                     //     $type = 'unknown';
                     // }
 
-                    if ($message['type'] == 'AudioMessage' && !empty($message['sendPayload']['type']) && $message['sendPayload']['type'] == 'type') {
+                    if ($message['messageType'] == 'AudioMessage' && !empty($message['sendPayload']['type']) && $message['sendPayload']['type'] == 'myaudio') {
                         $type = 'record';
                     }
                 } else {
