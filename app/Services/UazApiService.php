@@ -1264,7 +1264,7 @@ class UazApiService
                 action: 'send_download_message',
                 connection: $connection,
                 metadata: [
-                    'recipient' => $payload['number'],
+                    'id' => $payload['id'],
                     'media_type' => $requestData['type'],
                 ]
             );
@@ -1286,7 +1286,7 @@ class UazApiService
                 action: 'send_download_message',
                 connection: $connection,
                 metadata: [
-                    'recipient' => $payload['number'],
+                    'id' => $payload['id'],
                     'media_type' => $requestData['type'] ?? null,
                 ]
             );
