@@ -53,9 +53,6 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('download', [V1MessageController::class, 'download'])
             ->name('api.messages.download');
 
-        Route::get('download-file/{fileId}', [V1MessageController::class, 'downloadFile'])
-            ->name('api.messages.download-file');
-
         Route::post('menu-list', [V1MessageController::class, 'menuList'])
             ->name('api.messages.menu-list');
 
@@ -267,3 +264,7 @@ Route::get('health', function () {
         'timestamp' => now()->toISOString()
     ]);
 })->name('api.health');
+
+// Rota pública para download de arquivos
+Route::get('v1/download-file/{fileId}', [V1MessageController::class, 'downloadFile'])
+    ->name('api.download-file');
