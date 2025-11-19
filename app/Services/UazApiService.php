@@ -1265,7 +1265,6 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'id' => $payload['id'],
-                    'media_type' => $requestData['type'],
                 ]
             );
 
@@ -1287,7 +1286,6 @@ class UazApiService
                 connection: $connection,
                 metadata: [
                     'id' => $payload['id'],
-                    'media_type' => $requestData['type'] ?? null,
                 ]
             );
 
