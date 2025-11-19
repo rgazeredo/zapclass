@@ -2266,7 +2266,6 @@ class UazApiService
 
         // Tradução dos campos da sua API para a API do UazAPI
         $requestData = [
-            'number' => $payload['number'],
             'text' => $payload['message'],
             'id' => $payload['id'],
         ];
@@ -2286,7 +2285,6 @@ class UazApiService
                 action: 'messages_react',
                 connection: $connection,
                 metadata: [
-                    'number' => $payload['number'],
                     'message' => $payload['message'],
                     'id' => $payload['id'],
                 ]
@@ -2309,7 +2307,6 @@ class UazApiService
                 action: 'messages_react',
                 connection: $connection,
                 metadata: [
-                    'number' => $payload['number'],
                     'message' => $payload['message'],
                     'id' => $payload['id'],
                 ]
