@@ -731,6 +731,8 @@ class MessageController extends Controller
                     //     $type = 'unknown';
                     // }
 
+                    $type = $messageTypes[$message['messageType']] ?? 'unknown';
+
                     if ($message['messageType'] == 'AudioMessage' && !empty($message['sendPayload']['type']) && $message['sendPayload']['type'] == 'myaudio') {
                         $type = 'record';
                     }
