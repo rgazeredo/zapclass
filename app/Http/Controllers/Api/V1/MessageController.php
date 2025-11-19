@@ -371,9 +371,9 @@ class MessageController extends Controller
             return response()->json([
                 'success' => true,
                 'url' => $url,
-                'base64' => $response['base64Data'],
-                'mimetype' => $response['mimetype'],
-                'transcription' => $response['transcription']
+                'base64' => $response['base64Data'] ?? null,
+                'mimetype' => $response['mimetype'] ?? null,
+                'transcription' => $response['transcription'] ?? null,
             ], 200);
         } catch (Exception $e) {
             Log::error('Erro ao baixar arquivo: ' . $e->getMessage());
