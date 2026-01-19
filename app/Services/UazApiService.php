@@ -2313,4 +2313,840 @@ class UazApiService
             throw $e;
         }
     }
+
+    // ==================== GRUPOS ====================
+
+    public function groupCreate(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/create';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'name' => $payload['name'],
+            'participants' => $payload['participants'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_create',
+                connection: $connection,
+                metadata: ['group_name' => $payload['name']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao criar grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_create',
+                connection: $connection,
+                metadata: ['group_name' => $payload['name']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupList(WhatsAppConnection $connection, array $payload = []): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/list';
+        $headers = [
+            'token' => $connection->token,
+            'Accept' => 'application/json',
+        ];
+
+        // Construir query params
+        $queryParams = [];
+        if (isset($payload['force'])) {
+            $queryParams['force'] = $payload['force'] ? 'true' : 'false';
+        }
+        if (isset($payload['no_participants'])) {
+            $queryParams['noparticipants'] = $payload['no_participants'] ? 'true' : 'false';
+        }
+
+        if (!empty($queryParams)) {
+            $url .= '?' . http_build_query($queryParams);
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->get($url);
+
+            $this->logger->logOutbound(
+                method: 'GET',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                response: $response,
+                action: 'group_list',
+                connection: $connection,
+                metadata: $queryParams
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao listar grupos: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'GET',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: [],
+                exception: $e,
+                action: 'group_list',
+                connection: $connection,
+                metadata: $queryParams
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupInfo(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/info';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+        ];
+
+        // Campos opcionais com mapeamento snake_case → camelCase
+        if (isset($payload['get_invite_link'])) {
+            $requestData['getInviteLink'] = (bool) $payload['get_invite_link'];
+        }
+        if (isset($payload['get_requests_participants'])) {
+            $requestData['getRequestsParticipants'] = (bool) $payload['get_requests_participants'];
+        }
+        if (isset($payload['force'])) {
+            $requestData['force'] = (bool) $payload['force'];
+        }
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_info',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao obter informações do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_info',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupInviteInfo(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/inviteInfo';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'invitecode' => $payload['invite_code'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_invite_info',
+                connection: $connection,
+                metadata: ['invite_code' => $payload['invite_code']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao obter informações do convite: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_invite_info',
+                connection: $connection,
+                metadata: ['invite_code' => $payload['invite_code']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupJoin(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/join';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'invitecode' => $payload['invite_code'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_join',
+                connection: $connection,
+                metadata: ['invite_code' => $payload['invite_code']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao entrar no grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_join',
+                connection: $connection,
+                metadata: ['invite_code' => $payload['invite_code']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupLeave(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/leave';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_leave',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao sair do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_leave',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupResetInviteCode(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/resetInviteCode';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_reset_invite_code',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao resetar código de convite: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_reset_invite_code',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateAnnounce(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateAnnounce';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'announce' => (bool) $payload['announce'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_announce',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid'], 'announce' => $payload['announce']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar anúncio do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_announce',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateDescription(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateDescription';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'description' => $payload['description'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_description',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar descrição do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_description',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateImage(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateImage';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'image' => $payload['image'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_image',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar imagem do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_image',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateLocked(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateLocked';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'locked' => (bool) $payload['locked'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_locked',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid'], 'locked' => $payload['locked']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar bloqueio do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_locked',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateName(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateName';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'name' => $payload['name'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_name',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid'], 'name' => $payload['name']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar nome do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_name',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function groupUpdateParticipants(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/group/updateParticipants';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'groupjid' => $payload['groupjid'],
+            'action' => $payload['action'],
+            'participants' => $payload['participants'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'group_update_participants',
+                connection: $connection,
+                metadata: [
+                    'groupjid' => $payload['groupjid'],
+                    'action' => $payload['action'],
+                    'participants_count' => count($payload['participants']),
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao atualizar participantes do grupo: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'group_update_participants',
+                connection: $connection,
+                metadata: ['groupjid' => $payload['groupjid'], 'action' => $payload['action']]
+            );
+
+            throw $e;
+        }
+    }
+
+    // ==================== COMUNIDADES ====================
+
+    public function communityCreate(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/community/create';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'name' => $payload['name'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'community_create',
+                connection: $connection,
+                metadata: ['community_name' => $payload['name']]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao criar comunidade: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'community_create',
+                connection: $connection,
+                metadata: ['community_name' => $payload['name']]
+            );
+
+            throw $e;
+        }
+    }
+
+    public function communityEditGroups(WhatsAppConnection $connection, array $payload): array
+    {
+        $account = $this->getConnectionAccount($connection);
+
+        $url = $account->base_url . '/community/editgroups';
+        $headers = [
+            'token' => $connection->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $requestData = [
+            'community' => $payload['community'],
+            'action' => $payload['action'],
+            'groupjids' => $payload['groupjids'],
+        ];
+
+        $this->logger->startTimer();
+
+        try {
+            $response = Http::withHeaders($headers)->post($url, $requestData);
+
+            $this->logger->logOutbound(
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                response: $response,
+                action: 'community_edit_groups',
+                connection: $connection,
+                metadata: [
+                    'community' => $payload['community'],
+                    'action' => $payload['action'],
+                    'groups_count' => count($payload['groupjids']),
+                ]
+            );
+
+            if (!$response->successful()) {
+                throw new Exception('Falha ao editar grupos da comunidade: ' . $response->body());
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            $this->logger->logException(
+                direction: 'outbound',
+                method: 'POST',
+                url: $url,
+                requestHeaders: $headers,
+                requestBody: $requestData,
+                exception: $e,
+                action: 'community_edit_groups',
+                connection: $connection,
+                metadata: ['community' => $payload['community'], 'action' => $payload['action']]
+            );
+
+            throw $e;
+        }
+    }
 }

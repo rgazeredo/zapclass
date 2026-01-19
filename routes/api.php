@@ -157,7 +157,7 @@ Route::prefix('v1')->middleware([ApiAuthentication::class])->group(function () {
         Route::post('update-announce', [V1GroupController::class, 'updateAnnounce'])
             ->name('api.groups.update-announce');
 
-        Route::get('invite-link', [V1GroupController::class, 'inviteLink'])
+        Route::post('invite-link', [V1GroupController::class, 'inviteLink'])
             ->name('api.groups.invite-link');
 
         Route::post('invite-info', [V1GroupController::class, 'inviteInfo'])

@@ -20,7 +20,9 @@
       "Bash(npm run build:*)",
       "Bash(npm run lint)",
       "Bash(git commit:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(php:*)",
+      "Bash(php -l:*)"
     ],
     "deny": [],
     "ask": []
